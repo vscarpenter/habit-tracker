@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CalendarCheck,
+  CalendarRange,
   CalendarDays,
   BarChart3,
   Settings,
@@ -17,8 +18,18 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const NAV_ITEMS: NavItem[] = [
+/** Mobile bottom nav: 4 items (Today, Week, Stats, Settings) */
+const MOBILE_NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Today", icon: CalendarCheck },
+  { href: "/week", label: "Week", icon: CalendarRange },
+  { href: "/stats", label: "Stats", icon: BarChart3 },
+  { href: "/settings", label: "Settings", icon: Settings },
+];
+
+/** Desktop sidebar: all 5 items */
+const SIDEBAR_NAV_ITEMS: NavItem[] = [
+  { href: "/", label: "Today", icon: CalendarCheck },
+  { href: "/week", label: "Week", icon: CalendarRange },
   { href: "/habits", label: "Habits", icon: CalendarDays },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -41,7 +52,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-3 space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {SIDEBAR_NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
 
@@ -88,7 +99,7 @@ export function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 lg:hidden bg-surface-elevated backdrop-blur-xl border-t border-border safe-area-bottom">
       <div className="flex items-center justify-around h-16">
-        {NAV_ITEMS.map((item) => {
+        {MOBILE_NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
 
