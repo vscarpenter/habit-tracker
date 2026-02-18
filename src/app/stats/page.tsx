@@ -13,11 +13,13 @@ import { NoStatsEmpty } from "@/components/shared/empty-state";
 import { StatsSkeleton } from "@/components/stats/stats-skeleton";
 import { StatsDateRange } from "@/components/stats/stats-date-range";
 import { OverallStatsRow } from "@/components/stats/overall-stats-row";
-import { CompletionTrendChart } from "@/components/stats/completion-trend-chart";
+import {
+  LazyCompletionTrendChart as CompletionTrendChart,
+  LazyCategoryBreakdown as CategoryBreakdown,
+  LazyWeeklyPatternChart as WeeklyPatternChart,
+} from "@/components/charts/lazy-charts";
 import { AggregateHeatmap } from "@/components/stats/aggregate-heatmap";
-import { CategoryBreakdown } from "@/components/stats/category-breakdown";
 import { HabitLeaderboard } from "@/components/stats/habit-leaderboard";
-import { WeeklyPatternChart } from "@/components/stats/weekly-pattern-chart";
 import {
   DATE_RANGE_PRESETS,
   computeOverallStats,

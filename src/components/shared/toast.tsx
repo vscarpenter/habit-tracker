@@ -64,7 +64,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      <div className="fixed bottom-20 lg:bottom-6 right-4 z-50 flex flex-col gap-2">
+      <div className="fixed bottom-20 lg:bottom-6 right-4 z-50 flex flex-col gap-2" aria-live="polite">
         {toasts.map((t) => {
           const Icon = ICONS[t.variant];
           return (
@@ -76,7 +76,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 "animate-fade-in min-w-[280px] max-w-[400px]",
                 VARIANT_STYLES[t.variant]
               )}
-              role="alert"
+              role={t.variant === "error" ? "alert" : "status"}
             >
               <Icon className="h-5 w-5 shrink-0" />
               <span className="text-sm font-medium text-text-primary flex-1">

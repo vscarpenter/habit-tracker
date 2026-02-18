@@ -44,6 +44,12 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-xl focus:bg-accent-blue focus:px-4 focus:py-2 focus:text-white focus:shadow-xl"
+        >
+          Skip to content
+        </a>
         <ThemeProvider>
           <ToastProvider>
             <AppShell>{children}</AppShell>

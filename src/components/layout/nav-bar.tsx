@@ -45,13 +45,13 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden lg:flex w-60 flex-col bg-surface backdrop-blur-xl border-r border-border">
+    <aside aria-label="Main navigation" className="fixed inset-y-0 left-0 z-40 hidden lg:flex w-60 flex-col bg-surface backdrop-blur-xl border-r border-border">
       <div className="p-6">
         <h1 className="text-xl font-bold text-text-primary">HabitFlow</h1>
         <p className="text-xs text-text-muted mt-1">Build better habits</p>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1">
+      <nav aria-label="Primary" className="flex-1 px-3 space-y-1">
         {SIDEBAR_NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
@@ -60,6 +60,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium",
                 "transition-colors duration-150",
@@ -97,7 +98,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 lg:hidden bg-surface-elevated backdrop-blur-xl border-t border-border safe-area-bottom">
+    <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 lg:hidden bg-surface-elevated backdrop-blur-xl border-t border-border safe-area-bottom">
       <div className="flex items-center justify-around h-16">
         {MOBILE_NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
@@ -107,6 +108,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 min-w-[64px] py-1",
                 "transition-colors duration-150",

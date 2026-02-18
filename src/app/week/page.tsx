@@ -11,6 +11,7 @@ import { useToday } from "@/hooks/use-today";
 import { useSettings } from "@/hooks/use-settings";
 import { useHabits } from "@/hooks/use-habits";
 import { useWeekCompletions } from "@/hooks/use-week-completions";
+import { useKeyboardShortcuts, type ShortcutConfig } from "@/hooks/use-keyboard-shortcuts";
 import { getWeekStart, getWeekDates } from "@/lib/date-utils";
 
 export default function WeekPage() {
@@ -35,6 +36,16 @@ export default function WeekPage() {
 
   const isCurrentWeek = weekOffset === 0;
   const weekLabel = `${format(weekStart, "MMM d")} – ${format(addDays(weekStart, 6), "MMM d, yyyy")}`;
+
+  const arrowShortcuts = useMemo<ShortcutConfig[]>(
+    () => [
+      { key: "ArrowLeft", handler: () => setWeekOffset((o) => o - 1) },
+      { key: "ArrowRight", handler: () => setWeekOffset((o) => o + 1) },
+    ],
+    []
+  );
+
+  useKeyboardShortcuts(arrowShortcuts);
 
   return (
     <PageContainer>

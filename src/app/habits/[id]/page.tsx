@@ -9,8 +9,10 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { HabitDetailHeader } from "@/components/habits/habit-detail-header";
 import { HabitStatsGrid } from "@/components/habits/habit-stats-grid";
 import { HabitCalendarHeatmap } from "@/components/habits/habit-calendar-heatmap";
-import { HabitMonthlyChart } from "@/components/habits/habit-monthly-chart";
-import { HabitWeeklyPattern } from "@/components/habits/habit-weekly-pattern";
+import {
+  LazyHabitMonthlyChart as HabitMonthlyChart,
+  LazyHabitWeeklyPattern as HabitWeeklyPattern,
+} from "@/components/charts/lazy-charts";
 import { HabitRecentHistory } from "@/components/habits/habit-recent-history";
 import { useHabit } from "@/hooks/use-habit";
 import { useHabitStats } from "@/hooks/use-habit-stats";
