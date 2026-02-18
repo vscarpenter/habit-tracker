@@ -4,9 +4,7 @@ import {
   subDays,
   differenceInCalendarDays,
   startOfWeek,
-  eachDayOfInterval,
   subWeeks,
-  getDay,
 } from "date-fns";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import type { Habit, HabitCompletion } from "@/types";
@@ -73,6 +71,72 @@ export const DATE_RANGE_PRESETS: DateRangePreset[] = [
   { label: "All", value: "all", days: 0 },
 ];
 
+// ── Streak / Rate Helpers ──────────────────────────────
+
+/** Walks backwards from today; skips today if not yet completed. */
+function calcCurrentStreak(
+  habit: Habit,
+  completedDates: Set<string>,
+  today: string,
+  daysSinceCreation: number
+): number {
+  let streak = 0;
+  for (let i = 0; i <= daysSinceCreation; i++) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!isHabitScheduledForDate(habit, dateStr)) continue;
+
+    if (completedDates.has(dateStr)) {
+      streak++;
+    } else if (i === 0) {
+      continue; // Today not yet completed — don't break streak
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+/** Walks forward from creation to find the longest consecutive run. */
+function calcBestStreak(
+  habit: Habit,
+  completedDates: Set<string>,
+  today: string,
+  daysSinceCreation: number
+): number {
+  let best = 0;
+  let run = 0;
+  for (let i = daysSinceCreation; i >= 0; i--) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!isHabitScheduledForDate(habit, dateStr)) continue;
+
+    if (completedDates.has(dateStr)) {
+      run++;
+      best = Math.max(best, run);
+    } else {
+      run = 0;
+    }
+  }
+  return best;
+}
+
+/** Counts scheduled days and completed scheduled days. */
+function calcCompletionRate(
+  habit: Habit,
+  completedDates: Set<string>,
+  today: string,
+  daysSinceCreation: number
+): number {
+  let scheduled = 0;
+  let completed = 0;
+  for (let i = 0; i <= daysSinceCreation; i++) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!isHabitScheduledForDate(habit, dateStr)) continue;
+    scheduled++;
+    if (completedDates.has(dateStr)) completed++;
+  }
+  return scheduled > 0 ? Math.round((completed / scheduled) * 100) : 0;
+}
+
 // ── Per-Habit Stats ────────────────────────────────────
 
 export function computeHabitStats(
@@ -82,7 +146,6 @@ export function computeHabitStats(
 ): HabitStatsResult {
   const habitCompletions = completions.filter((c) => c.habitId === habit.id);
   const completedDates = new Set(habitCompletions.map((c) => c.date));
-  const totalCompletions = habitCompletions.length;
 
   const createdDate = habit.createdAt.split("T")[0];
   const daysSinceCreation = differenceInCalendarDays(
@@ -90,54 +153,12 @@ export function computeHabitStats(
     parseISO(createdDate)
   );
 
-  // Completion rate: completed scheduled days / total scheduled days
-  let scheduledDays = 0;
-  let completedScheduledDays = 0;
-  for (let i = 0; i <= daysSinceCreation; i++) {
-    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
-    if (!isHabitScheduledForDate(habit, dateStr)) continue;
-    scheduledDays++;
-    if (completedDates.has(dateStr)) completedScheduledDays++;
-  }
-
-  // Current streak: walk backwards from today, skip today if not completed
-  let currentStreak = 0;
-  let foundMissedDay = false;
-  for (let i = 0; i <= daysSinceCreation && !foundMissedDay; i++) {
-    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
-    if (!isHabitScheduledForDate(habit, dateStr)) continue;
-
-    if (completedDates.has(dateStr)) {
-      currentStreak++;
-    } else if (i === 0) {
-      // Today not yet completed — don't break streak
-      continue;
-    } else {
-      foundMissedDay = true;
-    }
-  }
-
-  // Best streak: walk forward from creation
-  let bestStreak = 0;
-  let tempStreak = 0;
-  for (let i = daysSinceCreation; i >= 0; i--) {
-    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
-    if (!isHabitScheduledForDate(habit, dateStr)) continue;
-
-    if (completedDates.has(dateStr)) {
-      tempStreak++;
-      bestStreak = Math.max(bestStreak, tempStreak);
-    } else {
-      tempStreak = 0;
-    }
-  }
-
-  const completionRate =
-    scheduledDays > 0
-      ? Math.round((completedScheduledDays / scheduledDays) * 100)
-      : 0;
-
-  return { currentStreak, bestStreak, totalCompletions, completionRate };
+  return {
+    currentStreak: calcCurrentStreak(habit, completedDates, today, daysSinceCreation),
+    bestStreak: calcBestStreak(habit, completedDates, today, daysSinceCreation),
+    totalCompletions: habitCompletions.length,
+    completionRate: calcCompletionRate(habit, completedDates, today, daysSinceCreation),
+  };
 }
 
 // ── Overall / Aggregate Stats ──────────────────────────
@@ -209,31 +230,21 @@ export function buildDailyCompletionTrend(
 
 // ── Aggregate Heatmap (52-week) ────────────────────────
 
-export function buildAggregateHeatmapData(
-  completions: HabitCompletion[],
+const HEATMAP_WEEKS = 52;
+const DAYS_PER_WEEK = 7;
+
+function buildHeatmapGrid(
+  gridStart: Date,
   today: string,
-  weekStartsOn: 0 | 1 = 0
-): AggregateHeatmapData {
-  const WEEKS = 52;
-  const todayDate = parseISO(today);
-  const weekEnd = startOfWeek(todayDate, { weekStartsOn });
-  const gridStart = subWeeks(weekEnd, WEEKS - 1);
-  const allDays = eachDayOfInterval({ start: gridStart, end: todayDate });
-
-  // Count completions per date
-  const countMap = new Map<string, number>();
-  for (const c of completions) {
-    countMap.set(c.date, (countMap.get(c.date) ?? 0) + 1);
-  }
-
-  // Build columns (one per week, 7 rows each)
+  countMap: Map<string, number>
+): { columns: HeatmapCell[][]; maxCount: number } {
   const columns: HeatmapCell[][] = [];
   let currentWeekStart = gridStart;
   let maxCount = 0;
 
-  for (let w = 0; w < WEEKS; w++) {
+  for (let w = 0; w < HEATMAP_WEEKS; w++) {
     const col: HeatmapCell[] = [];
-    for (let d = 0; d < 7; d++) {
+    for (let d = 0; d < DAYS_PER_WEEK; d++) {
       const date = new Date(currentWeekStart);
       date.setDate(date.getDate() + d);
       const dateStr = format(date, "yyyy-MM-dd");
@@ -243,24 +254,42 @@ export function buildAggregateHeatmapData(
     }
     columns.push(col);
     currentWeekStart = new Date(currentWeekStart);
-    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    currentWeekStart.setDate(currentWeekStart.getDate() + DAYS_PER_WEEK);
   }
+  return { columns, maxCount };
+}
 
-  // Month labels
-  const monthLabels: { col: number; label: string }[] = [];
+function buildMonthLabels(
+  columns: HeatmapCell[][]
+): { col: number; label: string }[] {
+  const labels: { col: number; label: string }[] = [];
   let lastMonth = "";
   for (let w = 0; w < columns.length; w++) {
     const month = columns[w][0].date.slice(0, 7);
     if (month !== lastMonth) {
-      monthLabels.push({
-        col: w,
-        label: format(parseISO(columns[w][0].date), "MMM"),
-      });
+      labels.push({ col: w, label: format(parseISO(columns[w][0].date), "MMM") });
       lastMonth = month;
     }
   }
+  return labels;
+}
 
-  return { grid: columns, monthLabels, maxCount };
+export function buildAggregateHeatmapData(
+  completions: HabitCompletion[],
+  today: string,
+  weekStartsOn: 0 | 1 = 0
+): AggregateHeatmapData {
+  const todayDate = parseISO(today);
+  const weekEnd = startOfWeek(todayDate, { weekStartsOn });
+  const gridStart = subWeeks(weekEnd, HEATMAP_WEEKS - 1);
+
+  const countMap = new Map<string, number>();
+  for (const c of completions) {
+    countMap.set(c.date, (countMap.get(c.date) ?? 0) + 1);
+  }
+
+  const { columns, maxCount } = buildHeatmapGrid(gridStart, today, countMap);
+  return { grid: columns, monthLabels: buildMonthLabels(columns), maxCount };
 }
 
 // ── Category Breakdown ─────────────────────────────────

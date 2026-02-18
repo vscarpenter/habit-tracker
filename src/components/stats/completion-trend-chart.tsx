@@ -15,11 +15,16 @@ interface CompletionTrendChartProps {
   data: DailyCompletionEntry[];
 }
 
+/** Picks an x-axis tick interval that avoids label crowding at any range. */
+function pickLabelInterval(pointCount: number): number {
+  if (pointCount > 60) return 13;  // ~90D/1Y: biweekly labels
+  if (pointCount > 14) return 6;   // ~30D: weekly labels
+  return 1;                         // 7D: every day
+}
+
 export function CompletionTrendChart({ data }: CompletionTrendChartProps) {
   const maxCount = Math.max(...data.map((d) => d.count), 1);
-
-  // Show abbreviated dates on x-axis: show every Nth label to avoid crowding
-  const labelInterval = data.length > 60 ? 13 : data.length > 14 ? 6 : 1;
+  const labelInterval = pickLabelInterval(data.length);
 
   return (
     <Card>
