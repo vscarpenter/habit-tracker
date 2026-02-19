@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { AppShell } from "@/components/layout/app-shell";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { ToastProvider } from "@/components/shared/toast";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import "./globals.css";
 
 const inter = Inter({
@@ -52,7 +53,9 @@ export default function RootLayout({
         </a>
         <ThemeProvider>
           <ToastProvider>
-            <AppShell>{children}</AppShell>
+            <AppShell>
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </AppShell>
           </ToastProvider>
         </ThemeProvider>
       </body>

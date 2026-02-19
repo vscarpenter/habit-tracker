@@ -12,6 +12,15 @@ import { isHabitScheduledForDate } from "@/lib/date-utils";
 import { format, parseISO } from "date-fns";
 
 const MAX_DIGIT_SHORTCUTS = 9;
+const AFTERNOON_HOUR = 12;
+const EVENING_HOUR = 18;
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < AFTERNOON_HOUR) return "Good morning";
+  if (hour < EVENING_HOUR) return "Good afternoon";
+  return "Good evening";
+}
 
 export default function DashboardPage() {
   const today = useToday();
@@ -19,7 +28,7 @@ export default function DashboardPage() {
   const { completions, loading: completionsLoading, toggle, isCompleted } =
     useCompletions(today);
 
-  const formatted = format(parseISO(today), "EEEE, MMMM d");
+  const formatted = `${getGreeting()} — ${format(parseISO(today), "EEEE, MMMM d")}`;
 
   const scheduledHabits = useMemo(
     () =>

@@ -7,7 +7,13 @@ import { DataManagement } from "./data-management";
 import { AboutSection } from "./about-section";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import type { Theme } from "@/types";
+
+const VIEW_OPTIONS = [
+  { value: "today" as const, label: "Today" },
+  { value: "week" as const, label: "Week" },
+];
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -93,6 +99,33 @@ export function SettingsContent() {
             checked={settings.showCompletionRate}
             onCheckedChange={(showCompletionRate) => update({ showCompletionRate })}
           />
+        </SettingRow>
+
+        <SettingRow
+          label="Default view"
+          description="Choose which view to show on launch"
+        >
+          <div className="flex gap-1" role="radiogroup" aria-label="Default view">
+            {VIEW_OPTIONS.map(({ value, label }) => {
+              const active = settings.defaultView === value;
+              return (
+                <button
+                  key={value}
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => update({ defaultView: value })}
+                  className={cn(
+                    "rounded-xl px-3 py-1.5 text-sm font-medium transition-colors duration-150",
+                    active
+                      ? "bg-accent-blue/10 text-accent-blue"
+                      : "text-text-secondary hover:bg-surface-elevated hover:text-text-primary"
+                  )}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </SettingRow>
       </Card>
 
