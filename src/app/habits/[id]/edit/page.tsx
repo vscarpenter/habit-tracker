@@ -12,6 +12,8 @@ import { useToast } from "@/components/shared/toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Habit } from "@/types";
 
+const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
+
 export default function EditHabitPage({
   params,
 }: {
@@ -32,15 +34,25 @@ export default function EditHabitPage({
   }, [habits, id, loading]);
 
   const handleSubmit = async (data: Parameters<typeof update>[1]) => {
-    await update(id, data);
-    toast("Changes saved!", "success");
-    router.push("/habits");
+    try {
+      await update(id, data);
+      toast("Changes saved!", "success");
+      router.push("/habits");
+    } catch (error) {
+      console.error("Failed to update habit:", error);
+      toast(DB_ERROR_MSG, "error");
+    }
   };
 
   const handleArchive = async () => {
-    await archive(id);
-    toast("Habit archived. You can restore it from the habits list.", "success");
-    router.push("/habits");
+    try {
+      await archive(id);
+      toast("Habit archived. You can restore it from the habits list.", "success");
+      router.push("/habits");
+    } catch (error) {
+      console.error("Failed to archive habit:", error);
+      toast(DB_ERROR_MSG, "error");
+    }
   };
 
   if (loading) {

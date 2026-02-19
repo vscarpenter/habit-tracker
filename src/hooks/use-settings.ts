@@ -2,11 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { settingsService } from "@/db/settings-service";
+import { useToast } from "@/components/shared/toast";
 import type { UserSettings } from "@/types";
+
+const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 export function useSettings() {
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const refresh = useCallback(async () => {
     try {
@@ -14,10 +18,11 @@ export function useSettings() {
       setSettings(data);
     } catch (error) {
       console.error("Failed to load settings:", error);
+      toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     refresh();
@@ -25,11 +30,17 @@ export function useSettings() {
 
   const update = useCallback(
     async (changes: Partial<Omit<UserSettings, "id" | "createdAt" | "updatedAt">>) => {
-      const updated = await settingsService.update(changes);
-      setSettings(updated);
-      return updated;
+      try {
+        const updated = await settingsService.update(changes);
+        setSettings(updated);
+        return updated;
+      } catch (error) {
+        console.error("Failed to update settings:", error);
+        toast(DB_ERROR_MSG, "error");
+        return settings;
+      }
     },
-    []
+    [settings, toast]
   );
 
   return { settings, loading, update, refresh };

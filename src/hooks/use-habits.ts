@@ -2,12 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { habitService } from "@/db/habit-service";
+import { useToast } from "@/components/shared/toast";
 import type { Habit } from "@/types";
 import type { CreateHabitInput, UpdateHabitInput } from "@/db/schemas";
+
+const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 export function useHabits() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const refresh = useCallback(async () => {
     try {
@@ -15,10 +19,11 @@ export function useHabits() {
       setHabits(all);
     } catch (error) {
       console.error("Failed to load habits:", error);
+      toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     refresh();

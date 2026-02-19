@@ -29,11 +29,6 @@ export interface ImportValidationResult {
   errors?: string[];
 }
 
-export interface ImportSummary {
-  habitsImported: number;
-  completionsImported: number;
-}
-
 // ── Export ────────────────────────────────────────────────────────────
 
 export async function buildExportPayload(): Promise<ExportData> {
@@ -88,8 +83,8 @@ export function validateImportData(raw: unknown): ImportValidationResult {
   return { valid: false, errors };
 }
 
-export async function applyImport(data: ExportData): Promise<ImportSummary> {
-  return db.transaction(
+export async function applyImport(data: ExportData): Promise<void> {
+  await db.transaction(
     "rw",
     [db.habits, db.completions, db.settings],
     async () => {
@@ -100,11 +95,6 @@ export async function applyImport(data: ExportData): Promise<ImportSummary> {
       await db.habits.bulkPut(data.data.habits);
       await db.completions.bulkPut(data.data.completions);
       await db.settings.put(data.data.settings);
-
-      return {
-        habitsImported: data.data.habits.length,
-        completionsImported: data.data.completions.length,
-      };
     }
   );
 }

@@ -1,9 +1,4 @@
 import {
-  isMonday,
-  isTuesday,
-  isWednesday,
-  isThursday,
-  isFriday,
   isSaturday,
   isSunday,
   getDay,
@@ -64,10 +59,6 @@ export function frequencyLabel(habit: Habit): string {
       return "";
   }
 }
-
-const DAY_CHECKERS = [isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday];
-
-export { DAY_CHECKERS };
 
 /**
  * Returns the start-of-week Date for the given date string.

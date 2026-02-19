@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { completionService } from "@/db/completion-service";
+import { useToast } from "@/components/shared/toast";
 import { computeHabitStats } from "@/lib/stats-utils";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import type { Habit, HabitCompletion } from "@/types";
 import type { HabitStatsResult } from "@/lib/stats-utils";
+
+const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 // Re-export for backward compatibility
 export type HabitStats = HabitStatsResult;
@@ -21,6 +24,7 @@ export function useHabitStats(habit: Habit | null, today: string) {
     completionRate: 0,
   });
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const calculate = useCallback(async () => {
     if (!habit) return;
@@ -31,10 +35,11 @@ export function useHabitStats(habit: Habit | null, today: string) {
       setStats(result);
     } catch (error) {
       console.error("Failed to calculate habit stats:", error);
+      toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);
     }
-  }, [habit, today]);
+  }, [habit, today, toast]);
 
   useEffect(() => {
     calculate();

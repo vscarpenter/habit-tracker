@@ -2,11 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { completionService } from "@/db/completion-service";
+import { useToast } from "@/components/shared/toast";
 import type { HabitCompletion } from "@/types";
+
+const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 export function useCompletions(date: string) {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const refresh = useCallback(async () => {
     try {
@@ -14,10 +18,11 @@ export function useCompletions(date: string) {
       setCompletions(data);
     } catch (error) {
       console.error("Failed to load completions:", error);
+      toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);
     }
-  }, [date]);
+  }, [date, toast]);
 
   useEffect(() => {
     refresh();
@@ -48,11 +53,11 @@ export function useCompletions(date: string) {
         await refresh();
       } catch (error) {
         console.error("Failed to toggle completion:", error);
-        // Rollback on error
+        toast(DB_ERROR_MSG, "error");
         await refresh();
       }
     },
-    [completions, date, refresh]
+    [completions, date, refresh, toast]
   );
 
   const isCompleted = useCallback(
@@ -69,6 +74,7 @@ export function useCompletions(date: string) {
 export function useCompletionRange(startDate: string, endDate: string) {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const refresh = useCallback(async () => {
     try {
@@ -76,10 +82,11 @@ export function useCompletionRange(startDate: string, endDate: string) {
       setCompletions(data);
     } catch (error) {
       console.error("Failed to load completions range:", error);
+      toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate, toast]);
 
   useEffect(() => {
     refresh();

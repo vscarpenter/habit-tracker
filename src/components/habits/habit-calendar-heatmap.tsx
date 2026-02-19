@@ -3,11 +3,9 @@
 import { useMemo } from "react";
 import {
   startOfWeek,
-  eachDayOfInterval,
   subWeeks,
   format,
   parseISO,
-  getDay,
 } from "date-fns";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -35,7 +33,6 @@ export function HabitCalendarHeatmap({
     const weekEnd = startOfWeek(todayDate, { weekStartsOn });
     const gridStart = subWeeks(weekEnd, WEEKS - 1);
 
-    const allDays = eachDayOfInterval({ start: gridStart, end: todayDate });
     const completedDates = new Set(completions.map((c) => c.date));
 
     // Build a 7 x WEEKS grid (rows = days of week, cols = weeks)

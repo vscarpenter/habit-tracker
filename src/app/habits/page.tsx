@@ -14,6 +14,8 @@ import { useHabits } from "@/hooks/use-habits";
 import { useToast } from "@/components/shared/toast";
 import { Plus, Search } from "lucide-react";
 
+const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
+
 export default function HabitsPage() {
   const {
     activeHabits,
@@ -50,18 +52,33 @@ export default function HabitsPage() {
   }, [activeHabits, search, categoryFilter]);
 
   const handleArchive = async (id: string) => {
-    await archive(id);
-    toast("Habit archived.", "success");
+    try {
+      await archive(id);
+      toast("Habit archived.", "success");
+    } catch (error) {
+      console.error("Failed to archive habit:", error);
+      toast(DB_ERROR_MSG, "error");
+    }
   };
 
   const handleRestore = async (id: string) => {
-    await restore(id);
-    toast("Habit restored!", "success");
+    try {
+      await restore(id);
+      toast("Habit restored!", "success");
+    } catch (error) {
+      console.error("Failed to restore habit:", error);
+      toast(DB_ERROR_MSG, "error");
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await remove(id);
-    toast("Habit permanently deleted.", "success");
+    try {
+      await remove(id);
+      toast("Habit permanently deleted.", "success");
+    } catch (error) {
+      console.error("Failed to delete habit:", error);
+      toast(DB_ERROR_MSG, "error");
+    }
   };
 
   const handleMoveUp = async (id: string) => {
@@ -69,7 +86,12 @@ export default function HabitsPage() {
     if (idx <= 0) return;
     const ids = activeHabits.map((h) => h.id);
     [ids[idx - 1], ids[idx]] = [ids[idx], ids[idx - 1]];
-    await reorder(ids);
+    try {
+      await reorder(ids);
+    } catch (error) {
+      console.error("Failed to reorder habits:", error);
+      toast(DB_ERROR_MSG, "error");
+    }
   };
 
   const handleMoveDown = async (id: string) => {
@@ -77,7 +99,12 @@ export default function HabitsPage() {
     if (idx < 0 || idx >= activeHabits.length - 1) return;
     const ids = activeHabits.map((h) => h.id);
     [ids[idx], ids[idx + 1]] = [ids[idx + 1], ids[idx]];
-    await reorder(ids);
+    try {
+      await reorder(ids);
+    } catch (error) {
+      console.error("Failed to reorder habits:", error);
+      toast(DB_ERROR_MSG, "error");
+    }
   };
 
   if (loading) {
