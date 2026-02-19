@@ -7,6 +7,8 @@ import { TodayView } from "@/components/dashboard/today-view";
 import { useHabits } from "@/hooks/use-habits";
 import { useCompletions } from "@/hooks/use-completions";
 import { useToday } from "@/hooks/use-today";
+import { useSettings } from "@/hooks/use-settings";
+import { useStreaks } from "@/hooks/use-streaks";
 import { useKeyboardShortcuts, type ShortcutConfig } from "@/hooks/use-keyboard-shortcuts";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import { format, parseISO } from "date-fns";
@@ -27,6 +29,9 @@ export default function DashboardPage() {
   const { habits, loading: habitsLoading } = useHabits();
   const { completions, loading: completionsLoading, toggle, isCompleted } =
     useCompletions(today);
+  const { settings } = useSettings();
+  const showStreaks = settings?.showStreaks ?? true;
+  const { streakMap } = useStreaks(habits, today);
 
   const formatted = `${getGreeting()} — ${format(parseISO(today), "EEEE, MMMM d")}`;
 
@@ -59,6 +64,8 @@ export default function DashboardPage() {
         loading={habitsLoading || completionsLoading}
         onToggle={toggle}
         isCompleted={isCompleted}
+        showStreaks={showStreaks}
+        streakMap={streakMap}
       />
     </PageContainer>
   );

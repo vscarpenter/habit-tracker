@@ -21,6 +21,7 @@ const GLOBAL_SHORTCUTS: ShortcutEntry[] = [
   { keys: ["N"], description: "New habit" },
   { keys: ["T"], description: "Go to Today" },
   { keys: ["W"], description: "Go to Week" },
+  { keys: ["M"], description: "Go to Month" },
   { keys: ["S"], description: "Go to Stats" },
   { keys: ["?"], description: "Show shortcuts" },
   { keys: ["\u2318", "K"], description: "Command palette" },
@@ -28,8 +29,8 @@ const GLOBAL_SHORTCUTS: ShortcutEntry[] = [
 
 const PAGE_SHORTCUTS: ShortcutEntry[] = [
   { keys: ["1"], description: "Toggle 1st habit (Today)" },
-  { keys: ["\u2190"], description: "Previous week (Week)" },
-  { keys: ["\u2192"], description: "Next week (Week)" },
+  { keys: ["\u2190"], description: "Previous week/month" },
+  { keys: ["\u2192"], description: "Next week/month" },
 ];
 
 function Kbd({ children }: { children: React.ReactNode }) {

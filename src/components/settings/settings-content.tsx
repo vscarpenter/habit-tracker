@@ -13,6 +13,7 @@ import type { Theme } from "@/types";
 const VIEW_OPTIONS = [
   { value: "today" as const, label: "Today" },
   { value: "week" as const, label: "Week" },
+  { value: "month" as const, label: "Month" },
 ];
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {

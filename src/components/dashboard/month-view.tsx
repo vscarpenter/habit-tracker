@@ -4,29 +4,29 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
-import { WeekCell } from "./week-cell";
+import { MonthCell } from "./month-cell";
 import { NoHabitsEmpty } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import type { Habit } from "@/types";
 
-interface WeekViewProps {
+interface MonthViewProps {
   habits: Habit[];
-  weekDates: string[];
+  monthDates: string[];
   today: string;
   isCompleted: (habitId: string, date: string) => boolean;
   onToggle: (habitId: string, date: string) => void;
   loading: boolean;
 }
 
-export function WeekView({
+export function MonthView({
   habits,
-  weekDates,
+  monthDates,
   today,
   isCompleted,
   onToggle,
   loading,
-}: WeekViewProps) {
+}: MonthViewProps) {
   const activeHabits = useMemo(
     () =>
       habits
@@ -35,25 +35,10 @@ export function WeekView({
     [habits]
   );
 
+  const daysCount = monthDates.length;
+
   if (loading) {
-    return (
-      <div className="space-y-3">
-        <div className="grid grid-cols-8 gap-2">
-          <Skeleton className="h-8 rounded-lg" />
-          {Array.from({ length: 7 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 rounded-lg" />
-          ))}
-        </div>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="grid grid-cols-8 gap-2">
-            <Skeleton className="h-11 rounded-lg" />
-            {Array.from({ length: 7 }).map((_, j) => (
-              <Skeleton key={j} className="h-11 rounded-full mx-auto w-8" />
-            ))}
-          </div>
-        ))}
-      </div>
-    );
+    return <MonthSkeleton daysCount={daysCount} />;
   }
 
   if (activeHabits.length === 0) {
@@ -69,45 +54,38 @@ export function WeekView({
         )}
       >
         <div
-          className="grid gap-x-1 gap-y-0 min-w-[520px]"
+          className="grid gap-x-0 gap-y-0"
           style={{
-            gridTemplateColumns: "140px repeat(7, minmax(44px, 1fr))",
+            gridTemplateColumns: `140px repeat(${daysCount}, minmax(28px, 1fr))`,
+            minWidth: `${140 + daysCount * 30}px`,
           }}
         >
-          {/* Header row */}
+          {/* Header row: day numbers */}
           <div />
-          {weekDates.map((date) => {
+          {monthDates.map((date) => {
             const isToday = date === today;
-            const parsed = parseISO(date);
+            const dayNum = format(parseISO(date), "d");
             return (
               <div
                 key={date}
                 className={cn(
-                  "flex flex-col items-center py-2 rounded-xl text-center",
-                  isToday && "bg-accent-blue/10"
+                  "flex items-center justify-center h-8 text-[10px] font-medium",
+                  isToday
+                    ? "text-accent-blue font-bold"
+                    : "text-text-muted"
                 )}
               >
-                <span className="text-[10px] font-medium text-text-muted uppercase">
-                  {format(parsed, "EEE")}
-                </span>
-                <span
-                  className={cn(
-                    "text-sm font-semibold mt-0.5",
-                    isToday ? "text-accent-blue" : "text-text-primary"
-                  )}
-                >
-                  {format(parsed, "d")}
-                </span>
+                {dayNum}
               </div>
             );
           })}
 
           {/* Habit rows */}
           {activeHabits.map((habit, idx) => (
-            <HabitRow
+            <MonthHabitRow
               key={habit.id}
               habit={habit}
-              weekDates={weekDates}
+              monthDates={monthDates}
               today={today}
               isCompleted={isCompleted}
               onToggle={onToggle}
@@ -120,52 +98,81 @@ export function WeekView({
   );
 }
 
-interface HabitRowProps {
+interface MonthHabitRowProps {
   habit: Habit;
-  weekDates: string[];
+  monthDates: string[];
   today: string;
   isCompleted: (habitId: string, date: string) => boolean;
   onToggle: (habitId: string, date: string) => void;
   isLast: boolean;
 }
 
-function HabitRow({ habit, weekDates, today, isCompleted, onToggle, isLast }: HabitRowProps) {
+function MonthHabitRow({
+  habit,
+  monthDates,
+  today,
+  isCompleted,
+  onToggle,
+  isLast,
+}: MonthHabitRowProps) {
   return (
     <>
-      {/* Sticky name column */}
       <Link
         href={`/habits/${habit.id}`}
         className={cn(
-          "flex items-center gap-2 min-h-[44px] pr-2 sticky left-0",
-          "bg-surface-elevated z-10 hover:bg-surface-elevated/80 transition-colors duration-150",
+          "flex items-center gap-2 min-h-[36px] pr-2 sticky left-0",
+          "bg-surface-elevated z-10",
           !isLast && "border-b border-border-subtle/30"
         )}
       >
-        <span className="text-base shrink-0">{habit.icon}</span>
-        <span className="text-sm font-medium text-text-primary truncate">
+        <span className="text-sm shrink-0">{habit.icon}</span>
+        <span className="text-xs font-medium text-text-primary truncate">
           {habit.name}
         </span>
       </Link>
 
-      {/* 7 day cells */}
-      {weekDates.map((date) => {
+      {monthDates.map((date) => {
         const scheduled = isHabitScheduledForDate(habit, date);
         const isFuture = date > today;
         return (
           <div
             key={date}
-            className={cn(!isLast && "border-b border-border-subtle/30")}
+            className={cn(
+              "flex items-center justify-center min-h-[36px]",
+              date === today && "bg-accent-blue/5",
+              !isLast && "border-b border-border-subtle/30"
+            )}
           >
-            <WeekCell
+            <MonthCell
               scheduled={scheduled && !isFuture}
               completed={isCompleted(habit.id, date)}
               color={habit.color}
-              isToday={date === today}
               onToggle={() => onToggle(habit.id, date)}
             />
           </div>
         );
       })}
     </>
+  );
+}
+
+function MonthSkeleton({ daysCount }: { daysCount: number }) {
+  return (
+    <div className="rounded-2xl bg-surface-elevated border border-border p-4 space-y-3">
+      <div className="flex gap-1">
+        <Skeleton className="h-6 w-[140px] rounded-lg" />
+        {Array.from({ length: Math.min(daysCount, 15) }).map((_, i) => (
+          <Skeleton key={i} className="h-6 w-7 rounded-lg" />
+        ))}
+      </div>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex gap-1">
+          <Skeleton className="h-8 w-[140px] rounded-lg" />
+          {Array.from({ length: Math.min(daysCount, 15) }).map((_, j) => (
+            <Skeleton key={j} className="h-7 w-7 rounded-md" />
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }

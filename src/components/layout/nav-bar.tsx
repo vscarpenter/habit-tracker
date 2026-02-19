@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   CalendarRange,
   CalendarDays,
+  ListChecks,
   BarChart3,
   Settings,
   Plus,
@@ -18,19 +19,21 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-/** Mobile bottom nav: 4 items (Today, Week, Stats, Settings) */
+/** Mobile bottom nav: 5 items (Today, Week, Month, Stats, Settings) */
 const MOBILE_NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Today", icon: CalendarCheck },
   { href: "/week", label: "Week", icon: CalendarRange },
+  { href: "/month", label: "Month", icon: CalendarDays },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-/** Desktop sidebar: all 5 items */
+/** Desktop sidebar: all 6 items */
 const SIDEBAR_NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Today", icon: CalendarCheck },
   { href: "/week", label: "Week", icon: CalendarRange },
-  { href: "/habits", label: "Habits", icon: CalendarDays },
+  { href: "/month", label: "Month", icon: CalendarDays },
+  { href: "/habits", label: "Habits", icon: ListChecks },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

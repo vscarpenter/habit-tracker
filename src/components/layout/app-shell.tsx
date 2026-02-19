@@ -28,6 +28,7 @@ export function AppShell({ children }: AppShellProps) {
       { key: "n", handler: () => router.push("/habits/new") },
       { key: "t", handler: () => router.push("/") },
       { key: "w", handler: () => router.push("/week") },
+      { key: "m", handler: () => router.push("/month") },
       { key: "s", handler: () => router.push("/stats") },
       { key: "?", handler: () => setShortcutsOpen(true) },
       { key: "k", ctrlOrCmd: true, handler: () => setPaletteOpen(true) },
