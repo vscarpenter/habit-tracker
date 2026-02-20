@@ -147,13 +147,16 @@ attach_policy_to_distribution() {
     --arg pid "$POLICY_ID" \
     '.DistributionConfig.DefaultCacheBehavior.ResponseHeadersPolicyId = $pid | .DistributionConfig')
 
-  aws cloudfront update-distribution \
+  if aws cloudfront update-distribution \
     --id "${DIST_ID}" \
     --distribution-config "$updated_config" \
     --if-match "$etag" \
-    --no-cli-pager > /dev/null
-
-  echo "Policy attached to distribution ${DIST_ID}"
+    --no-cli-pager > /dev/null 2>&1; then
+    echo "Policy attached to distribution ${DIST_ID}"
+  else
+    echo "Warning: Could not attach response headers policy (distribution may be on Free pricing plan)." >&2
+    echo "Deploy will continue. Re-run after switching to on-demand pricing." >&2
+  fi
 }
 
 echo "Building..."
