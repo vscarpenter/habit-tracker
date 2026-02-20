@@ -2,51 +2,88 @@
 
 /* ─── Light Mode (default) ───────────────────────────────── */
 :root {
-  --background: #f8fafc;
-  --surface: rgba(255, 255, 255, 0.70);
-  --surface-elevated: rgba(255, 255, 255, 0.85);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --border: rgba(255, 255, 255, 0.20);
-  --border-subtle: #e2e8f0;
-  --ring: #3b82f6;
+  --background: #f7f3ec;
+  --background-alt: #eee6da;
+  --surface: rgba(255, 255, 255, 0.64);
+  --surface-elevated: rgba(255, 255, 255, 0.84);
+  --surface-strong: #fffefb;
+  --surface-muted: #f4ede2;
+  --text-primary: #1f1b16;
+  --text-secondary: #554e43;
+  --text-muted: #8f8578;
+  --border: rgba(64, 50, 31, 0.14);
+  --border-subtle: #d9cfbf;
+  --ring: #2563eb;
+  --bg-glow-1: rgba(14, 165, 233, 0.15);
+  --bg-glow-2: rgba(245, 158, 11, 0.14);
+  --bg-grid: rgba(102, 83, 58, 0.06);
 
   /* Accent Colors */
-  --accent-blue: #3b82f6;
-  --accent-emerald: #10b981;
-  --accent-violet: #8b5cf6;
-  --accent-amber: #f59e0b;
+  --accent-blue: #2563eb;
+  --accent-emerald: #059669;
+  --accent-violet: #7c3aed;
+  --accent-amber: #d97706;
   --accent-rose: #f43f5e;
   --accent-cyan: #06b6d4;
-  --accent-orange: #f97316;
-  --accent-pink: #ec4899;
+  --accent-orange: #ea580c;
+  --accent-pink: #db2777;
 
   /* Semantic Colors */
-  --success: #22c55e;
-  --warning: #eab308;
-  --error: #ef4444;
-  --info: #3b82f6;
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --error: #dc2626;
+  --info: #2563eb;
+
+  /* Data Viz */
+  --chart-1: #0f766e;
+  --chart-2: #2563eb;
+  --chart-3: #9333ea;
+  --chart-4: #ea580c;
+  --chart-5: #0ea5e9;
+  --heatmap-0: #e6dfd4;
+  --heatmap-1: #bfdbfe;
+  --heatmap-2: #7dd3fc;
+  --heatmap-3: #60a5fa;
+  --heatmap-4: #1d4ed8;
 }
 
 /* ─── Dark Mode ──────────────────────────────────────────── */
 .dark {
-  --background: #020617;
-  --surface: rgba(15, 23, 42, 0.70);
-  --surface-elevated: rgba(15, 23, 42, 0.85);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
-  --border: rgba(255, 255, 255, 0.10);
-  --border-subtle: #1e293b;
-  --ring: #3b82f6;
+  --background: #13100d;
+  --background-alt: #1b1611;
+  --surface: rgba(41, 31, 23, 0.58);
+  --surface-elevated: rgba(46, 35, 26, 0.78);
+  --surface-strong: #2a2118;
+  --surface-muted: #231b14;
+  --text-primary: #f8f2e8;
+  --text-secondary: #d3c6b5;
+  --text-muted: #9b8d7b;
+  --border: rgba(255, 235, 209, 0.14);
+  --border-subtle: #433528;
+  --ring: #60a5fa;
+  --bg-glow-1: rgba(37, 99, 235, 0.26);
+  --bg-glow-2: rgba(217, 119, 6, 0.2);
+  --bg-grid: rgba(208, 176, 142, 0.05);
+  --chart-1: #2dd4bf;
+  --chart-2: #60a5fa;
+  --chart-3: #c084fc;
+  --chart-4: #fb923c;
+  --chart-5: #22d3ee;
+  --heatmap-0: #2f261d;
+  --heatmap-1: #164e63;
+  --heatmap-2: #0369a1;
+  --heatmap-3: #2563eb;
+  --heatmap-4: #60a5fa;
 }
 
 /* ─── Tailwind v4 Theme Tokens ───────────────────────────── */
 @theme inline {
   --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-muted: var(--surface-muted);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
@@ -68,7 +105,19 @@
   --color-error: var(--error);
   --color-info: var(--info);
 
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-heatmap-0: var(--heatmap-0);
+  --color-heatmap-1: var(--heatmap-1);
+  --color-heatmap-2: var(--heatmap-2);
+  --color-heatmap-3: var(--heatmap-3);
+  --color-heatmap-4: var(--heatmap-4);
+
+  --font-sans: var(--font-instrument-sans), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-instrument-sans), system-ui, sans-serif;
 
   /* Animation timings */
   --animate-fast: 150ms ease;
@@ -79,10 +128,32 @@
 /* ─── Base Styles ────────────────────────────────────────── */
 body {
   background-color: var(--background);
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 20px,
+      var(--bg-grid) 20px 21px
+    ),
+    radial-gradient(1200px 700px at -5% -15%, var(--bg-glow-1) 0%, transparent 60%),
+    radial-gradient(900px 540px at 105% -10%, var(--bg-glow-2) 0%, transparent 55%),
+    linear-gradient(180deg, var(--background) 0%, var(--background-alt) 100%);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-sans);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 /* ─── Focus Ring (Accessibility) ─────────────────────────── */
@@ -123,6 +194,11 @@ body {
   background: var(--text-secondary);
 }
 
+/* ─── Safe Area Helpers ──────────────────────────────────── */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* ─── Completion Bounce Animation ────────────────────────── */
 @keyframes completion-bounce {
   0% { transform: scale(1); }
@@ -142,6 +218,17 @@ body {
 
 .animate-fade-in {
   animation: fade-in 200ms ease-out;
+}
+
+/* ─── Nav Pop ────────────────────────────────────────────── */
+@keyframes nav-pop {
+  0% { transform: scale(0.94); }
+  65% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.animate-nav-pop {
+  animation: nav-pop 220ms ease-out;
 }
 
 /* ─── Slide Up (Sheet/Dialog enter) ──────────────────────── */

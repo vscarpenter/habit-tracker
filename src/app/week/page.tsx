@@ -52,6 +52,7 @@ export default function WeekPage() {
       <Header
         title="Week"
         subtitle={weekLabel}
+        eyebrow="Planning View"
         actions={
           <div className="flex items-center gap-1">
             <Button

@@ -12,14 +12,14 @@ const WEEKS = 52;
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
 function intensityColor(count: number, maxCount: number): string {
-  if (count === 0) return "var(--border-subtle)";
-  if (maxCount === 0) return "var(--border-subtle)";
+  if (count === 0) return "var(--heatmap-0)";
+  if (maxCount === 0) return "var(--heatmap-0)";
 
   const ratio = count / maxCount;
-  if (ratio <= 0.25) return "#93c5fd"; // blue-300
-  if (ratio <= 0.5) return "#60a5fa";  // blue-400
-  if (ratio <= 0.75) return "#3b82f6"; // blue-500
-  return "#2563eb";                     // blue-600
+  if (ratio <= 0.25) return "var(--heatmap-1)";
+  if (ratio <= 0.5) return "var(--heatmap-2)";
+  if (ratio <= 0.75) return "var(--heatmap-3)";
+  return "var(--heatmap-4)";
 }
 
 export function AggregateHeatmap({ data, today }: AggregateHeatmapProps) {

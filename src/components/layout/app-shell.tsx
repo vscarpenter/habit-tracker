@@ -39,11 +39,16 @@ export function AppShell({ children }: AppShellProps) {
   useKeyboardShortcuts(shortcuts);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
       <Sidebar />
       <BottomNav />
 
-      <main id="main-content" className="lg:pl-60 pb-20 lg:pb-0">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-background-alt/65 to-transparent lg:left-64"
+      />
+
+      <main id="main-content" className="relative pb-24 lg:pl-64 lg:pb-0">
         {children}
       </main>
 

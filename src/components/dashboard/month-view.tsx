@@ -49,33 +49,44 @@ export function MonthView({
     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
       <div
         className={cn(
-          "bg-surface-elevated backdrop-blur-xl border border-border rounded-2xl",
-          "p-3 sm:p-4"
+          "bg-surface-elevated/90 backdrop-blur-xl border border-border-subtle rounded-2xl",
+          "shadow-sm"
         )}
       >
+        <div className="flex flex-wrap items-center gap-3 border-b border-border-subtle/70 px-4 py-3 text-xs text-text-secondary">
+          <LegendChip label="Done" className="bg-accent-blue" />
+          <LegendChip label="Scheduled" className="bg-surface-muted border border-border-subtle" />
+          <LegendChip label="Future" className="bg-transparent border border-text-muted/45" />
+          <LegendChip label="No schedule" className="bg-text-muted/35" />
+        </div>
+
         <div
-          className="grid gap-x-0 gap-y-0"
+          className="grid gap-x-0 gap-y-0 p-3 sm:p-4"
           style={{
-            gridTemplateColumns: `140px repeat(${daysCount}, minmax(28px, 1fr))`,
-            minWidth: `${140 + daysCount * 30}px`,
+            gridTemplateColumns: `168px repeat(${daysCount}, minmax(30px, 1fr))`,
+            minWidth: `${168 + daysCount * 32}px`,
           }}
         >
           {/* Header row: day numbers */}
-          <div />
+          <div className="flex items-center px-2 text-xs font-semibold uppercase tracking-[0.1em] text-text-muted">
+            Habits
+          </div>
           {monthDates.map((date) => {
             const isToday = date === today;
-            const dayNum = format(parseISO(date), "d");
+            const parsed = parseISO(date);
+            const dayNum = format(parsed, "d");
             return (
               <div
                 key={date}
                 className={cn(
-                  "flex items-center justify-center h-8 text-[10px] font-medium",
+                  "flex h-10 flex-col items-center justify-center rounded-md border text-[10px]",
                   isToday
-                    ? "text-accent-blue font-bold"
-                    : "text-text-muted"
+                    ? "border-accent-blue/40 bg-accent-blue/8 text-accent-blue font-bold"
+                    : "border-border-subtle/60 bg-surface/40 text-text-muted"
                 )}
               >
                 {dayNum}
+                <span className="text-[9px] opacity-70">{format(parsed, "EEEEE")}</span>
               </div>
             );
           })}
@@ -89,6 +100,7 @@ export function MonthView({
               today={today}
               isCompleted={isCompleted}
               onToggle={onToggle}
+              rowIndex={idx}
               isLast={idx === activeHabits.length - 1}
             />
           ))}
@@ -104,6 +116,7 @@ interface MonthHabitRowProps {
   today: string;
   isCompleted: (habitId: string, date: string) => boolean;
   onToggle: (habitId: string, date: string) => void;
+  rowIndex: number;
   isLast: boolean;
 }
 
@@ -113,6 +126,7 @@ function MonthHabitRow({
   today,
   isCompleted,
   onToggle,
+  rowIndex,
   isLast,
 }: MonthHabitRowProps) {
   return (
@@ -120,10 +134,12 @@ function MonthHabitRow({
       <Link
         href={`/habits/${habit.id}`}
         className={cn(
-          "flex items-center gap-2 min-h-[36px] pr-2 sticky left-0",
-          "bg-surface-elevated z-10",
-          !isLast && "border-b border-border-subtle/30"
+          "flex items-center gap-2 min-h-[40px] px-2 sticky left-0 rounded-md border-l-2",
+          "z-10 backdrop-blur-xl",
+          rowIndex % 2 === 0 ? "bg-surface/75" : "bg-surface-muted/35",
+          !isLast && "border-b border-border-subtle/45"
         )}
+        style={{ borderLeftColor: habit.color }}
       >
         <span className="text-sm shrink-0">{habit.icon}</span>
         <span className="text-xs font-medium text-text-primary truncate">
@@ -134,19 +150,23 @@ function MonthHabitRow({
       {monthDates.map((date) => {
         const scheduled = isHabitScheduledForDate(habit, date);
         const isFuture = date > today;
+        const completed = isCompleted(habit.id, date);
         return (
           <div
             key={date}
             className={cn(
-              "flex items-center justify-center min-h-[36px]",
-              date === today && "bg-accent-blue/5",
-              !isLast && "border-b border-border-subtle/30"
+              "flex items-center justify-center min-h-[40px] rounded-md",
+              rowIndex % 2 === 0 ? "bg-surface/40" : "bg-surface-muted/24",
+              date === today && "bg-accent-blue/7",
+              !isLast && "border-b border-border-subtle/45"
             )}
           >
             <MonthCell
-              scheduled={scheduled && !isFuture}
-              completed={isCompleted(habit.id, date)}
+              scheduled={scheduled}
+              completed={completed}
               color={habit.color}
+              isFuture={isFuture}
+              isToday={date === today}
               onToggle={() => onToggle(habit.id, date)}
             />
           </div>
@@ -158,21 +178,30 @@ function MonthHabitRow({
 
 function MonthSkeleton({ daysCount }: { daysCount: number }) {
   return (
-    <div className="rounded-2xl bg-surface-elevated border border-border p-4 space-y-3">
+    <div className="rounded-2xl bg-surface-elevated border border-border-subtle p-4 space-y-3">
       <div className="flex gap-1">
-        <Skeleton className="h-6 w-[140px] rounded-lg" />
+        <Skeleton className="h-8 w-[168px] rounded-lg" />
         {Array.from({ length: Math.min(daysCount, 15) }).map((_, i) => (
-          <Skeleton key={i} className="h-6 w-7 rounded-lg" />
+          <Skeleton key={i} className="h-8 w-8 rounded-md" />
         ))}
       </div>
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex gap-1">
-          <Skeleton className="h-8 w-[140px] rounded-lg" />
+          <Skeleton className="h-10 w-[168px] rounded-lg" />
           {Array.from({ length: Math.min(daysCount, 15) }).map((_, j) => (
-            <Skeleton key={j} className="h-7 w-7 rounded-md" />
+            <Skeleton key={j} className="h-8 w-8 rounded-md" />
           ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+function LegendChip({ label, className }: { label: string; className: string }) {
+  return (
+    <div className="inline-flex items-center gap-1.5">
+      <span className={cn("h-2.5 w-2.5 rounded-full", className)} />
+      <span>{label}</span>
     </div>
   );
 }

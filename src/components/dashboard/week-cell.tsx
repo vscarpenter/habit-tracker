@@ -9,31 +9,55 @@ interface WeekCellProps {
   completed: boolean;
   color: string;
   isToday: boolean;
+  isFuture: boolean;
   onToggle: () => void;
 }
 
-export function WeekCell({ scheduled, completed, color, isToday, onToggle }: WeekCellProps) {
-  if (!scheduled) {
+export function WeekCell({
+  scheduled,
+  completed,
+  color,
+  isToday,
+  isFuture,
+  onToggle,
+}: WeekCellProps) {
+  const wrapperClass = cn(
+    "flex min-h-[52px] items-center justify-center rounded-xl border transition-colors duration-150",
+    isToday
+      ? "border-accent-blue/35 bg-accent-blue/8"
+      : "border-transparent"
+  );
+
+  if (isFuture) {
     return (
       <div
-        className={cn(
-          "flex items-center justify-center min-h-[44px] rounded-lg",
-          isToday && "bg-accent-blue/5"
-        )}
+        className={cn(wrapperClass, "bg-surface-muted/35")}
       >
-        <Minus className="h-4 w-4 text-text-muted/40" />
+        {scheduled ? (
+          <div
+            className="h-4 w-4 rounded-full border-2"
+            style={{ borderColor: `${color}88` }}
+          />
+        ) : (
+          <div className="h-1.5 w-1.5 rounded-full bg-text-muted/35" />
+        )}
+      </div>
+    );
+  }
+
+  if (!scheduled) {
+    return (
+      <div className={cn(wrapperClass, "bg-surface-muted/25")}>
+        <Minus className="h-4 w-4 text-text-muted/45" />
       </div>
     );
   }
 
   return (
     <div
-      className={cn(
-        "flex items-center justify-center min-h-[44px] rounded-lg transition-colors duration-150",
-        isToday && "bg-accent-blue/5"
-      )}
+      className={cn(wrapperClass, "bg-surface/45")}
       style={{
-        backgroundColor: completed && !isToday ? `${color}15` : undefined,
+        backgroundColor: completed ? `${color}1c` : undefined,
       }}
     >
       <CompletionToggle

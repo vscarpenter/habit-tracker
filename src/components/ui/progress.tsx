@@ -21,7 +21,7 @@ const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         aria-valuemin={0}
         aria-valuemax={max}
         className={cn(
-          "h-2 w-full overflow-hidden rounded-full bg-border-subtle",
+          "h-2 w-full overflow-hidden rounded-full bg-surface-muted",
           className
         )}
         {...props}
@@ -30,7 +30,7 @@ const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           className="h-full rounded-full transition-all duration-300 ease-out"
           style={{
             width: `${percentage}%`,
-            backgroundColor: color ?? "var(--accent-blue)",
+            backgroundColor: color ?? "var(--chart-2)",
           }}
         />
       </div>

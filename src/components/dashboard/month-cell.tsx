@@ -7,16 +7,40 @@ interface MonthCellProps {
   scheduled: boolean;
   completed: boolean;
   color: string;
+  isFuture: boolean;
+  isToday: boolean;
   onToggle: () => void;
 }
 
-export function MonthCell({ scheduled, completed, color, onToggle }: MonthCellProps) {
+export function MonthCell({
+  scheduled,
+  completed,
+  color,
+  isFuture,
+  isToday,
+  onToggle,
+}: MonthCellProps) {
   const [animating, setAnimating] = useState(false);
+
+  if (isFuture) {
+    return (
+      <div className="flex items-center justify-center h-8 w-8 rounded-md">
+        {scheduled ? (
+          <div
+            className="h-3.5 w-3.5 rounded-full border-[1.5px]"
+            style={{ borderColor: `${color}88` }}
+          />
+        ) : (
+          <div className="h-1.5 w-1.5 rounded-full bg-text-muted/30" />
+        )}
+      </div>
+    );
+  }
 
   if (!scheduled) {
     return (
-      <div className="flex items-center justify-center h-7 w-7">
-        <div className="h-1.5 w-1.5 rounded-full bg-text-muted/20" />
+      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-surface-muted/20">
+        <div className="h-1.5 w-1.5 rounded-full bg-text-muted/30" />
       </div>
     );
   }
@@ -34,13 +58,15 @@ export function MonthCell({ scheduled, completed, color, onToggle }: MonthCellPr
       type="button"
       onClick={handleClick}
       className={cn(
-        "h-7 w-7 rounded-md flex items-center justify-center",
+        "h-8 w-8 rounded-md flex items-center justify-center border",
         "transition-all duration-150",
-        completed ? "shadow-sm" : "border border-border-subtle/60 hover:border-border-subtle",
+        completed ? "shadow-sm" : "border-border-subtle/60 hover:border-border-subtle",
+        isToday && "ring-1 ring-accent-blue/45 ring-offset-1 ring-offset-background",
         animating && "animate-cell-fill"
       )}
       style={{
         backgroundColor: completed ? color : "transparent",
+        borderColor: completed ? `${color}88` : undefined,
       }}
       aria-label={completed ? "Mark as incomplete" : "Mark as complete"}
       aria-pressed={completed}

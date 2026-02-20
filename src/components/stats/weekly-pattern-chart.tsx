@@ -52,7 +52,7 @@ export function WeeklyPatternChart({ data }: WeeklyPatternChartProps) {
             />
             <Bar
               dataKey="count"
-              fill="#3b82f6"
+              fill="var(--chart-3)"
               radius={[6, 6, 0, 0]}
               maxBarSize={40}
             />

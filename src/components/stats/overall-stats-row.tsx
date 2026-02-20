@@ -10,22 +10,21 @@ interface OverallStatsRowProps {
   loading: boolean;
 }
 
-const ACCENT = "#3b82f6"; // accent-blue
-
 interface StatCardProps {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
   value: string | number;
+  accent: string;
 }
 
-function StatCard({ icon: Icon, label, value }: StatCardProps) {
+function StatCard({ icon: Icon, label, value, accent }: StatCardProps) {
   return (
     <Card className="flex flex-col items-center text-center py-4">
       <div
-        className="h-10 w-10 rounded-xl flex items-center justify-center mb-2"
-        style={{ backgroundColor: `${ACCENT}15` }}
+        className="h-10 w-10 rounded-xl flex items-center justify-center mb-2 border border-border-subtle"
+        style={{ backgroundColor: "var(--surface-muted)" }}
       >
-        <Icon className="h-5 w-5" style={{ color: ACCENT }} />
+        <Icon className="h-5 w-5" style={{ color: accent }} />
       </div>
       <div className="text-xl font-bold text-text-primary">{value}</div>
       <div className="text-xs text-text-muted">{label}</div>
@@ -50,21 +49,25 @@ export function OverallStatsRow({ stats, loading }: OverallStatsRowProps) {
         icon={Activity}
         label="Active Habits"
         value={stats.totalActiveHabits}
+        accent="var(--chart-1)"
       />
       <StatCard
         icon={TrendingUp}
         label="Completion Rate"
         value={`${stats.overallCompletionRate}%`}
+        accent="var(--chart-2)"
       />
       <StatCard
         icon={Flame}
         label="Best Streak"
         value={stats.bestCurrentStreak}
+        accent="var(--chart-4)"
       />
       <StatCard
         icon={Hash}
         label="Total Completions"
         value={stats.totalCompletions}
+        accent="var(--chart-3)"
       />
     </div>
   );

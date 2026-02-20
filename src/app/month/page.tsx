@@ -56,6 +56,7 @@ export default function MonthPage() {
       <Header
         title="Month"
         subtitle={monthLabel}
+        eyebrow="Planning View"
         actions={
           <div className="flex items-center gap-1">
             <Button

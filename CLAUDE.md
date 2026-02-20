@@ -23,13 +23,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Development Commands
 
 ```bash
-npm run dev            # Next.js dev server
-npm run build          # Static export to out/
-npm run test           # Vitest (all tests)
-npx vitest run src/db/schemas.test.ts  # Single test file
-npm run test:watch     # Vitest watch mode
-npm run lint           # ESLint
-npm run type-check     # tsc --noEmit
+bun run dev            # Next.js dev server
+bun run build          # Static export to out/
+bun run test           # Vitest (all tests)
+bunx vitest run src/db/schemas.test.ts  # Single test file
+bun run test:watch     # Vitest watch mode
+bun run lint           # ESLint
+bun run type-check     # tsc --noEmit
 ```
 
 Deploy: `aws s3 sync out/ s3://BUCKET --delete` then invalidate CloudFront.

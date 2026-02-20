@@ -64,18 +64,27 @@ export function WeekView({
     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
       <div
         className={cn(
-          "bg-surface-elevated backdrop-blur-xl border border-border rounded-2xl",
-          "p-3 sm:p-4"
+          "bg-surface-elevated/90 backdrop-blur-xl border border-border-subtle rounded-2xl",
+          "shadow-sm"
         )}
       >
+        <div className="flex flex-wrap items-center gap-3 border-b border-border-subtle/70 px-4 py-3 text-xs text-text-secondary">
+          <LegendItem label="Completed" colorClass="bg-accent-blue" />
+          <LegendItem label="Scheduled" colorClass="bg-surface-muted border border-border-subtle" />
+          <LegendItem label="Future" colorClass="bg-transparent border border-text-muted/45" />
+          <LegendItem label="Not scheduled" colorClass="bg-text-muted/35" />
+        </div>
+
         <div
-          className="grid gap-x-1 gap-y-0 min-w-[520px]"
+          className="grid gap-x-1.5 gap-y-0 min-w-[620px] p-3 sm:p-4"
           style={{
-            gridTemplateColumns: "140px repeat(7, minmax(44px, 1fr))",
+            gridTemplateColumns: "170px repeat(7, minmax(56px, 1fr))",
           }}
         >
           {/* Header row */}
-          <div />
+          <div className="flex items-center px-2 text-xs font-semibold uppercase tracking-[0.1em] text-text-muted">
+            Habits
+          </div>
           {weekDates.map((date) => {
             const isToday = date === today;
             const parsed = parseISO(date);
@@ -83,11 +92,13 @@ export function WeekView({
               <div
                 key={date}
                 className={cn(
-                  "flex flex-col items-center py-2 rounded-xl text-center",
-                  isToday && "bg-accent-blue/10"
+                  "flex h-14 flex-col items-center justify-center rounded-xl border text-center",
+                  isToday
+                    ? "border-accent-blue/35 bg-accent-blue/10"
+                    : "border-border-subtle/65 bg-surface/45"
                 )}
               >
-                <span className="text-[10px] font-medium text-text-muted uppercase">
+                <span className="text-[10px] font-semibold text-text-muted uppercase">
                   {format(parsed, "EEE")}
                 </span>
                 <span
@@ -111,6 +122,7 @@ export function WeekView({
               today={today}
               isCompleted={isCompleted}
               onToggle={onToggle}
+              rowIndex={idx}
               isLast={idx === activeHabits.length - 1}
             />
           ))}
@@ -126,20 +138,32 @@ interface HabitRowProps {
   today: string;
   isCompleted: (habitId: string, date: string) => boolean;
   onToggle: (habitId: string, date: string) => void;
+  rowIndex: number;
   isLast: boolean;
 }
 
-function HabitRow({ habit, weekDates, today, isCompleted, onToggle, isLast }: HabitRowProps) {
+function HabitRow({
+  habit,
+  weekDates,
+  today,
+  isCompleted,
+  onToggle,
+  rowIndex,
+  isLast,
+}: HabitRowProps) {
   return (
     <>
       {/* Sticky name column */}
       <Link
         href={`/habits/${habit.id}`}
         className={cn(
-          "flex items-center gap-2 min-h-[44px] pr-2 sticky left-0",
-          "bg-surface-elevated z-10 hover:bg-surface-elevated/80 transition-colors duration-150",
-          !isLast && "border-b border-border-subtle/30"
+          "flex items-center gap-2.5 min-h-[52px] px-2.5 sticky left-0 rounded-lg border-l-2",
+          "z-10 backdrop-blur-xl transition-colors duration-150",
+          rowIndex % 2 === 0 ? "bg-surface/75" : "bg-surface-muted/40",
+          "hover:bg-surface-strong",
+          !isLast && "border-b border-border-subtle/50"
         )}
+        style={{ borderLeftColor: habit.color }}
       >
         <span className="text-base shrink-0">{habit.icon}</span>
         <span className="text-sm font-medium text-text-primary truncate">
@@ -151,21 +175,36 @@ function HabitRow({ habit, weekDates, today, isCompleted, onToggle, isLast }: Ha
       {weekDates.map((date) => {
         const scheduled = isHabitScheduledForDate(habit, date);
         const isFuture = date > today;
+        const completed = isCompleted(habit.id, date);
         return (
           <div
             key={date}
-            className={cn(!isLast && "border-b border-border-subtle/30")}
+            className={cn(
+              "rounded-lg",
+              rowIndex % 2 === 0 ? "bg-surface/45" : "bg-surface-muted/30",
+              !isLast && "border-b border-border-subtle/45"
+            )}
           >
             <WeekCell
-              scheduled={scheduled && !isFuture}
-              completed={isCompleted(habit.id, date)}
+              scheduled={scheduled}
+              completed={completed}
               color={habit.color}
               isToday={date === today}
+              isFuture={isFuture}
               onToggle={() => onToggle(habit.id, date)}
             />
           </div>
         );
       })}
     </>
+  );
+}
+
+function LegendItem({ label, colorClass }: { label: string; colorClass: string }) {
+  return (
+    <div className="inline-flex items-center gap-1.5">
+      <span className={cn("h-2.5 w-2.5 rounded-full", colorClass)} />
+      <span>{label}</span>
+    </div>
   );
 }

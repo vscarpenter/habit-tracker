@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { MoreVertical, Edit, Archive, ArchiveRestore, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { MoreVertical, Edit, Archive, ArchiveRestore, Trash2, ArrowUp, ArrowDown, Flame } from "lucide-react";
 import { frequencyLabel } from "@/lib/date-utils";
 import type { Habit } from "@/types";
 
@@ -25,6 +25,7 @@ interface HabitListItemProps {
   onMoveDown?: (id: string) => void;
   isFirst?: boolean;
   isLast?: boolean;
+  streak?: number;
 }
 
 export function HabitListItem({
@@ -36,92 +37,110 @@ export function HabitListItem({
   onMoveDown,
   isFirst,
   isLast,
+  streak = 0,
 }: HabitListItemProps) {
   const [showDelete, setShowDelete] = useState(false);
+  const showStreak = streak >= 2 && !habit.isArchived;
 
   return (
     <>
       <div
         className={cn(
-          "flex items-center gap-3 px-4 py-3 rounded-xl",
-          "bg-surface backdrop-blur-xl border border-border",
-          "transition-colors duration-150 hover:bg-surface-elevated"
+          "group relative rounded-2xl border px-4 py-3",
+          "bg-surface backdrop-blur-xl transition-all duration-200",
+          "border-border hover:border-border-subtle hover:bg-surface-elevated"
         )}
       >
-        <div
-          className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shrink-0"
-          style={{ backgroundColor: `${habit.color}15` }}
-        >
-          {habit.icon}
-        </div>
+        <span
+          aria-hidden
+          className="absolute bottom-3 left-0 top-3 w-1 rounded-r-full opacity-85"
+          style={{ backgroundColor: habit.color }}
+        />
 
-        <Link
-          href={`/habits/${habit.id}`}
-          className="flex-1 min-w-0"
-        >
-          <div className="font-medium text-sm text-text-primary truncate">
-            {habit.name}
-          </div>
-          <div className="text-xs text-text-muted">
-            {frequencyLabel(habit)}
-          </div>
-        </Link>
-
-        {habit.category && (
-          <Badge className="hidden sm:inline-flex">{habit.category}</Badge>
-        )}
-
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface transition-colors"
-            aria-label="Actions"
+        <div className="flex items-center gap-3 pl-1">
+          <div
+            className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shrink-0 border border-border-subtle"
+            style={{ backgroundColor: `${habit.color}15` }}
           >
-            <MoreVertical className="h-4 w-4" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
-              <Link href={`/habits/${habit.id}/edit`} className="flex items-center gap-2 w-full">
-                <Edit className="h-4 w-4" />
-                Edit
-              </Link>
-            </DropdownMenuItem>
+            {habit.icon}
+          </div>
 
-            {!habit.isArchived && onMoveUp && !isFirst && (
-              <DropdownMenuItem onClick={() => onMoveUp(habit.id)}>
-                <ArrowUp className="h-4 w-4 mr-2" />
-                Move up
-              </DropdownMenuItem>
-            )}
-            {!habit.isArchived && onMoveDown && !isLast && (
-              <DropdownMenuItem onClick={() => onMoveDown(habit.id)}>
-                <ArrowDown className="h-4 w-4 mr-2" />
-                Move down
-              </DropdownMenuItem>
-            )}
+          <Link
+            href={`/habits/${habit.id}`}
+            className="flex-1 min-w-0"
+          >
+            <div className="flex items-center gap-2">
+              <div className="font-medium text-sm text-text-primary truncate">
+                {habit.name}
+              </div>
+              {habit.category && (
+                <Badge className="hidden sm:inline-flex text-[11px]">{habit.category}</Badge>
+              )}
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-text-muted">
+              {frequencyLabel(habit)}
+              {showStreak && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 font-medium text-accent-amber">
+                  <Flame className="h-3.5 w-3.5" />
+                  {streak} day streak
+                </span>
+              )}
+              {habit.isArchived && <Badge variant="warning">Archived</Badge>}
+            </div>
+          </Link>
 
-            <DropdownMenuSeparator />
-
-            {habit.isArchived ? (
-              <DropdownMenuItem onClick={() => onRestore(habit.id)}>
-                <ArchiveRestore className="h-4 w-4 mr-2" />
-                Restore
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem onClick={() => onArchive(habit.id)}>
-                <Archive className="h-4 w-4 mr-2" />
-                Archive
-              </DropdownMenuItem>
-            )}
-
-            <DropdownMenuItem
-              destructive
-              onClick={() => setShowDelete(true)}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-muted transition-colors"
+              aria-label="Actions"
             >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <MoreVertical className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Link href={`/habits/${habit.id}/edit`} className="flex items-center gap-2 w-full">
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Link>
+              </DropdownMenuItem>
+
+              {!habit.isArchived && onMoveUp && !isFirst && (
+                <DropdownMenuItem onClick={() => onMoveUp(habit.id)}>
+                  <ArrowUp className="h-4 w-4 mr-2" />
+                  Move up
+                </DropdownMenuItem>
+              )}
+              {!habit.isArchived && onMoveDown && !isLast && (
+                <DropdownMenuItem onClick={() => onMoveDown(habit.id)}>
+                  <ArrowDown className="h-4 w-4 mr-2" />
+                  Move down
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuSeparator />
+
+              {habit.isArchived ? (
+                <DropdownMenuItem onClick={() => onRestore(habit.id)}>
+                  <ArchiveRestore className="h-4 w-4 mr-2" />
+                  Restore
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={() => onArchive(habit.id)}>
+                  <Archive className="h-4 w-4 mr-2" />
+                  Archive
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuItem
+                destructive
+                onClick={() => setShowDelete(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <ConfirmDialog

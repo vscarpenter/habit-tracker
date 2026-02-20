@@ -14,15 +14,15 @@ export interface ButtonProps
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent-blue text-white hover:bg-accent-blue/90 shadow-sm",
+    "bg-accent-blue text-white hover:brightness-110 shadow-[0_10px_24px_-16px_var(--accent-blue)]",
   secondary:
-    "bg-surface-elevated text-text-primary hover:bg-surface-elevated/80 border border-border-subtle",
+    "bg-surface-strong text-text-primary hover:bg-surface-elevated border border-border-subtle shadow-sm",
   ghost:
-    "text-text-secondary hover:bg-surface hover:text-text-primary",
+    "text-text-secondary hover:bg-surface-muted hover:text-text-primary",
   destructive:
-    "bg-error text-white hover:bg-error/90 shadow-sm",
+    "bg-error text-white hover:brightness-110 shadow-[0_10px_24px_-16px_var(--error)]",
   outline:
-    "border border-border-subtle text-text-primary hover:bg-surface",
+    "border border-border-subtle text-text-primary hover:bg-surface-muted",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -38,7 +38,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center font-medium transition-colors duration-150",
+          "inline-flex items-center justify-center font-medium transition-all duration-150",
           "disabled:pointer-events-none disabled:opacity-50",
           variantStyles[variant],
           sizeStyles[size],

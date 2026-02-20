@@ -70,7 +70,7 @@ export default function EditHabitPage({
   if (!habit) {
     return (
       <PageContainer>
-        <Header title="Habit not found" />
+        <Header title="Habit not found" eyebrow="Habit Library" />
         <p className="text-text-secondary text-sm">
           This habit may have been deleted.
         </p>
@@ -80,7 +80,7 @@ export default function EditHabitPage({
 
   return (
     <PageContainer>
-      <Header title="Edit Habit" subtitle={habit.name} />
+      <Header title="Edit Habit" subtitle={habit.name} eyebrow="Habit Library" />
       <div className="max-w-xl space-y-6">
         <HabitForm
           initialData={habit}
