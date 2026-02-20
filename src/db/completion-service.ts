@@ -1,7 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod/v4";
 import { db } from "./database";
 import { habitCompletionSchema } from "./schemas";
 import type { HabitCompletion } from "@/types";
+
+const MAX_NOTE_LENGTH = 250;
 
 export const completionService = {
   async getByHabitId(habitId: string): Promise<HabitCompletion[]> {
@@ -64,6 +67,7 @@ export const completionService = {
   },
 
   async addNote(id: string, note: string): Promise<void> {
+    z.string().max(MAX_NOTE_LENGTH, "Note is too long").parse(note);
     await db.completions.update(id, { note });
   },
 

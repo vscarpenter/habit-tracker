@@ -66,7 +66,12 @@ export function downloadJson(data: ExportData, filename?: string): void {
 
 // ── Import ───────────────────────────────────────────────────────────
 
+const MAX_IMPORT_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export async function parseImportFile(file: File): Promise<unknown> {
+  if (file.size > MAX_IMPORT_SIZE_BYTES) {
+    throw new Error("Import file is too large (max 10 MB)");
+  }
   const text = await file.text();
   return JSON.parse(text);
 }

@@ -150,8 +150,7 @@ h2,
 h3,
 h4,
 h5,
-h6,
-.font-display {
+h6 {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
 }
@@ -229,16 +228,6 @@ h6,
 
 .animate-nav-pop {
   animation: nav-pop 220ms ease-out;
-}
-
-/* ─── Slide Up (Sheet/Dialog enter) ──────────────────────── */
-@keyframes slide-up {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-.animate-slide-up {
-  animation: slide-up 300ms ease-out;
 }
 
 /* ─── Overlay Fade ───────────────────────────────────────── */
