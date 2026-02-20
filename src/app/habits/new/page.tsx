@@ -40,7 +40,11 @@ export default function NewHabitPage() {
 
   return (
     <PageContainer>
-      <Header title="New Habit" subtitle="Create a new habit to track" />
+      <Header
+        title="New Habit"
+        subtitle="Create a new habit to track"
+        eyebrow="Habit Library"
+      />
       <div className="max-w-xl">
         <HabitForm onSubmit={handleSubmit} submitLabel="Create Habit" />
       </div>

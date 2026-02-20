@@ -1,30 +1,63 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Required environment variables:
-#   BUCKET_NAME  — S3 bucket for static hosting
-#   DIST_ID      — CloudFront distribution ID
+# Deploy defaults (override with env vars if needed)
+readonly DEFAULT_BUCKET_NAME="habittracker.vinny.dev"
+readonly DEFAULT_DIST_ID="ES4HK16S0OBWF"
+readonly DEFAULT_DOMAIN_NAME="habittracker.vinny.dev"
+readonly DEFAULT_OUT_DIR="out"
 
-if [[ -z "${BUCKET_NAME:-}" ]]; then
-  echo "Error: BUCKET_NAME is not set" >&2
+BUCKET_NAME="${BUCKET_NAME:-$DEFAULT_BUCKET_NAME}"
+DIST_ID="${DIST_ID:-$DEFAULT_DIST_ID}"
+DOMAIN_NAME="${DOMAIN_NAME:-$DEFAULT_DOMAIN_NAME}"
+OUT_DIR="${OUT_DIR:-$DEFAULT_OUT_DIR}"
+DRY_RUN="${DRY_RUN:-0}"
+
+if ! command -v aws >/dev/null 2>&1; then
+  echo "Error: aws CLI is not installed or not on PATH" >&2
   exit 1
 fi
 
-if [[ -z "${DIST_ID:-}" ]]; then
-  echo "Error: DIST_ID is not set" >&2
-  exit 1
-fi
+run() {
+  if [[ "$DRY_RUN" == "1" ]]; then
+    echo "[dry-run] $*"
+    return 0
+  fi
+  "$@"
+}
 
 echo "Building..."
-npm run build
+run bun run build
 
-echo "Syncing to s3://${BUCKET_NAME}..."
-aws s3 sync out/ "s3://${BUCKET_NAME}" --delete
+if [[ ! -d "$OUT_DIR" ]]; then
+  echo "Error: build output directory '$OUT_DIR' not found" >&2
+  exit 1
+fi
+
+echo "Syncing static assets to s3://${BUCKET_NAME}..."
+run aws s3 sync "${OUT_DIR}/" "s3://${BUCKET_NAME}" \
+  --delete \
+  --exclude "*.html" \
+  --exclude "sw.js" \
+  --cache-control "public,max-age=31536000,immutable" \
+  --no-progress
+
+echo "Syncing HTML and service worker with revalidation cache policy..."
+run aws s3 sync "${OUT_DIR}/" "s3://${BUCKET_NAME}" \
+  --exclude "*" \
+  --include "*.html" \
+  --include "sw.js" \
+  --cache-control "public,max-age=0,must-revalidate" \
+  --no-progress
 
 echo "Invalidating CloudFront distribution ${DIST_ID}..."
-aws cloudfront create-invalidation \
+run aws cloudfront create-invalidation \
   --distribution-id "${DIST_ID}" \
   --paths "/*" \
   --no-cli-pager
 
-echo "Deploy complete!"
+if [[ "$DRY_RUN" == "1" ]]; then
+  echo "Dry run complete. No AWS changes were made."
+else
+  echo "Deploy complete: https://${DOMAIN_NAME}"
+fi

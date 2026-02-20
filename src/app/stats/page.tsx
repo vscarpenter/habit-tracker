@@ -86,7 +86,11 @@ export default function StatsPage() {
 
   return (
     <PageContainer>
-      <Header title="Statistics" subtitle="Track your progress over time" />
+      <Header
+        title="Statistics"
+        subtitle="Track your progress over time"
+        eyebrow="Analytics"
+      />
 
       {loading ? (
         <StatsSkeleton />

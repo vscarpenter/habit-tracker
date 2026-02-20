@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:dry-run": "DRY_RUN=1 bash scripts/deploy.sh",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "test": "vitest run",

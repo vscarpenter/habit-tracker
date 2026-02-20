@@ -82,7 +82,7 @@ export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
 
                 {/* Streak */}
                 <div className="flex items-center gap-0.5 shrink-0">
-                  <Flame className="h-3.5 w-3.5 text-orange-500" />
+                  <Flame className="h-3.5 w-3.5" style={{ color: "var(--chart-4)" }} />
                   <span className="text-xs text-text-muted">
                     {entry.currentStreak}
                   </span>

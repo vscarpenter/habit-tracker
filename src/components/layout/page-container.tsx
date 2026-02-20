@@ -3,8 +3,7 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
-export interface PageContainerProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+export type PageContainerProps = React.HTMLAttributes<HTMLDivElement>;
 
 const PageContainer = forwardRef<HTMLDivElement, PageContainerProps>(
   ({ className, ...props }, ref) => {
@@ -12,7 +11,7 @@ const PageContainer = forwardRef<HTMLDivElement, PageContainerProps>(
       <div
         ref={ref}
         className={cn(
-          "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8",
+          "mx-auto w-full max-w-[1240px] px-4 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10",
           className
         )}
         {...props}

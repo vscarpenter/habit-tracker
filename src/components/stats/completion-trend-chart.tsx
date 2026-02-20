@@ -40,8 +40,8 @@ export function CompletionTrendChart({ data }: CompletionTrendChartProps) {
           >
             <defs>
               <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
+                <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <XAxis
@@ -71,7 +71,7 @@ export function CompletionTrendChart({ data }: CompletionTrendChartProps) {
             <Area
               type="monotone"
               dataKey="count"
-              stroke="#3b82f6"
+              stroke="var(--chart-2)"
               strokeWidth={2}
               fill="url(#trendFill)"
             />

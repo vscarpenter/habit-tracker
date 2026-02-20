@@ -56,7 +56,7 @@ export default function DashboardPage() {
 
   return (
     <PageContainer>
-      <Header title="Today" subtitle={formatted} />
+      <Header title="Today" subtitle={formatted} eyebrow="Daily Focus" />
       <TodayView
         habits={habits}
         completions={completions}

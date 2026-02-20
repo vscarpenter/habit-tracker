@@ -11,11 +11,11 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variantStyles: Record<CardVariant, string> = {
   default:
-    "bg-surface backdrop-blur-xl border border-border shadow-lg",
+    "bg-surface backdrop-blur-2xl border border-border shadow-[0_20px_38px_-30px_rgba(20,16,10,0.55)]",
   elevated:
-    "bg-surface-elevated backdrop-blur-xl border border-border shadow-xl",
+    "bg-surface-strong backdrop-blur-2xl border border-border-subtle shadow-[0_22px_44px_-30px_rgba(20,16,10,0.65)]",
   interactive:
-    "bg-surface backdrop-blur-xl border border-border shadow-lg hover:shadow-xl hover:border-border-subtle transition-all duration-200 cursor-pointer",
+    "bg-surface backdrop-blur-2xl border border-border shadow-[0_20px_38px_-30px_rgba(20,16,10,0.55)] hover:-translate-y-0.5 hover:border-border-subtle hover:shadow-[0_24px_46px_-28px_rgba(20,16,10,0.72)] transition-all duration-200 cursor-pointer",
 };
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
