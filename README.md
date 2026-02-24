@@ -99,11 +99,8 @@ Works with Netlify, Vercel, GitHub Pages, Cloudflare Pages, or any web server th
 The included deploy script handles S3 sync, cache headers, and CloudFront invalidation:
 
 ```bash
-# Set your AWS infrastructure details
-export BUCKET_NAME="your-bucket"
-export DIST_ID="your-cloudfront-distribution-id"
-export DOMAIN_NAME="your-domain.com"
-
+cp .env.example .env
+# Edit .env with your AWS infrastructure details
 bun run deploy
 ```
 

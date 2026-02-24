@@ -1,17 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Deploy defaults (override with env vars if needed)
-readonly DEFAULT_BUCKET_NAME="habittracker.vinny.dev"
-readonly DEFAULT_DIST_ID="ES4HK16S0OBWF"
-readonly DEFAULT_DOMAIN_NAME="habittracker.vinny.dev"
-readonly DEFAULT_OUT_DIR="out"
-readonly POLICY_NAME="HabitFlow-Security-Headers"
+# Source .env file if present (convenience for local deploys)
+if [[ -f ".env" ]]; then
+  set -a
+  # shellcheck source=/dev/null
+  source .env
+  set +a
+fi
 
-BUCKET_NAME="${BUCKET_NAME:-$DEFAULT_BUCKET_NAME}"
-DIST_ID="${DIST_ID:-$DEFAULT_DIST_ID}"
-DOMAIN_NAME="${DOMAIN_NAME:-$DEFAULT_DOMAIN_NAME}"
-OUT_DIR="${OUT_DIR:-$DEFAULT_OUT_DIR}"
+# AWS resource identifiers — must be provided via env vars or .env file.
+# See .env.example for the required variables.
+BUCKET_NAME="${BUCKET_NAME:-}"
+DIST_ID="${DIST_ID:-}"
+DOMAIN_NAME="${DOMAIN_NAME:-}"
+
+if [[ -z "$BUCKET_NAME" || -z "$DIST_ID" || -z "$DOMAIN_NAME" ]]; then
+  echo "Error: Missing required environment variables." >&2
+  echo "Set BUCKET_NAME, DIST_ID, and DOMAIN_NAME, or copy .env.example to .env and fill in values." >&2
+  exit 1
+fi
+
+readonly POLICY_NAME="HabitFlow-Security-Headers"
+OUT_DIR="${OUT_DIR:-out}"
 DRY_RUN="${DRY_RUN:-0}"
 
 if ! command -v aws >/dev/null 2>&1; then
@@ -63,6 +74,10 @@ ensure_response_headers_policy() {
   echo "Creating response headers policy '${POLICY_NAME}'..."
 
   local policy_config
+  # CSP note: 'unsafe-inline' is required for both script-src and style-src.
+  # - script-src: Next.js React Server Components inject inline <script> tags for hydration data.
+  # - style-src: Recharts v3 applies inline style attributes on SVG chart elements.
+  # Removing either will break the app. Nonce-based CSP is not feasible with static export.
   policy_config=$(cat <<'POLICY_JSON'
 {
   "Name": "HabitFlow-Security-Headers",
