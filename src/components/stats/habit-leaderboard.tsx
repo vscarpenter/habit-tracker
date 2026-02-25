@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Flame } from "lucide-react";
@@ -22,6 +22,7 @@ export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
       <Card>
         <CardHeader>
           <CardTitle>Leaderboard</CardTitle>
+          <CardDescription>Top habits ranked by completion rate in this range</CardDescription>
         </CardHeader>
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -39,20 +40,21 @@ export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
     <Card>
       <CardHeader>
         <CardTitle>Leaderboard</CardTitle>
+        <CardDescription>Top habits ranked by completion rate in this range</CardDescription>
       </CardHeader>
 
       {entries.length === 0 ? (
         <p className="text-sm text-text-muted">No habits to rank yet.</p>
       ) : (
         <>
-          <div className="divide-y divide-border-subtle">
+          <div className="space-y-2">
             {visible.map((entry, index) => (
               <div
                 key={entry.habit.id}
-                className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+                className="hf-row flex items-center gap-3 rounded-xl px-3 py-3"
               >
                 {/* Rank */}
-                <span className="text-sm font-semibold text-text-muted w-6 text-right shrink-0">
+                <span className="w-6 shrink-0 text-right text-sm font-semibold text-text-muted">
                   {index + 1}
                 </span>
 
@@ -65,7 +67,7 @@ export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
                 </div>
 
                 {/* Progress bar */}
-                <div className="w-20 sm:w-28 h-2 rounded-full bg-border-subtle shrink-0">
+                <div className="h-2 w-20 shrink-0 rounded-full bg-border-subtle sm:w-28">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{
@@ -81,7 +83,7 @@ export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
                 </span>
 
                 {/* Streak */}
-                <div className="flex items-center gap-0.5 shrink-0">
+                <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-border-subtle/70 bg-surface-paper/50 px-2 py-0.5">
                   <Flame className="h-3.5 w-3.5" style={{ color: "var(--chart-4)" }} />
                   <span className="text-xs text-text-muted">
                     {entry.currentStreak}

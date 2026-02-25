@@ -7,8 +7,9 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
+  CartesianGrid,
 } from "recharts";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import type { DailyCompletionEntry } from "@/lib/stats-utils";
 
 interface CompletionTrendChartProps {
@@ -30,6 +31,7 @@ export function CompletionTrendChart({ data }: CompletionTrendChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>Daily Completions</CardTitle>
+        <CardDescription>Completion volume across the selected date range</CardDescription>
       </CardHeader>
 
       <div className="h-64">
@@ -38,6 +40,7 @@ export function CompletionTrendChart({ data }: CompletionTrendChartProps) {
             data={data}
             margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
           >
+            <CartesianGrid vertical={false} stroke="var(--border-subtle)" strokeDasharray="3 4" />
             <defs>
               <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.3} />
@@ -65,6 +68,7 @@ export function CompletionTrendChart({ data }: CompletionTrendChartProps) {
                 border: "1px solid var(--border)",
                 borderRadius: "12px",
                 fontSize: "12px",
+                boxShadow: "var(--shadow-editorial-md)",
               }}
               labelFormatter={(d) => String(d)}
             />
@@ -72,7 +76,7 @@ export function CompletionTrendChart({ data }: CompletionTrendChartProps) {
               type="monotone"
               dataKey="count"
               stroke="var(--chart-2)"
-              strokeWidth={2}
+              strokeWidth={2.5}
               fill="url(#trendFill)"
             />
           </AreaChart>

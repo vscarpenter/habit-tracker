@@ -10,11 +10,11 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: "bg-surface-muted text-text-secondary border border-border-subtle",
-  success: "bg-success/12 text-success border border-success/30",
-  warning: "bg-warning/12 text-warning border border-warning/30",
-  error: "bg-error/12 text-error border border-error/30",
-  accent: "bg-accent-blue/12 text-accent-blue border border-accent-blue/30",
+  default: "bg-surface-tint/70 text-text-secondary border border-border-subtle",
+  success: "bg-success/10 text-success border border-success/25",
+  warning: "bg-warning/10 text-warning border border-warning/25",
+  error: "bg-error/10 text-error border border-error/25",
+  accent: "bg-accent-blue/10 text-accent-blue border border-accent-blue/25",
 };
 
 const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
@@ -23,7 +23,7 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
       <span
         ref={ref}
         className={cn(
-          "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+          "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]",
           variantStyles[variant],
           className
         )}

@@ -16,7 +16,11 @@ export function StatsDateRange({
   onSelect,
 }: StatsDateRangeProps) {
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="hf-panel rounded-2xl p-2">
+      <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted">
+        Time Range
+      </div>
+      <div className="flex flex-wrap gap-2">
       {presets.map((preset) => (
         <Button
           key={preset.value}
@@ -31,6 +35,7 @@ export function StatsDateRange({
           {preset.label}
         </Button>
       ))}
+      </div>
     </div>
   );
 }

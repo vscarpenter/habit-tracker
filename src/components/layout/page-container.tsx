@@ -11,7 +11,8 @@ const PageContainer = forwardRef<HTMLDivElement, PageContainerProps>(
       <div
         ref={ref}
         className={cn(
-          "mx-auto w-full max-w-[1240px] px-4 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10",
+          "mx-auto w-full max-w-[1260px] px-4 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10",
+          "relative",
           className
         )}
         {...props}

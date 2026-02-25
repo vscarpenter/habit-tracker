@@ -49,11 +49,10 @@ export function MonthView({
     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
       <div
         className={cn(
-          "bg-surface-elevated/90 backdrop-blur-xl border border-border-subtle rounded-2xl",
-          "shadow-sm"
+          "hf-panel rounded-3xl"
         )}
       >
-        <div className="flex flex-wrap items-center gap-3 border-b border-border-subtle/70 px-4 py-3 text-xs text-text-secondary">
+        <div className="flex flex-wrap items-center gap-2 border-b border-border-subtle/70 bg-surface-paper/35 px-4 py-3 text-xs text-text-secondary">
           <LegendChip label="Done" className="bg-accent-blue" />
           <LegendChip label="Scheduled" className="bg-surface-muted border border-border-subtle" />
           <LegendChip label="Future" className="bg-transparent border border-text-muted/45" />
@@ -81,8 +80,8 @@ export function MonthView({
                 className={cn(
                   "flex h-10 flex-col items-center justify-center rounded-md border text-[10px]",
                   isToday
-                    ? "border-accent-blue/40 bg-accent-blue/8 text-accent-blue font-bold"
-                    : "border-border-subtle/60 bg-surface/40 text-text-muted"
+                    ? "border-accent-blue/40 bg-accent-blue/8 text-accent-blue font-bold shadow-[var(--shadow-editorial-sm)]"
+                    : "border-border-subtle/60 bg-surface-paper/40 text-text-muted"
                 )}
               >
                 {dayNum}
@@ -136,7 +135,7 @@ function MonthHabitRow({
         className={cn(
           "flex items-center gap-2 min-h-[40px] px-2 sticky left-0 rounded-md border-l-2",
           "z-10 backdrop-blur-xl",
-          rowIndex % 2 === 0 ? "bg-surface/75" : "bg-surface-muted/35",
+          rowIndex % 2 === 0 ? "bg-surface-paper/72" : "bg-surface-overlay/72",
           !isLast && "border-b border-border-subtle/45"
         )}
         style={{ borderLeftColor: habit.color }}
@@ -156,7 +155,7 @@ function MonthHabitRow({
             key={date}
             className={cn(
               "flex items-center justify-center min-h-[40px] rounded-md",
-              rowIndex % 2 === 0 ? "bg-surface/40" : "bg-surface-muted/24",
+              rowIndex % 2 === 0 ? "bg-surface-paper/30" : "bg-surface-overlay/28",
               date === today && "bg-accent-blue/7",
               !isLast && "border-b border-border-subtle/45"
             )}
@@ -178,7 +177,7 @@ function MonthHabitRow({
 
 function MonthSkeleton({ daysCount }: { daysCount: number }) {
   return (
-    <div className="rounded-2xl bg-surface-elevated border border-border-subtle p-4 space-y-3">
+    <div className="hf-panel rounded-2xl p-4 space-y-3">
       <div className="flex gap-1">
         <Skeleton className="h-8 w-[168px] rounded-lg" />
         {Array.from({ length: Math.min(daysCount, 15) }).map((_, i) => (
@@ -199,7 +198,7 @@ function MonthSkeleton({ daysCount }: { daysCount: number }) {
 
 function LegendChip({ label, className }: { label: string; className: string }) {
   return (
-    <div className="inline-flex items-center gap-1.5">
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-border-subtle/70 bg-surface-paper/50 px-2 py-1">
       <span className={cn("h-2.5 w-2.5 rounded-full", className)} />
       <span>{label}</span>
     </div>

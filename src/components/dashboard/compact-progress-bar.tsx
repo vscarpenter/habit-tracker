@@ -13,7 +13,7 @@ export function CompactProgressBar({ completed, total }: CompactProgressBarProps
 
   return (
     <div className="flex items-center gap-4 sm:gap-5">
-      <div className="rounded-2xl border border-border-subtle bg-surface-muted/70 p-1">
+      <div className="rounded-2xl border border-border-subtle bg-surface-paper/75 p-1 shadow-[var(--shadow-editorial-sm)]">
         <DailyProgressRing
           completed={completed}
           total={total}
@@ -30,7 +30,7 @@ export function CompactProgressBar({ completed, total }: CompactProgressBarProps
             {percentage}%
           </span>
         </div>
-        <div className="h-2.5 overflow-hidden rounded-full bg-surface-muted">
+        <div className="h-2.5 overflow-hidden rounded-full border border-border-subtle/70 bg-surface-muted">
           <div
             className="h-full rounded-full bg-accent-blue transition-all duration-500 ease-out"
             style={{ width: `${percentage}%` }}

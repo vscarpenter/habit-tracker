@@ -23,7 +23,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           "inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full",
           "border-2 border-transparent transition-colors duration-200",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          checked ? "bg-accent-blue" : "bg-border-subtle",
+          checked ? "bg-accent-emerald shadow-[0_10px_18px_-14px_var(--accent-emerald)]" : "bg-border-subtle",
           className
         )}
         {...props}

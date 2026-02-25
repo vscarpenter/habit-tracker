@@ -24,14 +24,14 @@ export function WeekCell({
   const wrapperClass = cn(
     "flex min-h-[52px] items-center justify-center rounded-xl border transition-colors duration-150",
     isToday
-      ? "border-accent-blue/35 bg-accent-blue/8"
+      ? "border-accent-blue/35 bg-accent-blue/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
       : "border-transparent"
   );
 
   if (isFuture) {
     return (
       <div
-        className={cn(wrapperClass, "bg-surface-muted/35")}
+        className={cn(wrapperClass, "bg-surface-overlay/32")}
       >
         {scheduled ? (
           <div
@@ -47,7 +47,7 @@ export function WeekCell({
 
   if (!scheduled) {
     return (
-      <div className={cn(wrapperClass, "bg-surface-muted/25")}>
+      <div className={cn(wrapperClass, "bg-surface-overlay/24")}>
         <Minus className="h-4 w-4 text-text-muted/45" />
       </div>
     );
@@ -55,7 +55,7 @@ export function WeekCell({
 
   return (
     <div
-      className={cn(wrapperClass, "bg-surface/45")}
+      className={cn(wrapperClass, "bg-surface-paper/38")}
       style={{
         backgroundColor: completed ? `${color}1c` : undefined,
       }}

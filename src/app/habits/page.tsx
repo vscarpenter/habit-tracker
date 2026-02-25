@@ -136,6 +136,7 @@ export default function HabitsPage() {
         title="Habits"
         subtitle={`${activeHabits.length} active habit${activeHabits.length !== 1 ? "s" : ""}`}
         eyebrow="Habit Library"
+        accentColor="var(--accent-emerald)"
         actions={
           <Link href="/habits/new">
             <Button size="sm">
@@ -175,7 +176,7 @@ export default function HabitsPage() {
           </div>
 
           {/* Search & Filter */}
-          <div className="rounded-2xl border border-border-subtle bg-surface-elevated/80 p-4 backdrop-blur-xl">
+          <div className="hf-panel rounded-3xl p-4">
             <div className="mb-3 flex items-center gap-2">
               <Badge className="text-[11px]">Filters</Badge>
               <span className="text-xs text-text-muted">Narrow down your habit list</span>
@@ -199,10 +200,15 @@ export default function HabitsPage() {
           </div>
 
           {/* Active Habits */}
-          <div className="rounded-2xl border border-border-subtle bg-surface/70 p-3 sm:p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-text-primary">Active Habits</h2>
-              <span className="text-xs text-text-muted">{filteredHabits.length} shown</span>
+          <div className="hf-panel-strong rounded-3xl p-3 sm:p-4">
+            <div className="mb-3 flex items-center justify-between rounded-2xl border border-border-subtle/70 bg-surface-overlay/60 px-3 py-2">
+              <div>
+                <p className="hf-kicker">Library</p>
+                <h2 className="text-sm font-semibold text-text-primary">Active Habits</h2>
+              </div>
+              <span className="rounded-full border border-border-subtle/80 bg-surface-paper/70 px-2.5 py-1 text-xs text-text-muted">
+                {filteredHabits.length} shown
+              </span>
             </div>
             <div className="space-y-2">
               {filteredHabits.map((habit, idx) => (
@@ -230,11 +236,11 @@ export default function HabitsPage() {
 
           {/* Archived Section */}
           {archivedHabits.length > 0 && (
-            <div className="rounded-2xl border border-border-subtle bg-surface/60 p-4">
+            <div className="hf-panel-muted rounded-2xl p-4">
               <button
                 type="button"
                 onClick={() => setShowArchived(!showArchived)}
-                className="text-sm font-medium text-text-muted hover:text-text-secondary transition-colors"
+                className="rounded-full border border-transparent px-2 py-1 text-sm font-medium text-text-muted transition-colors hover:border-border-subtle hover:bg-surface-paper/50 hover:text-text-secondary"
               >
                 {showArchived ? "Hide" : "Show"} archived ({archivedHabits.length})
               </button>
@@ -271,12 +277,14 @@ interface SummaryCardProps {
 
 function SummaryCard({ icon: Icon, label, value, helper, accent }: SummaryCardProps) {
   return (
-    <div className="rounded-2xl border border-border-subtle bg-surface-strong/80 p-3.5 shadow-sm">
+    <div className="hf-panel-strong rounded-2xl p-3.5">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-text-secondary">{label}</p>
-        <Icon className="h-4 w-4" style={{ color: accent }} />
+        <p className="text-xs font-medium uppercase tracking-[0.1em] text-text-secondary">{label}</p>
+        <div className="rounded-lg border border-border-subtle/80 bg-surface-tint/70 p-1.5">
+          <Icon className="h-4 w-4" style={{ color: accent }} />
+        </div>
       </div>
-      <p className="mt-1 text-2xl font-semibold text-text-primary">{value}</p>
+      <p className="mt-2 text-2xl font-semibold text-text-primary">{value}</p>
       <p className="text-xs text-text-muted">{helper}</p>
     </div>
   );

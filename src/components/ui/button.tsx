@@ -14,15 +14,15 @@ export interface ButtonProps
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent-blue text-white hover:brightness-110 shadow-[0_10px_24px_-16px_var(--accent-blue)]",
+    "border border-white/20 bg-accent-blue text-white hover:brightness-110 shadow-[0_14px_26px_-16px_var(--accent-blue)]",
   secondary:
-    "bg-surface-strong text-text-primary hover:bg-surface-elevated border border-border-subtle shadow-sm",
+    "bg-surface-paper text-text-primary hover:bg-surface-strong border border-border-subtle shadow-[var(--shadow-editorial-sm)]",
   ghost:
-    "text-text-secondary hover:bg-surface-muted hover:text-text-primary",
+    "text-text-secondary hover:bg-surface-tint/70 hover:text-text-primary",
   destructive:
-    "bg-error text-white hover:brightness-110 shadow-[0_10px_24px_-16px_var(--error)]",
+    "border border-white/15 bg-error text-white hover:brightness-110 shadow-[0_12px_24px_-16px_var(--error)]",
   outline:
-    "border border-border-subtle text-text-primary hover:bg-surface-muted",
+    "border border-border-subtle text-text-primary bg-surface-overlay/60 hover:bg-surface-tint/70",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

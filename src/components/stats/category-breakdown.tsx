@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import type { CategoryBreakdownEntry } from "@/lib/stats-utils";
 
 interface CategoryBreakdownProps {
@@ -14,6 +14,7 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
       <Card>
         <CardHeader>
           <CardTitle>Categories</CardTitle>
+          <CardDescription>Habit mix and completion performance by category</CardDescription>
         </CardHeader>
         <p className="text-sm text-text-muted">
           No active habits to categorize.
@@ -26,10 +27,11 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
     <Card>
       <CardHeader>
         <CardTitle>Categories</CardTitle>
+        <CardDescription>Habit mix and completion performance by category</CardDescription>
       </CardHeader>
 
-      <div className="flex flex-col sm:flex-row items-center gap-4">
-        <div className="h-48 w-48 shrink-0">
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+        <div className="h-48 w-48 shrink-0 rounded-2xl border border-border-subtle/70 bg-surface-paper/45 p-2">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -51,9 +53,10 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
                 contentStyle={{
                   backgroundColor: "var(--surface-elevated)",
                   border: "1px solid var(--border)",
-                  borderRadius: "12px",
-                  fontSize: "12px",
-                }}
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    boxShadow: "var(--shadow-editorial-md)",
+                  }}
                 formatter={(value: number | undefined, name: string | undefined) => [
                   `${value ?? 0} habit${value !== 1 ? "s" : ""}`,
                   name ?? "",
@@ -64,9 +67,12 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex flex-col gap-2 min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
           {data.map((entry) => (
-            <div key={entry.category} className="flex items-center gap-2">
+            <div
+              key={entry.category}
+              className="flex items-center gap-2 rounded-xl border border-border-subtle/70 bg-surface-overlay/50 px-2.5 py-2"
+            >
               <div
                 className="h-3 w-3 rounded-full shrink-0"
                 style={{ backgroundColor: entry.color }}

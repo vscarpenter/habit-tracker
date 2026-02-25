@@ -20,15 +20,20 @@ interface StatItemProps {
 
 function StatItem({ icon: Icon, label, value, color }: StatItemProps) {
   return (
-    <Card className="flex flex-col items-center text-center py-4">
-      <div
-        className="h-10 w-10 rounded-xl flex items-center justify-center mb-2"
-        style={{ backgroundColor: `${color}15` }}
-      >
-        <Icon className="h-5 w-5" style={{ color }} />
+    <Card className="relative overflow-hidden py-4">
+      <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: color, opacity: 0.7 }} />
+      <div className="flex items-start gap-3">
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-subtle"
+          style={{ backgroundColor: `${color}14` }}
+        >
+          <Icon className="h-5 w-5" style={{ color }} />
+        </div>
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">{label}</div>
+          <div className="mt-1 text-2xl font-bold text-text-primary">{value}</div>
+        </div>
       </div>
-      <div className="text-xl font-bold text-text-primary">{value}</div>
-      <div className="text-xs text-text-muted">{label}</div>
     </Card>
   );
 }

@@ -4,7 +4,7 @@ const APP_VERSION = "1.0.0";
 
 export function AboutSection() {
   return (
-    <div className="space-y-3 text-sm">
+    <div className="space-y-3 rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-4 text-sm">
       <div className="flex items-center gap-2">
         <span className="font-semibold text-text-primary">HabitFlow</span>
         <span className="text-text-muted">v{APP_VERSION}</span>

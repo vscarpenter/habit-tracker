@@ -7,7 +7,7 @@ import {
   format,
   parseISO,
 } from "date-fns";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import type { Habit, HabitCompletion } from "@/types";
@@ -80,9 +80,10 @@ export function HabitCalendarHeatmap({
     <Card>
       <CardHeader>
         <CardTitle>Activity</CardTitle>
+        <CardDescription>Last 26 weeks of scheduled vs completed activity</CardDescription>
       </CardHeader>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-3">
         {/* Month labels */}
         <div className="flex ml-8 mb-1">
           {monthLabels.map(({ col, label }, i) => {
@@ -121,7 +122,7 @@ export function HabitCalendarHeatmap({
                   <div
                     key={cell.date}
                     className={cn(
-                      "h-[10px] w-[10px] rounded-[2px]",
+                      "h-[10px] w-[10px] rounded-[3px]",
                       cell.status === "future" && "bg-transparent",
                       cell.status === "unscheduled" && "bg-border-subtle/30",
                       cell.status === "scheduled" && "bg-border-subtle",
@@ -140,7 +141,7 @@ export function HabitCalendarHeatmap({
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 mt-3 text-[10px] text-text-muted">
+        <div className="mt-3 flex items-center gap-3 text-[10px] text-text-muted">
           <div className="flex items-center gap-1">
             <div className="h-[10px] w-[10px] rounded-[2px] bg-border-subtle/30" />
             <span>Not scheduled</span>

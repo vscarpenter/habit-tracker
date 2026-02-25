@@ -8,15 +8,23 @@
   --surface-elevated: rgba(255, 255, 255, 0.84);
   --surface-strong: #fffefb;
   --surface-muted: #f4ede2;
+  --surface-paper: #fffdf8;
+  --surface-panel: rgba(255, 252, 246, 0.78);
+  --surface-overlay: rgba(255, 255, 255, 0.52);
+  --surface-tint: rgba(245, 236, 223, 0.72);
   --text-primary: #1f1b16;
   --text-secondary: #554e43;
   --text-muted: #8f8578;
   --border: rgba(64, 50, 31, 0.14);
   --border-subtle: #d9cfbf;
+  --border-strong: rgba(78, 61, 38, 0.2);
   --ring: #2563eb;
   --bg-glow-1: rgba(14, 165, 233, 0.15);
   --bg-glow-2: rgba(245, 158, 11, 0.14);
   --bg-grid: rgba(102, 83, 58, 0.06);
+  --shadow-editorial-sm: 0 8px 20px -16px rgba(37, 29, 18, 0.34);
+  --shadow-editorial-md: 0 18px 34px -22px rgba(37, 29, 18, 0.38);
+  --shadow-editorial-lg: 0 28px 56px -32px rgba(37, 29, 18, 0.46);
 
   /* Accent Colors */
   --accent-blue: #2563eb;
@@ -53,17 +61,25 @@
   --background-alt: #1b1611;
   --surface: rgba(41, 31, 23, 0.58);
   --surface-elevated: rgba(46, 35, 26, 0.78);
-  --surface-strong: #2a2118;
-  --surface-muted: #231b14;
+  --surface-strong: #31261c;
+  --surface-muted: #2a2017;
+  --surface-paper: #2b2219;
+  --surface-panel: rgba(47, 36, 26, 0.82);
+  --surface-overlay: rgba(57, 43, 31, 0.6);
+  --surface-tint: rgba(68, 51, 36, 0.76);
   --text-primary: #f8f2e8;
-  --text-secondary: #d3c6b5;
-  --text-muted: #9b8d7b;
+  --text-secondary: #ddd0bf;
+  --text-muted: #b4a692;
   --border: rgba(255, 235, 209, 0.14);
-  --border-subtle: #433528;
+  --border-subtle: #594535;
+  --border-strong: rgba(255, 235, 209, 0.26);
   --ring: #60a5fa;
   --bg-glow-1: rgba(37, 99, 235, 0.26);
   --bg-glow-2: rgba(217, 119, 6, 0.2);
   --bg-grid: rgba(208, 176, 142, 0.05);
+  --shadow-editorial-sm: 0 10px 22px -16px rgba(0, 0, 0, 0.5);
+  --shadow-editorial-md: 0 22px 40px -24px rgba(0, 0, 0, 0.56);
+  --shadow-editorial-lg: 0 30px 58px -30px rgba(0, 0, 0, 0.62);
   --chart-1: #2dd4bf;
   --chart-2: #60a5fa;
   --chart-3: #c084fc;
@@ -84,11 +100,16 @@
   --color-surface-elevated: var(--surface-elevated);
   --color-surface-strong: var(--surface-strong);
   --color-surface-muted: var(--surface-muted);
+  --color-surface-paper: var(--surface-paper);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-surface-tint: var(--surface-tint);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-border: var(--border);
   --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
   --color-ring: var(--ring);
 
   --color-accent-blue: var(--accent-blue);
@@ -129,6 +150,7 @@
 body {
   background-color: var(--background);
   background-image:
+    radial-gradient(1200px 760px at 50% 120%, rgba(255, 255, 255, 0.35) 0%, transparent 68%),
     repeating-linear-gradient(
       45deg,
       transparent 0 20px,
@@ -143,6 +165,11 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent-blue) 22%, transparent);
+  color: var(--text-primary);
 }
 
 h1,
@@ -238,6 +265,79 @@ h6 {
 
 .animate-overlay-fade {
   animation: overlay-fade 200ms ease-out;
+}
+
+/* ─── Editorial Surface Helpers ──────────────────────────── */
+.hf-panel {
+  background: var(--surface-panel);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 88%, white 12%);
+  box-shadow: var(--shadow-editorial-sm);
+  backdrop-filter: blur(20px);
+}
+
+.hf-panel-strong {
+  background: var(--surface-paper);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 88%, white 12%);
+  box-shadow: var(--shadow-editorial-md);
+}
+
+.hf-panel-muted {
+  background: color-mix(in srgb, var(--surface-tint) 75%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 85%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(18px);
+}
+
+.hf-hero {
+  position: relative;
+  background:
+    radial-gradient(600px 240px at 105% -10%, color-mix(in srgb, var(--accent-amber) 15%, transparent), transparent 65%),
+    radial-gradient(680px 260px at -5% -25%, color-mix(in srgb, var(--accent-cyan) 14%, transparent), transparent 70%),
+    var(--surface-paper);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 85%, white 15%);
+  box-shadow: var(--shadow-editorial-md);
+}
+
+.hf-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), transparent 40%),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 13px,
+      color-mix(in srgb, var(--bg-grid) 70%, transparent) 13px 14px
+    );
+  opacity: 0.65;
+}
+
+.hf-row {
+  background: color-mix(in srgb, var(--surface-overlay) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.hf-row:hover {
+  background: color-mix(in srgb, var(--surface-paper) 72%, transparent);
+  border-color: color-mix(in srgb, var(--border-strong) 86%, transparent);
+}
+
+.hf-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .hf-hero::before {
+    opacity: 0.48;
+  }
 }
 
 /* ─── Cell Fill (Month Grid) ────────────────────────────── */

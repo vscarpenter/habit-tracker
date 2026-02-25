@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import type { AggregateHeatmapData } from "@/lib/stats-utils";
 
 interface AggregateHeatmapProps {
@@ -29,11 +29,12 @@ export function AggregateHeatmap({ data, today }: AggregateHeatmapProps) {
     <Card>
       <CardHeader>
         <CardTitle>Activity</CardTitle>
+        <CardDescription>52-week completion intensity across all habits</CardDescription>
       </CardHeader>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-3">
         {/* Month labels */}
-        <div className="flex ml-8 mb-1">
+        <div className="mb-1 ml-8 flex">
           {monthLabels.map(({ col, label }, i) => {
             const nextCol = monthLabels[i + 1]?.col ?? WEEKS;
             const span = nextCol - col;
@@ -69,7 +70,7 @@ export function AggregateHeatmap({ data, today }: AggregateHeatmapProps) {
                 {col.map((cell) => (
                   <div
                     key={cell.date}
-                    className="h-[10px] w-[10px] rounded-[2px]"
+                    className="h-[10px] w-[10px] rounded-[3px]"
                     style={{
                       backgroundColor:
                         cell.date > today
@@ -86,7 +87,7 @@ export function AggregateHeatmap({ data, today }: AggregateHeatmapProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-3 text-[10px] text-text-muted">
+        <div className="mt-3 flex items-center gap-2 text-[10px] text-text-muted">
           <span>Less</span>
           {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
             <div

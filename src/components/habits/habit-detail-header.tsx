@@ -13,11 +13,11 @@ interface HabitDetailHeaderProps {
 
 export function HabitDetailHeader({ habit }: HabitDetailHeaderProps) {
   return (
-    <div>
+    <div className="hf-hero rounded-3xl p-5">
       {/* Back link */}
       <Link
         href="/habits"
-        className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary transition-colors mb-4"
+        className="relative z-[1] mb-4 inline-flex items-center gap-1 rounded-full border border-transparent px-2 py-1 text-sm text-text-secondary transition-colors hover:border-border-subtle hover:bg-surface-paper/70 hover:text-text-primary"
       >
         <ChevronLeft className="h-4 w-4" />
         Back
@@ -25,13 +25,15 @@ export function HabitDetailHeader({ habit }: HabitDetailHeaderProps) {
 
       {/* Color accent bar */}
       <div
-        className="h-1.5 rounded-full w-16 mb-4"
+        className="relative z-[1] mb-4 h-1.5 w-16 rounded-full"
         style={{ backgroundColor: habit.color }}
       />
 
-      <div className="flex items-start justify-between gap-4">
+      <div className="relative z-[1] flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0">
-          <span className="text-3xl shrink-0">{habit.icon}</span>
+          <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border-subtle bg-surface-paper text-3xl shadow-[var(--shadow-editorial-sm)]">
+            {habit.icon}
+          </span>
           <div className="min-w-0">
             <h2 className="text-xl font-bold text-text-primary truncate">
               {habit.name}

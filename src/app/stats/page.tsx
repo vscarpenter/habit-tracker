@@ -90,6 +90,7 @@ export default function StatsPage() {
         title="Statistics"
         subtitle="Track your progress over time"
         eyebrow="Analytics"
+        accentColor="var(--accent-violet)"
       />
 
       {loading ? (

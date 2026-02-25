@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880" fill="none">
+  <defs>
+    <linearGradient id="bgCalm" x1="0" y1="0" x2="1400" y2="880" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FAFBF8"/>
+      <stop offset="1" stop-color="#F1F3EC"/>
+    </linearGradient>
+    <radialGradient id="mist" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1080 140) rotate(10) scale(420 220)">
+      <stop stop-color="#D7E8D9" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#D7E8D9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1400" height="880" fill="url(#bgCalm)"/>
+  <rect width="1400" height="880" fill="url(#mist)"/>
+
+  <text x="58" y="62" fill="#1F2A20" font-size="30" font-family="Space Grotesk, Arial" font-weight="700">HabitFlow - Minimal Calm</text>
+  <text x="58" y="90" fill="#647065" font-size="15" font-family="Instrument Sans, Arial">Concept direction: quiet whitespace, subtle borders, one restrained accent, fast daily completion flow</text>
+
+  <rect x="56" y="124" width="1288" height="708" rx="28" fill="#FBFCF9" stroke="#DFE5DA"/>
+
+  <!-- Header strip -->
+  <text x="92" y="178" fill="#748173" font-size="11" font-family="Instrument Sans, Arial" letter-spacing="2">DAILY FOCUS</text>
+  <text x="92" y="218" fill="#1D251E" font-size="38" font-family="Space Grotesk, Arial" font-weight="700">Today</text>
+  <text x="92" y="244" fill="#556055" font-size="15" font-family="Instrument Sans, Arial">Wednesday, February 25 - calm mode for quick completion</text>
+  <rect x="1148" y="174" width="140" height="38" rx="19" fill="#1F6B3B"/>
+  <text x="1191" y="198" fill="white" font-size="13" font-family="Instrument Sans, Arial" font-weight="700">New Habit</text>
+
+  <line x1="88" y1="270" x2="1312" y2="270" stroke="#E1E7DE"/>
+
+  <!-- Left content -->
+  <rect x="92" y="300" width="760" height="148" rx="18" fill="#FFFFFF" stroke="#E2E8E0"/>
+  <text x="116" y="330" fill="#6B766A" font-size="11" font-family="Instrument Sans, Arial" letter-spacing="1.5">TODAY</text>
+  <text x="116" y="367" fill="#1E2620" font-size="30" font-family="Space Grotesk, Arial" font-weight="700">4 of 6 habits done</text>
+  <text x="116" y="392" fill="#576258" font-size="14" font-family="Instrument Sans, Arial">Keep momentum. Finish two more before evening.</text>
+  <rect x="116" y="412" width="612" height="8" rx="4" fill="#E8EEE6"/>
+  <rect x="116" y="412" width="408" height="8" rx="4" fill="#1F6B3B"/>
+  <text x="742" y="418" fill="#1F6B3B" font-size="12" font-family="Instrument Sans, Arial" font-weight="700">67%</text>
+
+  <!-- Checklist -->
+  <rect x="92" y="470" width="760" height="310" rx="18" fill="#FFFFFF" stroke="#E2E8E0"/>
+  <text x="116" y="504" fill="#1F2721" font-size="16" font-family="Space Grotesk, Arial" font-weight="700">Checklist</text>
+  <text x="116" y="524" fill="#6A766C" font-size="12" font-family="Instrument Sans, Arial">Tap to complete. Open habit for detail.</text>
+  <text x="758" y="504" fill="#5D685E" font-size="12" font-family="Instrument Sans, Arial">Manage habits</text>
+
+  <g font-family="Instrument Sans, Arial">
+    <line x1="116" y1="544" x2="828" y2="544" stroke="#EDF1EB"/>
+    <line x1="116" y1="600" x2="828" y2="600" stroke="#EDF1EB"/>
+    <line x1="116" y1="656" x2="828" y2="656" stroke="#EDF1EB"/>
+    <line x1="116" y1="712" x2="828" y2="712" stroke="#EDF1EB"/>
+
+    <circle cx="130" cy="572" r="10" fill="#1F6B3B"/>
+    <path d="M125 572l3 3 7-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="130" cy="628" r="10" fill="white" stroke="#C9D3C8"/>
+    <circle cx="130" cy="684" r="10" fill="white" stroke="#C9D3C8"/>
+    <circle cx="130" cy="740" r="10" fill="white" stroke="#C9D3C8"/>
+
+    <text x="154" y="576" fill="#5E675F" font-size="14" text-decoration="line-through">Morning walk</text>
+    <text x="154" y="632" fill="#1F2721" font-size="14" font-weight="600">Read 20 minutes</text>
+    <text x="154" y="688" fill="#1F2721" font-size="14" font-weight="600">Journal</text>
+    <text x="154" y="744" fill="#1F2721" font-size="14" font-weight="600">Stretching</text>
+
+    <text x="708" y="576" fill="#7A847A" font-size="12">Health</text>
+    <text x="708" y="632" fill="#7A847A" font-size="12">Learning</text>
+    <text x="708" y="688" fill="#7A847A" font-size="12">Mindset</text>
+    <text x="708" y="744" fill="#7A847A" font-size="12">Mobility</text>
+  </g>
+
+  <!-- Right rail -->
+  <rect x="876" y="300" width="436" height="226" rx="18" fill="#FFFFFF" stroke="#E2E8E0"/>
+  <text x="900" y="334" fill="#1E2620" font-size="16" font-family="Space Grotesk, Arial" font-weight="700">Weekly rhythm</text>
+  <text x="900" y="354" fill="#677368" font-size="12" font-family="Instrument Sans, Arial">Low noise analytics for quick review</text>
+
+  <!-- Calm chart -->
+  <line x1="900" y1="484" x2="1278" y2="484" stroke="#EEF2EC"/>
+  <line x1="900" y1="444" x2="1278" y2="444" stroke="#F4F7F3"/>
+  <line x1="900" y1="404" x2="1278" y2="404" stroke="#F4F7F3"/>
+  <polyline points="916,470 964,456 1012,462 1060,434 1108,442 1156,418 1204,426 1252,392"
+            fill="none" stroke="#1F6B3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="1252" cy="392" r="4" fill="#1F6B3B"/>
+  <text x="1220" y="384" fill="#1F6B3B" font-size="11" font-family="Instrument Sans, Arial">today</text>
+
+  <rect x="876" y="544" width="436" height="236" rx="18" fill="#FFFFFF" stroke="#E2E8E0"/>
+  <text x="900" y="578" fill="#1E2620" font-size="16" font-family="Space Grotesk, Arial" font-weight="700">Habits list (minimal variant)</text>
+  <text x="900" y="598" fill="#677368" font-size="12" font-family="Instrument Sans, Arial">Rows feel lighter, with status shown through spacing and color restraint</text>
+
+  <g font-family="Instrument Sans, Arial">
+    <rect x="900" y="620" width="388" height="34" rx="10" fill="#F8FAF7" stroke="#E7ECE4"/>
+    <text x="916" y="642" fill="#7A857B" font-size="12">Search habits...</text>
+
+    <rect x="900" y="666" width="388" height="38" rx="12" fill="#FFFFFF" stroke="#ECF0EA"/>
+    <rect x="904" y="676" width="3" height="18" rx="1.5" fill="#1F6B3B"/>
+    <text x="918" y="689" fill="#1F2721" font-size="13" font-weight="600">Morning walk</text>
+    <text x="1166" y="689" fill="#6E796F" font-size="12">12 day streak</text>
+
+    <rect x="900" y="710" width="388" height="38" rx="12" fill="#FFFFFF" stroke="#ECF0EA"/>
+    <rect x="904" y="720" width="3" height="18" rx="1.5" fill="#8BAA92"/>
+    <text x="918" y="733" fill="#1F2721" font-size="13" font-weight="600">Read 20 minutes</text>
+    <text x="1178" y="733" fill="#6E796F" font-size="12">5 day</text>
+  </g>
+
+  <!-- Mobile preview chip -->
+  <rect x="1078" y="104" width="232" height="154" rx="22" fill="#FFFFFF" stroke="#E2E8E0"/>
+  <text x="1100" y="130" fill="#647065" font-size="10" font-family="Instrument Sans, Arial" letter-spacing="1.5">MOBILE PREVIEW</text>
+  <rect x="1092" y="142" width="204" height="96" rx="16" fill="#FAFBF8" stroke="#E8EDE6"/>
+  <rect x="1100" y="204" width="188" height="24" rx="12" fill="#FFFFFF" stroke="#E4EAE1"/>
+  <circle cx="1132" cy="216" r="6" fill="#1F6B3B"/>
+  <circle cx="1178" cy="216" r="6" fill="#CBD6CC"/>
+  <circle cx="1224" cy="216" r="6" fill="#CBD6CC"/>
+  <circle cx="1270" cy="216" r="6" fill="#CBD6CC"/>
+  <text x="1098" y="162" fill="#1E2620" font-size="12" font-family="Space Grotesk, Arial" font-weight="700">Today</text>
+  <text x="1098" y="182" fill="#6A766C" font-size="11" font-family="Instrument Sans, Arial">4 of 6 done</text>
+</svg>

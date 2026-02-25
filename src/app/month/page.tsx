@@ -57,10 +57,11 @@ export default function MonthPage() {
         title="Month"
         subtitle={monthLabel}
         eyebrow="Planning View"
+        accentColor="var(--accent-cyan)"
         actions={
           <div className="flex items-center gap-1">
             <Button
-              variant="ghost"
+              variant="secondary"
               size="icon"
               onClick={() => setMonthOffset((o) => o - 1)}
               aria-label="Previous month"
@@ -77,7 +78,7 @@ export default function MonthPage() {
               </Button>
             )}
             <Button
-              variant="ghost"
+              variant="secondary"
               size="icon"
               onClick={() => setMonthOffset((o) => o + 1)}
               aria-label="Next month"
