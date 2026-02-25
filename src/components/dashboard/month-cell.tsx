@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { COMPLETION_ANIMATION_MS } from "@/lib/constants";
 
 interface MonthCellProps {
   scheduled: boolean;
@@ -48,7 +49,7 @@ export function MonthCell({
   const handleClick = () => {
     if (!completed) {
       setAnimating(true);
-      setTimeout(() => setAnimating(false), 200);
+      setTimeout(() => setAnimating(false), COMPLETION_ANIMATION_MS);
     }
     onToggle();
   };

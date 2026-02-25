@@ -15,9 +15,9 @@ import { useHabits } from "@/hooks/use-habits";
 import { useToday } from "@/hooks/use-today";
 import { useStreaks } from "@/hooks/use-streaks";
 import { useToast } from "@/components/shared/toast";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import { Plus, Search, Flame, Layers3, FolderKanban } from "lucide-react";
-
-const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 export default function HabitsPage() {
   const today = useToday();
@@ -47,8 +47,8 @@ export default function HabitsPage() {
   const filteredHabits = useMemo(() => {
     let filtered = activeHabits;
     if (search.trim()) {
-      const q = search.toLowerCase();
-      filtered = filtered.filter((h) => h.name.toLowerCase().includes(q));
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter((h) => h.name.toLowerCase().includes(searchLower));
     }
     if (categoryFilter) {
       filtered = filtered.filter((h) => h.category === categoryFilter);
@@ -67,7 +67,7 @@ export default function HabitsPage() {
       await archive(id);
       toast("Habit archived.", "success");
     } catch (error) {
-      console.error("Failed to archive habit:", error);
+      logger.error("Failed to archive habit:", error);
       toast(DB_ERROR_MSG, "error");
     }
   };
@@ -77,7 +77,7 @@ export default function HabitsPage() {
       await restore(id);
       toast("Habit restored!", "success");
     } catch (error) {
-      console.error("Failed to restore habit:", error);
+      logger.error("Failed to restore habit:", error);
       toast(DB_ERROR_MSG, "error");
     }
   };
@@ -87,33 +87,21 @@ export default function HabitsPage() {
       await remove(id);
       toast("Habit permanently deleted.", "success");
     } catch (error) {
-      console.error("Failed to delete habit:", error);
+      logger.error("Failed to delete habit:", error);
       toast(DB_ERROR_MSG, "error");
     }
   };
 
-  const handleMoveUp = async (id: string) => {
+  const handleReorder = async (id: string, direction: "up" | "down") => {
     const idx = activeHabits.findIndex((h) => h.id === id);
-    if (idx <= 0) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (idx < 0 || swapIdx < 0 || swapIdx >= activeHabits.length) return;
     const ids = activeHabits.map((h) => h.id);
-    [ids[idx - 1], ids[idx]] = [ids[idx], ids[idx - 1]];
+    [ids[idx], ids[swapIdx]] = [ids[swapIdx], ids[idx]];
     try {
       await reorder(ids);
     } catch (error) {
-      console.error("Failed to reorder habits:", error);
-      toast(DB_ERROR_MSG, "error");
-    }
-  };
-
-  const handleMoveDown = async (id: string) => {
-    const idx = activeHabits.findIndex((h) => h.id === id);
-    if (idx < 0 || idx >= activeHabits.length - 1) return;
-    const ids = activeHabits.map((h) => h.id);
-    [ids[idx], ids[idx + 1]] = [ids[idx + 1], ids[idx]];
-    try {
-      await reorder(ids);
-    } catch (error) {
-      console.error("Failed to reorder habits:", error);
+      logger.error("Failed to reorder habits:", error);
       toast(DB_ERROR_MSG, "error");
     }
   };
@@ -218,8 +206,8 @@ export default function HabitsPage() {
                   onArchive={handleArchive}
                   onRestore={handleRestore}
                   onDelete={handleDelete}
-                  onMoveUp={handleMoveUp}
-                  onMoveDown={handleMoveDown}
+                  onMoveUp={(id) => handleReorder(id, "up")}
+                  onMoveDown={(id) => handleReorder(id, "down")}
                   isFirst={idx === 0}
                   isLast={idx === filteredHabits.length - 1}
                   streak={streakMap.get(habit.id) ?? 0}

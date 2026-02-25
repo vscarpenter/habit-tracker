@@ -37,8 +37,9 @@ describe("validateImportData", () => {
     const result = validateImportData(payload);
 
     expect(result.valid).toBe(true);
+    if (!result.valid) return;
     expect(result.data).toBeDefined();
-    expect(result.data?.version).toBe(EXPORT_VERSION);
+    expect(result.data.version).toBe(EXPORT_VERSION);
   });
 
   it("rejects when version is missing", () => {
@@ -48,8 +49,9 @@ describe("validateImportData", () => {
 
     const result = validateImportData(payload);
     expect(result.valid).toBe(false);
+    if (result.valid) return;
     expect(result.errors).toBeDefined();
-    expect(result.errors!.some((e) => e.includes("version"))).toBe(true);
+    expect(result.errors.some((e: string) => e.includes("version"))).toBe(true);
   });
 
   it("rejects a malformed habit with specific error", () => {
@@ -64,7 +66,8 @@ describe("validateImportData", () => {
 
     const result = validateImportData(payload);
     expect(result.valid).toBe(false);
-    expect(result.errors!.some((e) => e.includes("name") || e.includes("Name"))).toBe(true);
+    if (result.valid) return;
+    expect(result.errors.some((e: string) => e.includes("name") || e.includes("Name"))).toBe(true);
   });
 
   it("rejects non-object input", () => {
@@ -86,7 +89,8 @@ describe("validateImportData", () => {
     const result = validateImportData(payload);
 
     expect(result.valid).toBe(true);
-    expect(result.data?.data.habits).toHaveLength(1);
-    expect(result.data?.data.completions).toHaveLength(1);
+    if (!result.valid) return;
+    expect(result.data.data.habits).toHaveLength(1);
+    expect(result.data.data.completions).toHaveLength(1);
   });
 });

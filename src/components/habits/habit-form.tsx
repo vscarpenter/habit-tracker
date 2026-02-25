@@ -14,6 +14,8 @@ import { EmojiPicker } from "./emoji-picker";
 import { ColorPicker } from "./color-picker";
 import { FrequencySelector } from "./frequency-selector";
 import { useToast } from "@/components/shared/toast";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 
 interface HabitFormProps {
   initialData?: Habit;
@@ -21,8 +23,17 @@ interface HabitFormProps {
   submitLabel: string;
 }
 
-interface FormErrors {
-  [key: string]: string | undefined;
+type FormErrors = Partial<Record<keyof CreateHabitInput, string>>;
+
+function mapZodErrors(issues: { path: PropertyKey[]; message: string }[]): FormErrors {
+  const fieldErrors: FormErrors = {};
+  for (const issue of issues) {
+    const path = issue.path[0];
+    if (path && typeof path === "string") {
+      fieldErrors[path as keyof CreateHabitInput] = issue.message;
+    }
+  }
+  return fieldErrors;
 }
 
 export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps) {
@@ -62,13 +73,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
     const result = createHabitSchema.safeParse(data);
 
     if (!result.success) {
-      const fieldErrors: FormErrors = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0];
-        if (path && typeof path === "string") {
-          fieldErrors[path] = issue.message;
-        }
-      }
+      const fieldErrors = mapZodErrors(result.error.issues);
 
       // Handle cross-field validation from the base schema
       if (frequency === "specific_days" && targetDays.length === 0) {
@@ -100,8 +105,8 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
     try {
       await onSubmit(data);
     } catch (error) {
-      console.error("Form submission failed:", error);
-      toast("Something went wrong. Your data is safe.", "error");
+      logger.error("Form submission failed:", error);
+      toast(DB_ERROR_MSG, "error");
     } finally {
       setSubmitting(false);
     }

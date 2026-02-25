@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { habitService } from "@/db/habit-service";
 import { useToast } from "@/components/shared/toast";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import type { Habit } from "@/types";
-
-const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 export function useHabit(id: string | undefined) {
   const [habit, setHabit] = useState<Habit | null>(null);
@@ -29,7 +29,7 @@ export function useHabit(id: string | undefined) {
         setNotFound(true);
       }
     } catch (error) {
-      console.error("Failed to load habit:", error);
+      logger.error("Failed to load habit:", error);
       toast(DB_ERROR_MSG, "error");
       setNotFound(true);
     } finally {

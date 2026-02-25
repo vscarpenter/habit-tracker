@@ -349,3 +349,69 @@ export function buildLeaderboard(
     })
     .sort((a, b) => b.completionRate - a.completionRate);
 }
+
+// ── Per-Habit Heatmap (26-week) ──────────────────────
+
+export type HabitHeatmapStatus = "completed" | "scheduled" | "unscheduled" | "future";
+
+export interface HabitHeatmapCell {
+  date: string;
+  status: HabitHeatmapStatus;
+}
+
+export interface HabitHeatmapData {
+  grid: HabitHeatmapCell[][]; // columns (weeks) of 7 rows (days)
+  monthLabels: { col: number; label: string }[];
+}
+
+const HABIT_HEATMAP_WEEKS = 26;
+
+export function buildHabitHeatmapData(
+  habit: Habit,
+  completions: HabitCompletion[],
+  today: string,
+  weekStartsOn: 0 | 1 = 0
+): HabitHeatmapData {
+  const todayDate = parseISO(today);
+  const weekEnd = startOfWeek(todayDate, { weekStartsOn });
+  const gridStart = subWeeks(weekEnd, HABIT_HEATMAP_WEEKS - 1);
+
+  const completedDates = new Set(completions.map((c) => c.date));
+
+  const columns: HabitHeatmapCell[][] = [];
+  let currentWeekStart = gridStart;
+
+  for (let w = 0; w < HABIT_HEATMAP_WEEKS; w++) {
+    const col: HabitHeatmapCell[] = [];
+    for (let d = 0; d < DAYS_PER_WEEK; d++) {
+      const date = new Date(currentWeekStart);
+      date.setDate(date.getDate() + d);
+      const dateStr = format(date, "yyyy-MM-dd");
+
+      if (dateStr > today) {
+        col.push({ date: dateStr, status: "future" });
+      } else if (!isHabitScheduledForDate(habit, dateStr)) {
+        col.push({ date: dateStr, status: "unscheduled" });
+      } else if (completedDates.has(dateStr)) {
+        col.push({ date: dateStr, status: "completed" });
+      } else {
+        col.push({ date: dateStr, status: "scheduled" });
+      }
+    }
+    columns.push(col);
+    currentWeekStart = new Date(currentWeekStart);
+    currentWeekStart.setDate(currentWeekStart.getDate() + DAYS_PER_WEEK);
+  }
+
+  const labels: { col: number; label: string }[] = [];
+  let lastMonth = "";
+  for (let w = 0; w < columns.length; w++) {
+    const month = columns[w][0].date.slice(0, 7);
+    if (month !== lastMonth) {
+      labels.push({ col: w, label: format(parseISO(columns[w][0].date), "MMM") });
+      lastMonth = month;
+    }
+  }
+
+  return { grid: columns, monthLabels: labels };
+}

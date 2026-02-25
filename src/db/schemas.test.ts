@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { habitSchema, habitCompletionSchema, userSettingsSchema } from "./schemas";
-import { createHabit, createCompletion, createSettings } from "@/test/factories";
+import { createHabit, createCompletion, createSettings, resetFactories } from "@/test/factories";
+
+beforeEach(() => {
+  resetFactories();
+});
 
 describe("habitSchema", () => {
   it("validates a correct habit", () => {
@@ -61,6 +65,17 @@ describe("habitCompletionSchema", () => {
 
   it("rejects note over 250 chars", () => {
     const completion = createCompletion({ note: "a".repeat(251) });
+    expect(() => habitCompletionSchema.parse(completion)).toThrow();
+  });
+
+  it("rejects impossible calendar dates", () => {
+    // Feb 30 doesn't exist
+    const completion = createCompletion({ date: "2026-02-30" });
+    expect(() => habitCompletionSchema.parse(completion)).toThrow();
+  });
+
+  it("rejects month 13", () => {
+    const completion = createCompletion({ date: "2026-13-01" });
     expect(() => habitCompletionSchema.parse(completion)).toThrow();
   });
 });

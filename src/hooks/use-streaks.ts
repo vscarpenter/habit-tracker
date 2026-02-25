@@ -5,9 +5,9 @@ import { format, subDays, parseISO } from "date-fns";
 import { completionService } from "@/db/completion-service";
 import { computeHabitStats } from "@/lib/stats-utils";
 import { useToast } from "@/components/shared/toast";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import type { Habit, HabitCompletion } from "@/types";
-
-const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 const STREAK_LOOKBACK_DAYS = 60;
 
 /**
@@ -29,7 +29,7 @@ export function useStreaks(habits: Habit[], today: string) {
       const data = await completionService.getByDateRange(startDate, today);
       setCompletions(data);
     } catch (error) {
-      console.error("Failed to load streaks:", error);
+      logger.error("Failed to load streaks:", error);
       toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);

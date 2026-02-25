@@ -2,9 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import { z } from "zod/v4";
 import { db } from "./database";
 import { habitCompletionSchema } from "./schemas";
+import { MAX_NOTE_LENGTH } from "@/lib/utils";
 import type { HabitCompletion } from "@/types";
-
-const MAX_NOTE_LENGTH = 250;
 
 export const completionService = {
   async getByHabitId(habitId: string): Promise<HabitCompletion[]> {

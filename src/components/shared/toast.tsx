@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { cn } from "@/lib/utils";
+import { TOAST_AUTO_DISMISS_MS } from "@/lib/constants";
 import { CheckCircle, AlertCircle, Info, X } from "lucide-react";
 
 type ToastVariant = "success" | "error" | "info";
@@ -54,7 +55,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3000);
+    }, TOAST_AUTO_DISMISS_MS);
   }, []);
 
   const removeToast = useCallback((id: number) => {

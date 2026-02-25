@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { DangerConfirmDialog } from "@/components/shared/danger-confirm-dialog";
 import { useToast } from "@/components/shared/toast";
+import { logger } from "@/lib/logger";
 import {
   buildExportPayload,
   downloadJson,
@@ -74,7 +75,8 @@ export function DataManagement() {
       const payload = await buildExportPayload();
       downloadJson(payload);
       toast("Data exported successfully");
-    } catch {
+    } catch (error) {
+      logger.error("Failed to export data:", error);
       toast("Failed to export data", "error");
     }
   }
@@ -91,12 +93,13 @@ export function DataManagement() {
       const result = validateImportData(raw);
 
       if (!result.valid) {
-        toast(`Invalid file: ${result.errors?.[0] ?? "Unknown error"}`, "error");
+        toast(`Invalid file: ${result.errors[0] ?? "Unknown error"}`, "error");
         return;
       }
 
-      openImportPreview(result.data!);
-    } catch {
+      openImportPreview(result.data);
+    } catch (error) {
+      logger.error("Failed to parse import file:", error);
       toast("Could not read file. Make sure it's valid JSON.", "error");
     }
   }
@@ -104,7 +107,10 @@ export function DataManagement() {
   async function handleLoadSample(sample: (typeof SAMPLE_IMPORTS)[number]) {
     setLoadingSampleId(sample.id);
     try {
-      const response = await fetch(sample.href, { cache: "no-store" });
+      const response = await fetch(sample.href, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(30_000),
+      });
       if (!response.ok) {
         toast(`Failed to load sample (${response.status})`, "error");
         return;
@@ -113,12 +119,13 @@ export function DataManagement() {
       const raw = await response.json();
       const result = validateImportData(raw);
       if (!result.valid) {
-        toast(`Invalid sample: ${result.errors?.[0] ?? "Unknown error"}`, "error");
+        toast(`Invalid sample: ${result.errors[0] ?? "Unknown error"}`, "error");
         return;
       }
 
-      openImportPreview(result.data!, sample.label);
-    } catch {
+      openImportPreview(result.data, sample.label);
+    } catch (error) {
+      logger.error("Failed to load sample data:", error);
       toast("Could not load sample data", "error");
     } finally {
       setLoadingSampleId(null);
@@ -133,7 +140,8 @@ export function DataManagement() {
       toast("Data imported successfully");
       setImportPreview(null);
       window.location.href = "/";
-    } catch {
+    } catch (error) {
+      logger.error("Failed to import data:", error);
       toast("Failed to import data", "error");
     }
   }
@@ -143,7 +151,8 @@ export function DataManagement() {
       await clearAllData();
       toast("All data cleared");
       window.location.href = "/";
-    } catch {
+    } catch (error) {
+      logger.error("Failed to clear data:", error);
       toast("Failed to clear data", "error");
     }
   }

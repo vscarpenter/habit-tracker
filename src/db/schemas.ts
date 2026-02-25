@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { isValid, parseISO } from "date-fns";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -8,6 +9,15 @@ const HEX_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
 const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Validates that a YYYY-MM-DD string represents a real calendar date. */
+const dateString = z
+  .string()
+  .regex(DATE_REGEX, "Date must be YYYY-MM-DD format")
+  .refine(
+    (value: string) => isValid(parseISO(value)),
+    "Date is not a valid calendar date"
+  );
 
 const habitFrequencySchema = z.enum([
   "daily",
@@ -59,7 +69,7 @@ export const habitSchema = habitBaseSchema
 export const habitCompletionSchema = z.object({
   id: z.string().regex(UUID_REGEX, "Invalid UUID format"),
   habitId: z.string().regex(UUID_REGEX, "Invalid habit ID format"),
-  date: z.string().regex(DATE_REGEX, "Date must be YYYY-MM-DD format"),
+  date: dateString,
   completedAt: z.iso.datetime(),
   note: z.string().max(250, "Note is too long").optional(),
 });

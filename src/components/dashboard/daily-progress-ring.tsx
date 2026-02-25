@@ -14,8 +14,9 @@ export function DailyProgressRing({
   className,
 }: DailyProgressRingProps) {
   const percentage = total > 0 ? (completed / total) * 100 : 0;
-  const radius = 54;
-  const circumference = 2 * Math.PI * radius;
+  // Radius tuned to the 120x120 viewBox with strokeWidth=8
+  const RING_RADIUS = 54;
+  const circumference = 2 * Math.PI * RING_RADIUS;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
@@ -25,7 +26,7 @@ export function DailyProgressRing({
         <circle
           cx="60"
           cy="60"
-          r={radius}
+          r={RING_RADIUS}
           fill="none"
           stroke="var(--border-subtle)"
           strokeWidth="8"
@@ -34,7 +35,7 @@ export function DailyProgressRing({
         <circle
           cx="60"
           cy="60"
-          r={radius}
+          r={RING_RADIUS}
           fill="none"
           stroke="var(--accent-blue)"
           strokeWidth="8"

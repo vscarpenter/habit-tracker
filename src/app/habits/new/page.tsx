@@ -7,8 +7,8 @@ import { HabitForm } from "@/components/habits/habit-form";
 import { useHabits } from "@/hooks/use-habits";
 import { useToast } from "@/components/shared/toast";
 import { MAX_ACTIVE_HABITS, HABIT_WARN_THRESHOLD } from "@/lib/utils";
-
-const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 
 export default function NewHabitPage() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function NewHabitPage() {
     try {
       await create(data);
     } catch (error) {
-      console.error("Failed to create habit:", error);
+      logger.error("Failed to create habit:", error);
       toast(DB_ERROR_MSG, "error");
       return;
     }

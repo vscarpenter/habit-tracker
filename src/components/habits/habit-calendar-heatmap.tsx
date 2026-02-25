@@ -1,15 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  startOfWeek,
-  subWeeks,
-  format,
-  parseISO,
-} from "date-fns";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { isHabitScheduledForDate } from "@/lib/date-utils";
+import { buildHabitHeatmapData } from "@/lib/stats-utils";
 import type { Habit, HabitCompletion } from "@/types";
 
 interface HabitCalendarHeatmapProps {
@@ -28,53 +22,10 @@ export function HabitCalendarHeatmap({
   today,
   weekStartsOn = 0,
 }: HabitCalendarHeatmapProps) {
-  const { grid, monthLabels } = useMemo(() => {
-    const todayDate = parseISO(today);
-    const weekEnd = startOfWeek(todayDate, { weekStartsOn });
-    const gridStart = subWeeks(weekEnd, WEEKS - 1);
-
-    const completedDates = new Set(completions.map((c) => c.date));
-
-    // Build a 7 x WEEKS grid (rows = days of week, cols = weeks)
-    const columns: { date: string; status: "completed" | "scheduled" | "unscheduled" | "future" }[][] = [];
-    let currentWeekStart = gridStart;
-
-    for (let w = 0; w < WEEKS; w++) {
-      const col: typeof columns[0] = [];
-      for (let d = 0; d < 7; d++) {
-        const date = new Date(currentWeekStart);
-        date.setDate(date.getDate() + d);
-        const dateStr = format(date, "yyyy-MM-dd");
-
-        if (dateStr > today) {
-          col.push({ date: dateStr, status: "future" });
-        } else if (!isHabitScheduledForDate(habit, dateStr)) {
-          col.push({ date: dateStr, status: "unscheduled" });
-        } else if (completedDates.has(dateStr)) {
-          col.push({ date: dateStr, status: "completed" });
-        } else {
-          col.push({ date: dateStr, status: "scheduled" });
-        }
-      }
-      columns.push(col);
-      currentWeekStart = new Date(currentWeekStart);
-      currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-    }
-
-    // Month labels: find the first column that starts in each new month
-    const labels: { col: number; label: string }[] = [];
-    let lastMonth = "";
-    for (let w = 0; w < columns.length; w++) {
-      const firstDay = columns[w][0];
-      const month = firstDay.date.slice(0, 7);
-      if (month !== lastMonth) {
-        labels.push({ col: w, label: format(parseISO(firstDay.date), "MMM") });
-        lastMonth = month;
-      }
-    }
-
-    return { grid: columns, monthLabels: labels };
-  }, [habit, completions, today, weekStartsOn]);
+  const { grid, monthLabels } = useMemo(
+    () => buildHabitHeatmapData(habit, completions, today, weekStartsOn),
+    [habit, completions, today, weekStartsOn]
+  );
 
   return (
     <Card>

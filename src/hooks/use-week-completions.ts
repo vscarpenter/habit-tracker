@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { completionService } from "@/db/completion-service";
 import { useToast } from "@/components/shared/toast";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import type { HabitCompletion } from "@/types";
-
-const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 function completionKey(habitId: string, date: string): string {
   return `${habitId}::${date}`;
@@ -21,7 +21,7 @@ export function useWeekCompletions(startDate: string, endDate: string) {
       const data = await completionService.getByDateRange(startDate, endDate);
       setCompletions(data);
     } catch (error) {
-      console.error("Failed to load week completions:", error);
+      logger.error("Failed to load week completions:", error);
       toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);
@@ -69,7 +69,7 @@ export function useWeekCompletions(startDate: string, endDate: string) {
         await completionService.toggle(habitId, date);
         await refresh();
       } catch (error) {
-        console.error("Failed to toggle completion:", error);
+        logger.error("Failed to toggle completion:", error);
         toast(DB_ERROR_MSG, "error");
         await refresh();
       }

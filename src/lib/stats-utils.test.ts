@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { format, subDays, parseISO } from "date-fns";
 import {
   computeHabitStats,
@@ -8,7 +8,11 @@ import {
   buildCategoryBreakdown,
   buildLeaderboard,
 } from "./stats-utils";
-import { createHabit, createCompletion } from "@/test/factories";
+import { createHabit, createCompletion, resetFactories } from "@/test/factories";
+
+beforeEach(() => {
+  resetFactories();
+});
 
 const TODAY = "2026-02-17";
 
@@ -315,5 +319,70 @@ describe("buildLeaderboard", () => {
     });
     const result = buildLeaderboard([h], [], TODAY);
     expect(result).toHaveLength(0);
+  });
+});
+
+// ── Edge case: habit created today ────────────────────
+
+describe("computeHabitStats — edge cases", () => {
+  it("handles habit created today with no completions", () => {
+    const habit = createHabit({
+      frequency: "daily",
+      createdAt: `${TODAY}T00:00:00.000Z`,
+    });
+    const result = computeHabitStats(habit, [], TODAY);
+    expect(result.currentStreak).toBe(0);
+    expect(result.bestStreak).toBe(0);
+    expect(result.completionRate).toBe(0);
+    expect(result.totalCompletions).toBe(0);
+  });
+
+  it("handles habit created today with today completed", () => {
+    const habit = createHabit({
+      frequency: "daily",
+      createdAt: `${TODAY}T00:00:00.000Z`,
+    });
+    const completions = [createCompletion({ habitId: habit.id, date: TODAY })];
+    const result = computeHabitStats(habit, completions, TODAY);
+    expect(result.currentStreak).toBe(1);
+    expect(result.bestStreak).toBe(1);
+    expect(result.completionRate).toBe(100);
+  });
+
+  it("handles single-day date range in trend", () => {
+    const entries = buildDailyCompletionTrend([], TODAY, TODAY);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].date).toBe(TODAY);
+    expect(entries[0].count).toBe(0);
+  });
+});
+
+// ── computeOverallStats — single habit ────────────────
+
+describe("computeOverallStats — single habit", () => {
+  it("returns stats for a single active habit", () => {
+    const habit = createHabit({
+      frequency: "daily",
+      createdAt: `${daysAgo(2)}T00:00:00.000Z`,
+    });
+    const completions = [0, 1, 2].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i) })
+    );
+    const result = computeOverallStats([habit], completions, TODAY);
+    expect(result.totalActiveHabits).toBe(1);
+    expect(result.totalCompletions).toBe(3);
+    expect(result.overallCompletionRate).toBe(100);
+  });
+});
+
+// ── buildAggregateHeatmapData — weekStartsOn=1 ───────
+
+describe("buildAggregateHeatmapData — weekStartsOn=1", () => {
+  it("returns 52 columns with Monday start", () => {
+    const { grid } = buildAggregateHeatmapData([], TODAY, 1);
+    expect(grid).toHaveLength(52);
+    for (const col of grid) {
+      expect(col).toHaveLength(7);
+    }
   });
 });

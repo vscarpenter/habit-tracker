@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { logger } from "@/lib/logger";
 
 export function useServiceWorker() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -28,7 +29,7 @@ export function useServiceWorker() {
         });
       })
       .catch((error) => {
-        console.error("Service worker registration failed:", error);
+        logger.error("Service worker registration failed:", error);
       });
   }, []);
 

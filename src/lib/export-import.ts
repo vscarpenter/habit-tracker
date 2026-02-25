@@ -23,11 +23,9 @@ const exportDataSchema = z.object({
 
 export type ExportData = z.infer<typeof exportDataSchema>;
 
-export interface ImportValidationResult {
-  valid: boolean;
-  data?: ExportData;
-  errors?: string[];
-}
+export type ImportValidationResult =
+  | { valid: true; data: ExportData }
+  | { valid: false; errors: string[] };
 
 // ── Export ────────────────────────────────────────────────────────────
 
@@ -73,7 +71,11 @@ export async function parseImportFile(file: File): Promise<unknown> {
     throw new Error("Import file is too large (max 10 MB)");
   }
   const text = await file.text();
-  return JSON.parse(text);
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("File is not valid JSON");
+  }
 }
 
 export function validateImportData(raw: unknown): ImportValidationResult {

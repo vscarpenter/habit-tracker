@@ -112,12 +112,12 @@ export function buildMonthlyCompletionData(
   for (const c of completions) {
     const ym = c.date.slice(0, 7); // "YYYY-MM"
     if (countMap.has(ym)) {
-      countMap.set(ym, countMap.get(ym)! + 1);
+      countMap.set(ym, (countMap.get(ym) ?? 0) + 1);
     }
   }
 
   return months.map((m) => ({
     month: format(parseISO(`${m}-01`), "MMM yyyy"),
-    count: countMap.get(m)!,
+    count: countMap.get(m) ?? 0,
   }));
 }

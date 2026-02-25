@@ -5,10 +5,10 @@ import { completionService } from "@/db/completion-service";
 import { useToast } from "@/components/shared/toast";
 import { computeHabitStats } from "@/lib/stats-utils";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import type { Habit, HabitCompletion } from "@/types";
 import type { HabitStatsResult } from "@/lib/stats-utils";
-
-const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 // Re-export for backward compatibility
 export type HabitStats = HabitStatsResult;
@@ -34,7 +34,7 @@ export function useHabitStats(habit: Habit | null, today: string) {
       const result = computeHabitStats(habit, completions, today);
       setStats(result);
     } catch (error) {
-      console.error("Failed to calculate habit stats:", error);
+      logger.error("Failed to calculate habit stats:", error);
       toast(DB_ERROR_MSG, "error");
     } finally {
       setLoading(false);

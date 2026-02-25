@@ -10,9 +10,9 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useHabits } from "@/hooks/use-habits";
 import { useToast } from "@/components/shared/toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DB_ERROR_MSG } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import type { Habit } from "@/types";
-
-const DB_ERROR_MSG = "Something went wrong. Your data is safe.";
 
 export default function EditHabitPage({
   params,
@@ -39,7 +39,7 @@ export default function EditHabitPage({
       toast("Changes saved!", "success");
       router.push("/habits");
     } catch (error) {
-      console.error("Failed to update habit:", error);
+      logger.error("Failed to update habit:", error);
       toast(DB_ERROR_MSG, "error");
     }
   };
@@ -50,7 +50,7 @@ export default function EditHabitPage({
       toast("Habit archived. You can restore it from the habits list.", "success");
       router.push("/habits");
     } catch (error) {
-      console.error("Failed to archive habit:", error);
+      logger.error("Failed to archive habit:", error);
       toast(DB_ERROR_MSG, "error");
     }
   };

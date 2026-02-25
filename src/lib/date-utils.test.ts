@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   getWeekStart,
   getWeekDates,
@@ -7,7 +7,12 @@ import {
   isHabitScheduledForDate,
   frequencyLabel,
 } from "./date-utils";
+import { resetFactories } from "@/test/factories";
 import type { Habit, HabitCompletion } from "@/types";
+
+beforeEach(() => {
+  resetFactories();
+});
 
 // --- getWeekStart ---
 
@@ -92,12 +97,13 @@ describe("buildMonthlyCompletionData", () => {
   });
 
   it("counts completions in the correct month bucket", () => {
-    // Using dates that should fall within the last 3 months from "now"
-    const now = new Date();
-    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    // Build thisMonth from the same Date constructor the function uses internally,
+    // ensuring alignment even on month boundaries.
+    const anchor = new Date();
+    const thisMonth = `${anchor.getFullYear()}-${String(anchor.getMonth() + 1).padStart(2, "0")}`;
     const completions: HabitCompletion[] = [
-      { id: "1", habitId: "h1", date: `${thisMonth}-01`, completedAt: "" },
-      { id: "2", habitId: "h1", date: `${thisMonth}-15`, completedAt: "" },
+      { id: "1", habitId: "h1", date: `${thisMonth}-05`, completedAt: "" },
+      { id: "2", habitId: "h1", date: `${thisMonth}-10`, completedAt: "" },
     ];
     const result = buildMonthlyCompletionData(completions, 3);
     const currentEntry = result[result.length - 1];
@@ -146,6 +152,13 @@ describe("isHabitScheduledForDate", () => {
     const habit = { ...baseHabit, frequency: "specific_days" as const, targetDays: [1, 3, 5] };
     expect(isHabitScheduledForDate(habit, "2026-02-16")).toBe(true);  // Monday=1
     expect(isHabitScheduledForDate(habit, "2026-02-17")).toBe(false); // Tuesday=2
+  });
+
+  it("returns true for x_per_week on any day", () => {
+    const habit = { ...baseHabit, frequency: "x_per_week" as const, targetCount: 3 };
+    expect(isHabitScheduledForDate(habit, "2026-02-15")).toBe(true); // Sunday
+    expect(isHabitScheduledForDate(habit, "2026-02-17")).toBe(true); // Tuesday
+    expect(isHabitScheduledForDate(habit, "2026-02-21")).toBe(true); // Saturday
   });
 });
 
