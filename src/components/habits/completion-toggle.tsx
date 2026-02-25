@@ -35,14 +35,14 @@ export function CompletionToggle({
       type="button"
       onClick={handleClick}
       className={cn(
-        "rounded-full flex items-center justify-center shrink-0",
-        "transition-all duration-200 border-2",
+        "flex shrink-0 items-center justify-center rounded-full",
+        "transition-all duration-200 border-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
         sizeClass,
         animating && "animate-completion-bounce"
       )}
       style={{
         borderColor: completed ? color : "var(--border-subtle)",
-        backgroundColor: completed ? color : "transparent",
+        backgroundColor: completed ? color : "var(--surface-paper)",
       }}
       aria-label={completed ? "Mark as incomplete" : "Mark as complete"}
       aria-pressed={completed}

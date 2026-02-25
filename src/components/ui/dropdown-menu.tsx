@@ -114,7 +114,7 @@ const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuContentProps>
         role="menu"
         className={cn(
           "absolute z-50 mt-1 min-w-[160px] overflow-hidden rounded-xl",
-          "bg-surface-strong backdrop-blur-2xl border border-border-subtle shadow-[0_18px_34px_-20px_rgba(20,16,10,0.7)]",
+          "bg-surface-paper/96 backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-lg)]",
           "p-1 animate-fade-in",
           align === "start" && "left-0",
           align === "center" && "left-1/2 -translate-x-1/2",
@@ -151,8 +151,8 @@ const DropdownMenuItem = forwardRef<HTMLButtonElement, DropdownMenuItemProps>(
           "flex w-full items-center rounded-lg px-2 py-1.5 text-sm",
           "transition-colors duration-150 outline-none",
           destructive
-            ? "text-error hover:bg-error/10"
-            : "text-text-primary hover:bg-surface-muted",
+            ? "text-error hover:bg-error/8"
+            : "text-text-primary hover:bg-surface-tint/75",
           className
         )}
         {...props}

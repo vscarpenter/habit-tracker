@@ -1,0 +1,687 @@
+{
+  "version": "1.0",
+  "exportedAt": "2026-02-25T15:30:00Z",
+  "app": "HabitFlow",
+  "data": {
+    "habits": [
+      {
+        "id": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "name": "Morning Walk",
+        "icon": "\ud83d\udeb6",
+        "color": "#10b981",
+        "frequency": "daily",
+        "category": "Health",
+        "sortOrder": 0,
+        "isArchived": false,
+        "createdAt": "2025-08-15T12:00:00Z",
+        "updatedAt": "2025-12-13T12:00:00Z",
+        "description": "20-minute walk after coffee",
+        "reminderTime": "07:30"
+      },
+      {
+        "id": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "name": "Read 20 Minutes",
+        "icon": "\ud83d\udcda",
+        "color": "#3b82f6",
+        "frequency": "daily",
+        "category": "Learning",
+        "sortOrder": 1,
+        "isArchived": false,
+        "createdAt": "2025-08-16T12:00:00Z",
+        "updatedAt": "2025-12-14T12:00:00Z",
+        "description": "Read before bed",
+        "reminderTime": "21:00"
+      },
+      {
+        "id": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "name": "Strength Training",
+        "icon": "\ud83c\udfcb\ufe0f",
+        "color": "#ef4444",
+        "frequency": "specific_days",
+        "category": "Fitness",
+        "sortOrder": 2,
+        "isArchived": false,
+        "createdAt": "2025-08-17T12:00:00Z",
+        "updatedAt": "2025-12-15T12:00:00Z",
+        "description": "Mon/Wed/Fri",
+        "reminderTime": "18:00",
+        "targetDays": [
+          1,
+          3,
+          5
+        ]
+      },
+      {
+        "id": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "name": "Meditation",
+        "icon": "\ud83e\uddd8",
+        "color": "#8b5cf6",
+        "frequency": "weekdays",
+        "category": "Mindset",
+        "sortOrder": 3,
+        "isArchived": false,
+        "createdAt": "2025-08-18T12:00:00Z",
+        "updatedAt": "2025-12-16T12:00:00Z",
+        "description": "10 minutes breathing",
+        "reminderTime": "08:00"
+      },
+      {
+        "id": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "name": "Meal Prep",
+        "icon": "\ud83e\udd57",
+        "color": "#14b8a6",
+        "frequency": "weekends",
+        "category": "Health",
+        "sortOrder": 4,
+        "isArchived": false,
+        "createdAt": "2025-08-19T12:00:00Z",
+        "updatedAt": "2025-12-17T12:00:00Z",
+        "description": "Prep lunches for the week",
+        "reminderTime": "11:00"
+      }
+    ],
+    "completions": [
+      {
+        "id": "d0f95f1e-4a82-4e74-9650-141f27245e3d",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-21",
+        "completedAt": "2026-01-21T21:45:00Z"
+      },
+      {
+        "id": "d1f6f80e-b9ac-4821-b270-b652b97486de",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-01-21",
+        "completedAt": "2026-01-21T08:45:00Z"
+      },
+      {
+        "id": "737d3166-0578-4e42-9d9d-0a6ff2a7ded2",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-22",
+        "completedAt": "2026-01-22T22:15:00Z"
+      },
+      {
+        "id": "221a46ae-0491-4d7d-889a-57c5a2b8c2ee",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-22",
+        "completedAt": "2026-01-22T22:05:00Z",
+        "note": "Finished a chapter"
+      },
+      {
+        "id": "8e88e2fa-743d-4aac-839c-25e222565f99",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-01-22",
+        "completedAt": "2026-01-22T06:05:00Z"
+      },
+      {
+        "id": "1a13a896-d67a-4a3c-b2a1-c86219fa67fe",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-23",
+        "completedAt": "2026-01-23T21:45:00Z"
+      },
+      {
+        "id": "ba702657-d9b2-4438-a52d-cf7b95a13c42",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-23",
+        "completedAt": "2026-01-23T17:00:00Z"
+      },
+      {
+        "id": "3228f9b0-60d4-407d-92c9-08e70ab460f2",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-24",
+        "completedAt": "2026-01-24T08:05:00Z"
+      },
+      {
+        "id": "59c809cb-f7e5-49f0-84c1-1f16e25d0ab9",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-01-24",
+        "completedAt": "2026-01-24T12:05:00Z"
+      },
+      {
+        "id": "6bac5bd3-16cd-4a9b-b1c9-df46a549ce68",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-24",
+        "completedAt": "2026-01-24T17:40:00Z"
+      },
+      {
+        "id": "d784cb88-a56d-400b-b7bc-d176547edfb8",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-25",
+        "completedAt": "2026-01-25T08:05:00Z"
+      },
+      {
+        "id": "6783a8e3-5785-4a4b-80e2-ca6ceb68b5d8",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-01-25",
+        "completedAt": "2026-01-25T19:10:00Z"
+      },
+      {
+        "id": "7f04995f-6e59-47a7-92e6-dc7332ef2e0c",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-25",
+        "completedAt": "2026-01-25T22:15:00Z",
+        "note": "Read before bed"
+      },
+      {
+        "id": "05106b34-5196-48a5-9825-fee23e4a7ac2",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-26",
+        "completedAt": "2026-01-26T06:40:00Z"
+      },
+      {
+        "id": "3bbdbaf3-9bee-49c1-882b-bf46a9669f89",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-26",
+        "completedAt": "2026-01-26T20:10:00Z"
+      },
+      {
+        "id": "dd5b2f37-228c-43d4-bac2-ac388b4e214e",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-01-26",
+        "completedAt": "2026-01-26T08:05:00Z"
+      },
+      {
+        "id": "b494c6e4-1a4e-4a57-b68a-3b5a78c327b0",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-01-26",
+        "completedAt": "2026-01-26T19:45:00Z"
+      },
+      {
+        "id": "0d514af1-78c5-4cdc-bb30-0bb44622efff",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-27",
+        "completedAt": "2026-01-27T22:10:00Z"
+      },
+      {
+        "id": "ad70f82f-4607-4b69-9f41-254beeb7ff68",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-01-27",
+        "completedAt": "2026-01-27T17:15:00Z"
+      },
+      {
+        "id": "b0cc539e-f6aa-4602-931c-01356fd0002f",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-28",
+        "completedAt": "2026-01-28T22:10:00Z"
+      },
+      {
+        "id": "5ed2a79b-4a13-4193-8944-328b171868cc",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-28",
+        "completedAt": "2026-01-28T08:20:00Z"
+      },
+      {
+        "id": "3b4e1105-2cb4-4798-a9de-6b56621bf1a8",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-01-28",
+        "completedAt": "2026-01-28T21:05:00Z"
+      },
+      {
+        "id": "5026639f-2522-4911-9808-39bb34dd9124",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-29",
+        "completedAt": "2026-01-29T21:05:00Z"
+      },
+      {
+        "id": "b6f57f22-16aa-487a-8170-291fc1b93c1a",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-01-29",
+        "completedAt": "2026-01-29T21:45:00Z"
+      },
+      {
+        "id": "a33d71e6-3175-4878-9533-ed3a784b6331",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-30",
+        "completedAt": "2026-01-30T12:15:00Z"
+      },
+      {
+        "id": "79b55968-89ac-4b1f-acca-15000f3a71ae",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-01-30",
+        "completedAt": "2026-01-30T12:10:00Z"
+      },
+      {
+        "id": "4ff8d621-8198-4fa7-8750-bc917683adab",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-01-30",
+        "completedAt": "2026-01-30T22:45:00Z"
+      },
+      {
+        "id": "6702a28e-87c0-4c9b-97d6-9323dc10cebb",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-01-30",
+        "completedAt": "2026-01-30T21:00:00Z"
+      },
+      {
+        "id": "6f3127c3-33f0-4168-882f-d820e3074179",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-01-31",
+        "completedAt": "2026-01-31T20:30:00Z"
+      },
+      {
+        "id": "7ebd36bb-4001-478f-895f-2c1c2b681f2b",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-01-31",
+        "completedAt": "2026-01-31T12:00:00Z"
+      },
+      {
+        "id": "eddddc0f-6cc5-4096-8388-8802118e41ae",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-01",
+        "completedAt": "2026-02-01T12:50:00Z"
+      },
+      {
+        "id": "e0c7defe-f10f-4369-b390-7ad055104f44",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-02-01",
+        "completedAt": "2026-02-01T22:50:00Z"
+      },
+      {
+        "id": "63b4332a-4ebd-43e0-afad-3b0fe72a714a",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-01",
+        "completedAt": "2026-02-01T19:45:00Z"
+      },
+      {
+        "id": "1aa7432d-d1a0-4456-b35e-e8f65793fc9b",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-02",
+        "completedAt": "2026-02-02T17:45:00Z"
+      },
+      {
+        "id": "e6b76d3f-f590-4f92-a2d2-c8370d02d1d1",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-02",
+        "completedAt": "2026-02-02T07:05:00Z",
+        "note": "Read before bed"
+      },
+      {
+        "id": "0b28c672-a5b6-480a-bf0c-5b1d9476a34c",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-02",
+        "completedAt": "2026-02-02T06:20:00Z"
+      },
+      {
+        "id": "a749d6a1-6131-42db-97ae-d79f26066c22",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-02",
+        "completedAt": "2026-02-02T07:45:00Z"
+      },
+      {
+        "id": "9aee1120-1428-44e0-9042-a25a7697e8c4",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-03",
+        "completedAt": "2026-02-03T07:45:00Z"
+      },
+      {
+        "id": "65b1b9b9-255c-4e96-9541-a3ca48e781d8",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-03",
+        "completedAt": "2026-02-03T19:20:00Z"
+      },
+      {
+        "id": "42f99000-50d6-4e2b-b02f-481cc6b36d75",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-04",
+        "completedAt": "2026-02-04T19:50:00Z"
+      },
+      {
+        "id": "408a6ef1-e3b0-4b5c-af79-8fef749ed948",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-04",
+        "completedAt": "2026-02-04T17:30:00Z"
+      },
+      {
+        "id": "b4ebf1a9-d026-4001-8d75-6dc0b3f1f98c",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-04",
+        "completedAt": "2026-02-04T07:45:00Z"
+      },
+      {
+        "id": "7fa14447-4946-4328-90ee-898aad180e5d",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-05",
+        "completedAt": "2026-02-05T21:10:00Z"
+      },
+      {
+        "id": "b131fdfb-38e1-44ca-81c5-7b3d72e93efa",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-05",
+        "completedAt": "2026-02-05T22:00:00Z"
+      },
+      {
+        "id": "b1b926b9-b789-4478-a1cd-35efa763ebe4",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-06",
+        "completedAt": "2026-02-06T19:45:00Z"
+      },
+      {
+        "id": "da704dae-3e42-43bf-9c65-6fad7fc50384",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-07",
+        "completedAt": "2026-02-07T18:15:00Z"
+      },
+      {
+        "id": "e79f7cfd-857e-4a6d-b48e-25276feccb72",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-02-07",
+        "completedAt": "2026-02-07T18:45:00Z"
+      },
+      {
+        "id": "3718545c-531b-4648-9d74-cff0dd6aa36a",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-07",
+        "completedAt": "2026-02-07T20:50:00Z"
+      },
+      {
+        "id": "ac4682e0-8885-4096-95f0-756d134c2a61",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-08",
+        "completedAt": "2026-02-08T06:05:00Z"
+      },
+      {
+        "id": "c983f65e-4ff7-447c-ba37-c2e469595546",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-02-08",
+        "completedAt": "2026-02-08T12:05:00Z"
+      },
+      {
+        "id": "82e3df2a-b6f1-4817-9c4a-73e0579e83fe",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-08",
+        "completedAt": "2026-02-08T07:20:00Z"
+      },
+      {
+        "id": "2c656cae-fa5d-4bbf-9913-16cc19ac1eb4",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-09",
+        "completedAt": "2026-02-09T07:40:00Z"
+      },
+      {
+        "id": "6fdaf968-89f4-47a2-839e-a3e9e073a941",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-09",
+        "completedAt": "2026-02-09T17:15:00Z"
+      },
+      {
+        "id": "8ac03fbb-9b7f-4945-b819-43cdc83d1cde",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-09",
+        "completedAt": "2026-02-09T20:20:00Z"
+      },
+      {
+        "id": "0db96d18-9b6b-4ffb-b27c-c9675466a786",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-10",
+        "completedAt": "2026-02-10T17:40:00Z"
+      },
+      {
+        "id": "b9a4b3f6-2db4-4bf2-b9d3-f7e675d2a7e9",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-10",
+        "completedAt": "2026-02-10T07:20:00Z"
+      },
+      {
+        "id": "38af9224-b0c4-4762-b437-6da8b24c36bc",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-11",
+        "completedAt": "2026-02-11T06:00:00Z"
+      },
+      {
+        "id": "d3fbae9c-86a4-4a69-9c4e-d74889aa26b4",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-11",
+        "completedAt": "2026-02-11T06:10:00Z"
+      },
+      {
+        "id": "63700884-65ce-4db1-b780-f82ec84247d2",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-12",
+        "completedAt": "2026-02-12T06:45:00Z"
+      },
+      {
+        "id": "3edb441e-f98d-42f7-8ea2-86dd1694e329",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-12",
+        "completedAt": "2026-02-12T08:05:00Z"
+      },
+      {
+        "id": "db9c9705-b477-49ae-aea5-6201d2af6a43",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-13",
+        "completedAt": "2026-02-13T19:40:00Z"
+      },
+      {
+        "id": "4cc9ecaa-e26b-46f8-8a11-be52a1fc16bb",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-13",
+        "completedAt": "2026-02-13T07:50:00Z"
+      },
+      {
+        "id": "2eeded25-7161-4c75-9f7c-29418bf5ff74",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-13",
+        "completedAt": "2026-02-13T08:15:00Z"
+      },
+      {
+        "id": "79b7f687-d5e3-43bd-8571-0cdaf938346f",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-14",
+        "completedAt": "2026-02-14T12:20:00Z"
+      },
+      {
+        "id": "5a2fe68c-b895-4c73-849b-46ac081c89bd",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-02-14",
+        "completedAt": "2026-02-14T07:15:00Z"
+      },
+      {
+        "id": "daf22540-a352-4196-801f-aa882fd429c6",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-15",
+        "completedAt": "2026-02-15T17:30:00Z"
+      },
+      {
+        "id": "2af25764-6cf1-4e4a-9ff6-a09dde1fb7f1",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-02-15",
+        "completedAt": "2026-02-15T19:05:00Z"
+      },
+      {
+        "id": "45a5d43e-4170-41a4-af0a-56492d790957",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-15",
+        "completedAt": "2026-02-15T21:10:00Z"
+      },
+      {
+        "id": "970dc4ed-541d-4021-9f92-4feb504c8a20",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-16",
+        "completedAt": "2026-02-16T19:05:00Z"
+      },
+      {
+        "id": "32097f43-a369-45b2-8bae-4625b859231d",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-16",
+        "completedAt": "2026-02-16T18:05:00Z"
+      },
+      {
+        "id": "6921bee5-c428-4ec2-9d32-4d3438f51d60",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-16",
+        "completedAt": "2026-02-16T18:45:00Z"
+      },
+      {
+        "id": "1e0ac9d6-c172-46cc-a009-af3d666e11e7",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-17",
+        "completedAt": "2026-02-17T07:00:00Z"
+      },
+      {
+        "id": "61bb6335-2104-4195-9c2c-84fed49ecb0a",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-17",
+        "completedAt": "2026-02-17T18:20:00Z"
+      },
+      {
+        "id": "27b829f8-8e59-457b-bebf-dc5ae788a87b",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-17",
+        "completedAt": "2026-02-17T12:45:00Z"
+      },
+      {
+        "id": "710bb445-989f-46ef-b9bf-437e22f0765a",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-18",
+        "completedAt": "2026-02-18T20:10:00Z"
+      },
+      {
+        "id": "fb32db55-887e-4471-996f-c4a8ddbe7aed",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-18",
+        "completedAt": "2026-02-18T07:45:00Z"
+      },
+      {
+        "id": "8d8659de-c36f-4aa5-af3a-91c425ce9328",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-18",
+        "completedAt": "2026-02-18T06:45:00Z"
+      },
+      {
+        "id": "a84e400e-d0ed-44e1-be4d-3d2229a7fab5",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-18",
+        "completedAt": "2026-02-18T12:30:00Z"
+      },
+      {
+        "id": "b9c680e7-a118-4a2e-bd00-7cef4bc937fb",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-19",
+        "completedAt": "2026-02-19T12:45:00Z"
+      },
+      {
+        "id": "e2ef0c67-a993-4b70-b862-fee175983f79",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-19",
+        "completedAt": "2026-02-19T08:05:00Z"
+      },
+      {
+        "id": "6e20990e-365d-4d85-8c8a-0fad592f609e",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-19",
+        "completedAt": "2026-02-19T06:10:00Z"
+      },
+      {
+        "id": "6ba98772-8834-440d-973c-5527d6eb29e8",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-20",
+        "completedAt": "2026-02-20T08:40:00Z"
+      },
+      {
+        "id": "54a33e2f-b3b0-4936-bde2-80217ed4d347",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-20",
+        "completedAt": "2026-02-20T06:10:00Z"
+      },
+      {
+        "id": "d2d0cb56-b03b-451f-9c33-a7a69f4fd26f",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-20",
+        "completedAt": "2026-02-20T18:50:00Z"
+      },
+      {
+        "id": "1d5bbc9f-24db-4e0e-ab6b-aa8e301d6a95",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-20",
+        "completedAt": "2026-02-20T17:15:00Z"
+      },
+      {
+        "id": "5fc60bc6-36a6-4d16-b1da-d6f71743cb8c",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-21",
+        "completedAt": "2026-02-21T07:40:00Z"
+      },
+      {
+        "id": "28e2d861-2d66-40a3-8db3-5837158c8cf0",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-22",
+        "completedAt": "2026-02-22T12:00:00Z"
+      },
+      {
+        "id": "e1dd462d-3b60-4dc9-9895-70d165c67b08",
+        "habitId": "7fbd931f-c18a-4eba-8ac2-3f7d30b9246b",
+        "date": "2026-02-22",
+        "completedAt": "2026-02-22T18:20:00Z"
+      },
+      {
+        "id": "9a37745b-0695-42c8-a86c-696059164e17",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-22",
+        "completedAt": "2026-02-22T20:05:00Z"
+      },
+      {
+        "id": "8bef377c-c39e-43e5-944a-ed7980a87403",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-23",
+        "completedAt": "2026-02-23T22:20:00Z"
+      },
+      {
+        "id": "875c78d0-73f7-4047-8b7d-3003bf2666a2",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-23",
+        "completedAt": "2026-02-23T06:45:00Z"
+      },
+      {
+        "id": "e3203f3e-e294-4ea5-9531-9e49099e1519",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-23",
+        "completedAt": "2026-02-23T21:50:00Z"
+      },
+      {
+        "id": "01e04127-b60e-43a2-9585-44047b147ca2",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-23",
+        "completedAt": "2026-02-23T12:15:00Z"
+      },
+      {
+        "id": "cdb30613-993d-4cd7-ba5b-8fb411c26233",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-24",
+        "completedAt": "2026-02-24T19:40:00Z"
+      },
+      {
+        "id": "067ec799-f523-4525-8444-f1934c91e38b",
+        "habitId": "b3aeb084-72a2-46cb-b4f6-ecd7d11a40b6",
+        "date": "2026-02-24",
+        "completedAt": "2026-02-24T08:40:00Z"
+      },
+      {
+        "id": "5869e607-b1fa-4df7-a408-94322a82bd5b",
+        "habitId": "4ffea61d-bc83-4225-9614-4384550912c4",
+        "date": "2026-02-25",
+        "completedAt": "2026-02-25T08:40:00Z"
+      },
+      {
+        "id": "b752f7b3-c4b5-4f0f-aa79-5f24f2b4a734",
+        "habitId": "a04d9a49-13d9-4fa4-b2cc-3f3b0cb0fbb7",
+        "date": "2026-02-25",
+        "completedAt": "2026-02-25T07:05:00Z"
+      },
+      {
+        "id": "bcff69c4-e898-4342-aa99-8ebfab12a661",
+        "habitId": "b9d507c7-8bb1-4ce7-a8a0-2afb12a8f97c",
+        "date": "2026-02-25",
+        "completedAt": "2026-02-25T22:30:00Z"
+      }
+    ],
+    "settings": {
+      "id": "user_settings",
+      "theme": "system",
+      "weekStartsOn": 1,
+      "showStreaks": true,
+      "showCompletionRate": true,
+      "defaultView": "today",
+      "createdAt": "2025-08-15T12:00:00Z",
+      "updatedAt": "2026-02-25T15:30:00Z"
+    }
+  }
+}

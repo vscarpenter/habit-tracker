@@ -37,7 +37,7 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/50 animate-overlay-fade"
+        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] animate-overlay-fade"
         onClick={() => onOpenChange(false)}
         aria-hidden="true"
       />
@@ -59,8 +59,8 @@ const DialogContent = forwardRef<
   <div
     ref={ref}
     className={cn(
-      "w-full max-w-lg mx-4 rounded-2xl p-6",
-      "bg-surface-elevated backdrop-blur-xl border border-border shadow-xl",
+      "mx-4 w-full max-w-lg rounded-3xl p-6",
+      "bg-surface-paper/96 backdrop-blur-xl border border-border-subtle shadow-[var(--shadow-editorial-lg)]",
       className
     )}
     {...props}
@@ -68,7 +68,7 @@ const DialogContent = forwardRef<
     {onClose && (
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 rounded-lg p-1 text-text-muted hover:text-text-primary transition-colors"
+        className="absolute right-4 top-4 rounded-xl border border-border-subtle/70 bg-surface-overlay/80 p-1.5 text-text-muted transition-colors hover:text-text-primary"
         aria-label="Close"
       >
         <X className="h-4 w-4" />
@@ -84,7 +84,7 @@ const DialogHeader = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mb-4", className)} {...props} />
+  <div ref={ref} className={cn("mb-4 border-b border-border-subtle/70 pb-3", className)} {...props} />
 ));
 
 DialogHeader.displayName = "DialogHeader";
@@ -121,7 +121,7 @@ const DialogFooter = forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("mt-6 flex justify-end gap-3", className)}
+    className={cn("mt-6 flex justify-end gap-3 border-t border-border-subtle/70 pt-4", className)}
     {...props}
   />
 ));

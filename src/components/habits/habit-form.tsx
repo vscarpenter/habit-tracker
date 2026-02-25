@@ -110,8 +110,9 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       {/* Name */}
-      <Card>
+      <Card variant="elevated">
         <div className="space-y-2" data-error={errors.name ? "" : undefined}>
+          <p className="hf-kicker">Essentials</p>
           <Label htmlFor="name">Name *</Label>
           <Input
             id="name"
@@ -144,9 +145,10 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       {/* Icon */}
       <Card>
         <div className="space-y-2" data-error={errors.icon ? "" : undefined}>
+          <p className="hf-kicker">Identity</p>
           <Label>Icon</Label>
           <div className="flex items-center gap-4 mb-3">
-            <div className="h-14 w-14 rounded-xl bg-surface-elevated border border-border-subtle flex items-center justify-center text-3xl">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border-subtle bg-surface-paper text-3xl shadow-[var(--shadow-editorial-sm)]">
               {icon}
             </div>
             <span className="text-sm text-text-secondary">
@@ -163,17 +165,19 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       {/* Color */}
       <Card>
         <div className="space-y-2">
+          <p className="hf-kicker">Color</p>
           <Label>Color</Label>
           <ColorPicker value={color} onChange={setColor} />
         </div>
       </Card>
 
       {/* Frequency */}
-      <Card>
+      <Card variant="elevated">
         <div
           className="space-y-2"
           data-error={errors.targetDays || errors.targetCount ? "" : undefined}
         >
+          <p className="hf-kicker">Schedule</p>
           <Label>Frequency *</Label>
           <FrequencySelector
             frequency={frequency}
@@ -195,6 +199,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       {/* Reminder Time */}
       <Card>
         <div className="space-y-2">
+          <p className="hf-kicker">Reminder</p>
           <Label htmlFor="reminderTime">Reminder Time</Label>
           <Input
             id="reminderTime"
@@ -209,6 +214,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       {/* Category */}
       <Card>
         <div className="space-y-2">
+          <p className="hf-kicker">Organization</p>
           <Label htmlFor="category">Category</Label>
           <Input
             id="category"
@@ -222,7 +228,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       </Card>
 
       {/* Actions */}
-      <div className="flex gap-3 pt-2">
+      <div className="hf-panel rounded-2xl flex gap-3 p-3">
         <Button
           type="button"
           variant="ghost"

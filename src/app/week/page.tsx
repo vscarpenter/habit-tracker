@@ -53,10 +53,11 @@ export default function WeekPage() {
         title="Week"
         subtitle={weekLabel}
         eyebrow="Planning View"
+        accentColor="var(--accent-emerald)"
         actions={
           <div className="flex items-center gap-1">
             <Button
-              variant="ghost"
+              variant="secondary"
               size="icon"
               onClick={() => setWeekOffset((o) => o - 1)}
               aria-label="Previous week"
@@ -73,7 +74,7 @@ export default function WeekPage() {
               </Button>
             )}
             <Button
-              variant="ghost"
+              variant="secondary"
               size="icon"
               onClick={() => setWeekOffset((o) => o + 1)}
               aria-label="Next week"

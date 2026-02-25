@@ -56,7 +56,12 @@ export default function DashboardPage() {
 
   return (
     <PageContainer>
-      <Header title="Today" subtitle={formatted} eyebrow="Daily Focus" />
+      <Header
+        title="Today"
+        subtitle={formatted}
+        eyebrow="Daily Focus"
+        accentColor="var(--accent-blue)"
+      />
       <TodayView
         habits={habits}
         completions={completions}

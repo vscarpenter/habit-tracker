@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { parseISO, format, subDays, isToday, isYesterday } from "date-fns";
 import { Check, Circle, Minus } from "lucide-react";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import type { Habit, HabitCompletion } from "@/types";
@@ -49,13 +49,14 @@ export function HabitRecentHistory({
     <Card>
       <CardHeader>
         <CardTitle>Recent History</CardTitle>
+        <CardDescription>Last {DAYS_TO_SHOW} days for this habit</CardDescription>
       </CardHeader>
 
-      <div className="space-y-0 divide-y divide-border-subtle">
+      <div className="space-y-2">
         {days.map(({ dateStr, scheduled, completion }) => (
           <div
             key={dateStr}
-            className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0"
+            className="hf-row flex items-center gap-3 rounded-xl px-3 py-2.5"
           >
             {/* Status icon */}
             {!scheduled ? (

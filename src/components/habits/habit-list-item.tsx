@@ -46,9 +46,8 @@ export function HabitListItem({
     <>
       <div
         className={cn(
-          "group relative rounded-2xl border px-4 py-3",
-          "bg-surface backdrop-blur-xl transition-all duration-200",
-          "border-border hover:border-border-subtle hover:bg-surface-elevated"
+          "hf-row group relative rounded-2xl px-4 py-3",
+          "transition-all duration-200 hover:-translate-y-0.5"
         )}
       >
         <span
@@ -59,8 +58,8 @@ export function HabitListItem({
 
         <div className="flex items-center gap-3 pl-1">
           <div
-            className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shrink-0 border border-border-subtle"
-            style={{ backgroundColor: `${habit.color}15` }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-surface-paper text-xl shadow-[var(--shadow-editorial-sm)]"
+            style={{ boxShadow: `inset 0 0 0 1px ${habit.color}20, var(--shadow-editorial-sm)` }}
           >
             {habit.icon}
           </div>
@@ -91,7 +90,7 @@ export function HabitListItem({
 
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-muted transition-colors"
+              className="rounded-xl border border-transparent p-2 text-text-muted transition-colors hover:border-border-subtle hover:bg-surface-paper/70 hover:text-text-primary"
               aria-label="Actions"
             >
               <MoreVertical className="h-4 w-4" />

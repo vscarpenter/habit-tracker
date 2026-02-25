@@ -11,6 +11,7 @@ export default function SettingsPage() {
         title="Settings"
         subtitle="Customize your experience"
         eyebrow="Preferences"
+        accentColor="var(--accent-amber)"
       />
       <SettingsContent />
     </PageContainer>

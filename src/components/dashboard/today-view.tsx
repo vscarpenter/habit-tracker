@@ -82,13 +82,13 @@ export function TodayView({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-3xl border border-border-subtle bg-surface-strong/90 p-4 shadow-sm backdrop-blur-xl sm:p-5">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="hf-hero rounded-3xl p-4 sm:p-5">
+        <div className="relative z-[1] mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted">
+            <p className="hf-kicker">
               Today&apos;s Momentum
             </p>
-            <h2 className="mt-1 text-xl font-semibold text-text-primary sm:text-2xl">
+            <h2 className="mt-1 text-xl font-semibold text-text-primary sm:text-3xl">
               {completedCount} of {scheduledCount} habits complete
             </h2>
             <p className="mt-1 text-sm text-text-secondary">
@@ -97,7 +97,7 @@ export function TodayView({
                 : `${remainingCount} left today. Small steps compound quickly.`}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
             <Badge variant="accent" className="px-3 py-1 text-[11px]">
               {completionRate}% completion
             </Badge>
@@ -109,24 +109,26 @@ export function TodayView({
           </div>
         </div>
 
-        <CompactProgressBar completed={completedCount} total={scheduledCount} />
+        <div className="relative z-[1] rounded-2xl border border-border-subtle/75 bg-surface-overlay/70 p-3 sm:p-4">
+          <CompactProgressBar completed={completedCount} total={scheduledCount} />
 
-        {focusCategories.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-text-muted">Focus areas:</span>
-            {focusCategories.map((category) => (
-              <Badge key={category} className="text-[11px]">
-                {category}
-              </Badge>
-            ))}
-          </div>
-        )}
+          {focusCategories.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs text-text-muted">Focus areas:</span>
+              {focusCategories.map((category) => (
+                <Badge key={category} className="text-[11px]">
+                  {category}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Checklist */}
       {scheduledHabits.length > 0 ? (
-        <div className="overflow-hidden rounded-2xl border border-border-subtle bg-surface-elevated/90 backdrop-blur-xl">
-          <div className="flex items-center justify-between border-b border-border-subtle/70 px-4 py-3">
+        <div className="hf-panel overflow-hidden rounded-3xl">
+          <div className="flex items-center justify-between border-b border-border-subtle/70 bg-surface-paper/40 px-4 py-3">
             <div>
               <h3 className="text-sm font-semibold text-text-primary">Today&apos;s Checklist</h3>
               <p className="text-xs text-text-muted">
@@ -135,7 +137,7 @@ export function TodayView({
             </div>
             <Link
               href="/habits"
-              className="inline-flex items-center gap-1 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary"
+              className="inline-flex items-center gap-1 rounded-full border border-transparent px-2 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-border-subtle hover:bg-surface-paper/70 hover:text-text-primary"
             >
               Manage
               <ArrowRight className="h-3.5 w-3.5" />
@@ -159,9 +161,9 @@ export function TodayView({
           })}
         </div>
       ) : (
-        <p className="text-center text-sm text-text-muted py-8">
+        <div className="hf-panel rounded-2xl px-4 py-8 text-center text-sm text-text-muted">
           No habits scheduled for today.
-        </p>
+        </div>
       )}
 
       {/* All Complete Message */}
@@ -185,7 +187,7 @@ function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistR
     <div
       className={cn(
         "group relative flex items-center gap-3 px-4 py-3.5",
-        "transition-colors duration-150 hover:bg-surface/55",
+        "transition-all duration-150 hover:bg-surface-paper/40",
         !isLast && "border-b border-border-subtle/50"
       )}
     >
@@ -203,7 +205,7 @@ function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistR
 
       <Link
         href={`/habits/${habit.id}`}
-        className="flex-1 min-w-0 flex items-center gap-2"
+        className="flex min-w-0 flex-1 items-center gap-2 rounded-lg pr-1"
       >
         <span className="text-base shrink-0">{habit.icon}</span>
         <span

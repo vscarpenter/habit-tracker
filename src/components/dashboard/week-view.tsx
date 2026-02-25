@@ -64,11 +64,10 @@ export function WeekView({
     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
       <div
         className={cn(
-          "bg-surface-elevated/90 backdrop-blur-xl border border-border-subtle rounded-2xl",
-          "shadow-sm"
+          "hf-panel rounded-3xl"
         )}
       >
-        <div className="flex flex-wrap items-center gap-3 border-b border-border-subtle/70 px-4 py-3 text-xs text-text-secondary">
+        <div className="flex flex-wrap items-center gap-2 border-b border-border-subtle/70 bg-surface-paper/35 px-4 py-3 text-xs text-text-secondary">
           <LegendItem label="Completed" colorClass="bg-accent-blue" />
           <LegendItem label="Scheduled" colorClass="bg-surface-muted border border-border-subtle" />
           <LegendItem label="Future" colorClass="bg-transparent border border-text-muted/45" />
@@ -94,8 +93,8 @@ export function WeekView({
                 className={cn(
                   "flex h-14 flex-col items-center justify-center rounded-xl border text-center",
                   isToday
-                    ? "border-accent-blue/35 bg-accent-blue/10"
-                    : "border-border-subtle/65 bg-surface/45"
+                    ? "border-accent-blue/35 bg-accent-blue/10 shadow-[var(--shadow-editorial-sm)]"
+                    : "border-border-subtle/65 bg-surface-paper/45"
                 )}
               >
                 <span className="text-[10px] font-semibold text-text-muted uppercase">
@@ -159,8 +158,8 @@ function HabitRow({
         className={cn(
           "flex items-center gap-2.5 min-h-[52px] px-2.5 sticky left-0 rounded-lg border-l-2",
           "z-10 backdrop-blur-xl transition-colors duration-150",
-          rowIndex % 2 === 0 ? "bg-surface/75" : "bg-surface-muted/40",
-          "hover:bg-surface-strong",
+          rowIndex % 2 === 0 ? "bg-surface-paper/70" : "bg-surface-overlay/70",
+          "hover:bg-surface-paper",
           !isLast && "border-b border-border-subtle/50"
         )}
         style={{ borderLeftColor: habit.color }}
@@ -181,7 +180,7 @@ function HabitRow({
             key={date}
             className={cn(
               "rounded-lg",
-              rowIndex % 2 === 0 ? "bg-surface/45" : "bg-surface-muted/30",
+              rowIndex % 2 === 0 ? "bg-surface-paper/35" : "bg-surface-overlay/35",
               !isLast && "border-b border-border-subtle/45"
             )}
           >
@@ -202,7 +201,7 @@ function HabitRow({
 
 function LegendItem({ label, colorClass }: { label: string; colorClass: string }) {
   return (
-    <div className="inline-flex items-center gap-1.5">
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-border-subtle/70 bg-surface-paper/50 px-2 py-1">
       <span className={cn("h-2.5 w-2.5 rounded-full", colorClass)} />
       <span>{label}</span>
     </div>

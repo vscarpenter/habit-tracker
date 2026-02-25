@@ -44,6 +44,7 @@ export default function NewHabitPage() {
         title="New Habit"
         subtitle="Create a new habit to track"
         eyebrow="Habit Library"
+        accentColor="var(--accent-emerald)"
       />
       <div className="max-w-xl">
         <HabitForm onSubmit={handleSubmit} submitLabel="Create Habit" />

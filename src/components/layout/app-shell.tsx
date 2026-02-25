@@ -45,10 +45,19 @@ export function AppShell({ children }: AppShellProps) {
 
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-background-alt/65 to-transparent lg:left-64"
+        className="pointer-events-none fixed inset-0 z-0"
+      >
+        <div className="absolute left-[20%] top-[-6rem] h-64 w-64 rounded-full bg-accent-cyan/10 blur-3xl" />
+        <div className="absolute right-[8%] top-10 h-56 w-56 rounded-full bg-accent-amber/10 blur-3xl" />
+        <div className="absolute bottom-[8%] left-[35%] h-72 w-72 rounded-full bg-accent-blue/7 blur-3xl" />
+      </div>
+
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-background-alt/70 via-background-alt/30 to-transparent lg:left-64"
       />
 
-      <main id="main-content" className="relative pb-24 lg:pl-64 lg:pb-0">
+      <main id="main-content" className="relative z-10 pb-32 lg:pl-64 lg:pb-0">
         {children}
       </main>
 

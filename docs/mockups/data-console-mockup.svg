@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880" fill="none">
+  <defs>
+    <linearGradient id="bgConsole" x1="0" y1="0" x2="1400" y2="880" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#09111A"/>
+      <stop offset="1" stop-color="#0E1723"/>
+    </linearGradient>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" stroke="#223142" stroke-width="1"/>
+    </pattern>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#3B82F6" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="880" fill="url(#bgConsole)"/>
+  <rect width="1400" height="880" fill="url(#grid)" opacity="0.5"/>
+
+  <text x="58" y="62" fill="#E8F0FF" font-size="30" font-family="Space Grotesk, Arial" font-weight="700">HabitFlow - Data Console</text>
+  <text x="58" y="90" fill="#93A7C2" font-size="15" font-family="Instrument Sans, Arial">Concept direction: denser panels, stronger grids, neon accents, analytics-first posture</text>
+
+  <rect x="48" y="120" width="1304" height="720" rx="20" fill="#0A131E" stroke="#223246" stroke-width="2"/>
+
+  <!-- Top status bar -->
+  <rect x="68" y="140" width="1264" height="58" rx="14" fill="#0E1A28" stroke="#223246"/>
+  <text x="92" y="175" fill="#DBEAFE" font-size="20" font-family="Space Grotesk, Arial" font-weight="700">HABITFLOW / OPS VIEW</text>
+  <rect x="1108" y="154" width="94" height="30" rx="10" fill="#102338" stroke="#2A4665"/>
+  <text x="1138" y="173" fill="#8AB4FF" font-size="12" font-family="Instrument Sans, Arial" font-weight="700">LIVE</text>
+  <rect x="1212" y="154" width="96" height="30" rx="10" fill="#11261C" stroke="#214F3A"/>
+  <text x="1235" y="173" fill="#6EE7B7" font-size="12" font-family="Instrument Sans, Arial" font-weight="700">SYNC OK</text>
+
+  <!-- Left nav rail -->
+  <rect x="68" y="214" width="220" height="606" rx="14" fill="#0D1826" stroke="#223246"/>
+  <g font-family="Instrument Sans, Arial" font-size="13" font-weight="600">
+    <text x="92" y="248" fill="#7E96B6">ROUTES</text>
+    <rect x="84" y="264" width="188" height="36" rx="10" fill="#102238" stroke="#2A4665"/>
+    <rect x="90" y="272" width="3" height="20" rx="1.5" fill="#3B82F6"/>
+    <text x="106" y="286" fill="#EAF2FF">Today</text>
+    <text x="106" y="330" fill="#A8B7CE">Week Grid</text>
+    <text x="106" y="374" fill="#A8B7CE">Month Grid</text>
+    <text x="106" y="418" fill="#A8B7CE">Habits Table</text>
+    <text x="106" y="462" fill="#A8B7CE">Stats</text>
+    <text x="106" y="506" fill="#A8B7CE">Settings</text>
+  </g>
+
+  <rect x="84" y="566" width="188" height="112" rx="12" fill="#0B1420" stroke="#223246"/>
+  <text x="98" y="592" fill="#8EA4BF" font-size="11" font-family="Instrument Sans, Arial">SHORTCUTS</text>
+  <text x="98" y="618" fill="#D8E6FF" font-size="13" font-family="Instrument Sans, Arial">Cmd + K  command palette</text>
+  <text x="98" y="642" fill="#D8E6FF" font-size="13" font-family="Instrument Sans, Arial">1-9      toggle habits</text>
+  <text x="98" y="666" fill="#D8E6FF" font-size="13" font-family="Instrument Sans, Arial">Left/Right move weeks</text>
+
+  <rect x="84" y="764" width="188" height="40" rx="10" fill="#102238" stroke="#2A4665" filter="url(#glow)"/>
+  <text x="145" y="789" fill="#EAF2FF" font-size="13" font-family="Instrument Sans, Arial" font-weight="700">New Habit</text>
+
+  <!-- Main panels -->
+  <rect x="304" y="214" width="700" height="268" rx="14" fill="#0D1826" stroke="#223246"/>
+  <text x="328" y="246" fill="#8EA4BF" font-size="11" font-family="Instrument Sans, Arial">TODAY / THROUGHPUT</text>
+  <text x="328" y="278" fill="#EAF2FF" font-size="28" font-family="Space Grotesk, Arial" font-weight="700">4 / 6 completed</text>
+  <text x="328" y="300" fill="#9BB0C9" font-size="13" font-family="Instrument Sans, Arial">Realtime checklist with keyboard-first controls and stronger telemetry framing</text>
+
+  <!-- KPI row -->
+  <g font-family="Instrument Sans, Arial">
+    <rect x="328" y="320" width="150" height="64" rx="10" fill="#0A131E" stroke="#223246"/>
+    <rect x="490" y="320" width="150" height="64" rx="10" fill="#0A131E" stroke="#223246"/>
+    <rect x="652" y="320" width="150" height="64" rx="10" fill="#0A131E" stroke="#223246"/>
+    <rect x="814" y="320" width="166" height="64" rx="10" fill="#0A131E" stroke="#223246"/>
+    <text x="342" y="342" fill="#7E96B6" font-size="10">COMPLETION</text>
+    <text x="342" y="368" fill="#60A5FA" font-size="24" font-weight="700">67%</text>
+    <text x="504" y="342" fill="#7E96B6" font-size="10">STREAKING</text>
+    <text x="504" y="368" fill="#F59E0B" font-size="24" font-weight="700">2</text>
+    <text x="666" y="342" fill="#7E96B6" font-size="10">FOCUS AREAS</text>
+    <text x="666" y="368" fill="#34D399" font-size="24" font-weight="700">3</text>
+    <text x="828" y="342" fill="#7E96B6" font-size="10">OPEN ITEMS</text>
+    <text x="828" y="368" fill="#FCA5A5" font-size="24" font-weight="700">2</text>
+  </g>
+
+  <!-- Trend panel in hero -->
+  <rect x="328" y="400" width="652" height="64" rx="10" fill="#0A131E" stroke="#223246"/>
+  <polyline points="346,450 390,438 434,444 478,420 522,430 566,398 610,414 654,390 698,402 742,370 786,384 830,360 874,374 918,352 962,366"
+            fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="346,456 390,448 434,452 478,434 522,440 566,422 610,430 654,416 698,422 742,404 786,412 830,398 874,406 918,392 962,396"
+            fill="none" stroke="#38BDF8" stroke-width="1.2" opacity="0.6"/>
+  <line x1="346" y1="458" x2="962" y2="458" stroke="#223246"/>
+
+  <!-- Right stack -->
+  <rect x="1020" y="214" width="312" height="182" rx="14" fill="#0D1826" stroke="#223246"/>
+  <text x="1044" y="246" fill="#8EA4BF" font-size="11" font-family="Instrument Sans, Arial">ALERTS / ANOMALIES</text>
+  <rect x="1044" y="264" width="264" height="34" rx="9" fill="#101C2B" stroke="#24354A"/>
+  <text x="1060" y="285" fill="#DCE8FF" font-size="12" font-family="Instrument Sans, Arial">Read 20 minutes lagging by 2 days</text>
+  <rect x="1044" y="306" width="264" height="34" rx="9" fill="#101C2B" stroke="#24354A"/>
+  <text x="1060" y="327" fill="#DCE8FF" font-size="12" font-family="Instrument Sans, Arial">Sleep target improving (+14%)</text>
+  <rect x="1044" y="348" width="264" height="28" rx="9" fill="#11261C" stroke="#214F3A"/>
+  <text x="1060" y="366" fill="#6EE7B7" font-size="11" font-family="Instrument Sans, Arial">No sync issues detected</text>
+
+  <rect x="1020" y="412" width="312" height="408" rx="14" fill="#0D1826" stroke="#223246"/>
+  <text x="1044" y="444" fill="#8EA4BF" font-size="11" font-family="Instrument Sans, Arial">WEEK GRID / DENSE MODE</text>
+
+  <!-- Mini week table -->
+  <g>
+    <rect x="1044" y="460" width="264" height="338" rx="10" fill="#0A131E" stroke="#223246"/>
+    <g font-family="Instrument Sans, Arial" font-size="10">
+      <text x="1084" y="478" fill="#8EA4BF">M</text>
+      <text x="1120" y="478" fill="#8EA4BF">T</text>
+      <text x="1156" y="478" fill="#8EA4BF">W</text>
+      <text x="1192" y="478" fill="#8EA4BF">T</text>
+      <text x="1228" y="478" fill="#8EA4BF">F</text>
+      <text x="1264" y="478" fill="#8EA4BF">S</text>
+      <text x="1292" y="478" fill="#8EA4BF">S</text>
+    </g>
+    <g>
+      <rect x="1054" y="490" width="90" height="28" rx="7" fill="#0F1D2C"/>
+      <text x="1062" y="508" fill="#CFE0FF" font-size="11" font-family="Instrument Sans, Arial">Walk</text>
+      <rect x="1150" y="490" width="20" height="20" rx="6" fill="#1F2F42"/>
+      <rect x="1186" y="490" width="20" height="20" rx="6" fill="#3B82F6"/>
+      <rect x="1222" y="490" width="20" height="20" rx="6" fill="#3B82F6"/>
+      <rect x="1258" y="490" width="20" height="20" rx="6" fill="#1F2F42"/>
+      <rect x="1294" y="490" width="4" height="20" rx="2" fill="#34D399"/>
+    </g>
+    <g>
+      <rect x="1054" y="526" width="90" height="28" rx="7" fill="#0F1D2C"/>
+      <text x="1062" y="544" fill="#CFE0FF" font-size="11" font-family="Instrument Sans, Arial">Read</text>
+      <rect x="1150" y="526" width="20" height="20" rx="6" fill="#3B82F6"/>
+      <rect x="1186" y="526" width="20" height="20" rx="6" fill="#1F2F42"/>
+      <rect x="1222" y="526" width="20" height="20" rx="6" fill="#1F2F42"/>
+      <rect x="1258" y="526" width="20" height="20" rx="6" fill="#3B82F6"/>
+      <rect x="1294" y="526" width="4" height="20" rx="2" fill="#F59E0B"/>
+    </g>
+    <g>
+      <rect x="1054" y="562" width="90" height="28" rx="7" fill="#0F1D2C"/>
+      <text x="1062" y="580" fill="#CFE0FF" font-size="11" font-family="Instrument Sans, Arial">Journal</text>
+      <rect x="1150" y="562" width="20" height="20" rx="6" fill="#1F2F42"/>
+      <rect x="1186" y="562" width="20" height="20" rx="6" fill="#1F2F42"/>
+      <rect x="1222" y="562" width="20" height="20" rx="6" fill="#3B82F6"/>
+      <rect x="1258" y="562" width="20" height="20" rx="6" fill="#3B82F6"/>
+      <rect x="1294" y="562" width="4" height="20" rx="2" fill="#F472B6"/>
+    </g>
+    <g>
+      <rect x="1054" y="610" width="244" height="172" rx="8" fill="#09111A" stroke="#223246"/>
+      <text x="1066" y="632" fill="#8EA4BF" font-size="10" font-family="Instrument Sans, Arial">Legend</text>
+      <rect x="1066" y="644" width="10" height="10" rx="2" fill="#3B82F6"/><text x="1084" y="653" fill="#DCE8FF" font-size="10" font-family="Instrument Sans, Arial">Completed</text>
+      <rect x="1160" y="644" width="10" height="10" rx="2" fill="#1F2F42"/><text x="1178" y="653" fill="#DCE8FF" font-size="10" font-family="Instrument Sans, Arial">Scheduled</text>
+      <rect x="1250" y="644" width="10" height="10" rx="2" fill="none" stroke="#6A7C97"/><text x="1268" y="653" fill="#DCE8FF" font-size="10" font-family="Instrument Sans, Arial">Future</text>
+      <text x="1066" y="684" fill="#8EA4BF" font-size="10" font-family="Instrument Sans, Arial">This direction makes analytics and planning feel like a command center.</text>
+    </g>
+  </g>
+
+  <!-- Bottom panel: habits table -->
+  <rect x="304" y="498" width="700" height="322" rx="14" fill="#0D1826" stroke="#223246"/>
+  <text x="328" y="530" fill="#8EA4BF" font-size="11" font-family="Instrument Sans, Arial">HABITS / TABLE VIEW</text>
+  <rect x="328" y="546" width="652" height="42" rx="10" fill="#0A131E" stroke="#223246"/>
+  <text x="346" y="571" fill="#A7BAD4" font-size="12" font-family="Instrument Sans, Arial">Search habits...</text>
+  <rect x="838" y="554" width="132" height="26" rx="8" fill="#102238" stroke="#2A4665"/>
+  <text x="880" y="571" fill="#AFC9F8" font-size="11" font-family="Instrument Sans, Arial">Filter: Health</text>
+
+  <g font-family="Instrument Sans, Arial" font-size="12">
+    <rect x="328" y="602" width="652" height="44" rx="10" fill="#0A131E" stroke="#1F3144"/>
+    <rect x="328" y="650" width="652" height="44" rx="10" fill="#09111A" stroke="#1A2B3D"/>
+    <rect x="328" y="698" width="652" height="44" rx="10" fill="#0A131E" stroke="#1F3144"/>
+    <rect x="328" y="746" width="652" height="44" rx="10" fill="#09111A" stroke="#1A2B3D"/>
+    <text x="348" y="629" fill="#E4EEFF">Morning walk</text>
+    <text x="348" y="677" fill="#E4EEFF">Read 20 minutes</text>
+    <text x="348" y="725" fill="#E4EEFF">Journal</text>
+    <text x="348" y="773" fill="#E4EEFF">Stretching</text>
+    <text x="520" y="629" fill="#9DB1CB">Daily</text>
+    <text x="520" y="677" fill="#9DB1CB">Daily</text>
+    <text x="520" y="725" fill="#9DB1CB">Mon/Wed/Fri</text>
+    <text x="520" y="773" fill="#9DB1CB">Daily</text>
+    <text x="690" y="629" fill="#60A5FA">86%</text>
+    <text x="690" y="677" fill="#60A5FA">72%</text>
+    <text x="690" y="725" fill="#60A5FA">54%</text>
+    <text x="690" y="773" fill="#60A5FA">78%</text>
+    <text x="826" y="629" fill="#F59E0B">12d</text>
+    <text x="826" y="677" fill="#F59E0B">5d</text>
+    <text x="826" y="725" fill="#F59E0B">3d</text>
+    <text x="826" y="773" fill="#F59E0B">8d</text>
+    <rect x="904" y="613" width="64" height="20" rx="6" fill="#11261C" stroke="#214F3A"/>
+    <text x="924" y="627" fill="#6EE7B7" font-size="10">ACTIVE</text>
+  </g>
+</svg>

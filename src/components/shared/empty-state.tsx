@@ -27,17 +27,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center text-center py-16 px-4",
+        "hf-panel-strong mx-auto flex w-full max-w-3xl flex-col items-center justify-center rounded-3xl px-4 py-10 text-center sm:py-16",
         className
       )}
     >
       {Icon && (
-        <div className="mb-6 rounded-2xl bg-surface p-4 border border-border-subtle">
-          <Icon className="h-10 w-10 text-text-muted" />
+        <div className="mb-5 rounded-2xl border border-border-subtle bg-surface-tint/80 p-3 shadow-[var(--shadow-editorial-sm)] sm:mb-6 sm:p-4">
+          <Icon className="h-8 w-8 text-text-muted sm:h-10 sm:w-10" />
         </div>
       )}
-      <h3 className="text-lg font-semibold text-text-primary mb-2">{title}</h3>
-      <p className="text-sm text-text-secondary max-w-xs mb-6">{description}</p>
+      <h3 className="mb-2 text-lg font-semibold text-text-primary">{title}</h3>
+      <p className="mb-5 max-w-xs text-sm text-text-secondary sm:mb-6">{description}</p>
       {actionLabel && actionHref && (
         <Link href={actionHref}>
           <Button>
@@ -80,7 +80,7 @@ export function NoStatsEmpty() {
 
 export function AllCompleteMessage() {
   return (
-    <div className="text-center py-8 animate-fade-in">
+    <div className="hf-panel-strong animate-fade-in rounded-3xl py-8 text-center">
       <div className="text-4xl mb-3">🎉</div>
       <h3 className="text-lg font-semibold text-text-primary mb-1">
         All done for today!

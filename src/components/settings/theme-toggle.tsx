@@ -37,8 +37,8 @@ export function ThemeToggle({ theme, onChange, className }: ThemeToggleProps) {
               "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium",
               "transition-colors duration-150",
               active
-                ? "bg-accent-blue/10 text-accent-blue"
-                : "text-text-secondary hover:bg-surface-elevated hover:text-text-primary"
+                ? "border border-accent-blue/20 bg-accent-blue/10 text-accent-blue shadow-[var(--shadow-editorial-sm)]"
+                : "border border-transparent text-text-secondary hover:bg-surface-tint/70 hover:text-text-primary"
             )}
           >
             <Icon className="h-4 w-4" />

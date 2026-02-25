@@ -18,8 +18,11 @@ const VIEW_OPTIONS = [
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl bg-surface-elevated backdrop-blur-xl border border-border p-5 space-y-4">
-      <h2 className="text-base font-semibold text-text-primary">{title}</h2>
+    <section className="hf-panel rounded-3xl p-5 space-y-4">
+      <div className="border-b border-border-subtle/70 pb-3">
+        <p className="hf-kicker">Settings</p>
+        <h2 className="text-base font-semibold text-text-primary">{title}</h2>
+      </div>
       {children}
     </section>
   );
@@ -35,7 +38,7 @@ function SettingRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-border-subtle/60 bg-surface-overlay/45 px-3 py-2.5">
       <div className="min-w-0">
         <p className="text-sm font-medium text-text-primary">{label}</p>
         {description && (
@@ -106,7 +109,7 @@ export function SettingsContent() {
           label="Default view"
           description="Choose which view to show on launch"
         >
-          <div className="flex gap-1" role="radiogroup" aria-label="Default view">
+          <div className="hf-panel-muted flex gap-1 rounded-2xl p-1" role="radiogroup" aria-label="Default view">
             {VIEW_OPTIONS.map(({ value, label }) => {
               const active = settings.defaultView === value;
               return (
@@ -118,8 +121,8 @@ export function SettingsContent() {
                   className={cn(
                     "rounded-xl px-3 py-1.5 text-sm font-medium transition-colors duration-150",
                     active
-                      ? "bg-accent-blue/10 text-accent-blue"
-                      : "text-text-secondary hover:bg-surface-elevated hover:text-text-primary"
+                      ? "border border-accent-blue/20 bg-accent-blue/10 text-accent-blue shadow-[var(--shadow-editorial-sm)]"
+                      : "border border-transparent text-text-secondary hover:bg-surface-paper/70 hover:text-text-primary"
                   )}
                 >
                   {label}

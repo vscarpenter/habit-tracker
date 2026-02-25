@@ -39,7 +39,7 @@ export function MonthCell({
 
   if (!scheduled) {
     return (
-      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-surface-muted/20">
+      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-surface-overlay/28">
         <div className="h-1.5 w-1.5 rounded-full bg-text-muted/30" />
       </div>
     );
@@ -60,7 +60,7 @@ export function MonthCell({
       className={cn(
         "h-8 w-8 rounded-md flex items-center justify-center border",
         "transition-all duration-150",
-        completed ? "shadow-sm" : "border-border-subtle/60 hover:border-border-subtle",
+        completed ? "shadow-[var(--shadow-editorial-sm)]" : "border-border-subtle/60 bg-surface-paper/40 hover:border-border-subtle",
         isToday && "ring-1 ring-accent-blue/45 ring-offset-1 ring-offset-background",
         animating && "animate-cell-fill"
       )}

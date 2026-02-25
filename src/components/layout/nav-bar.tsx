@@ -51,20 +51,20 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Main navigation"
-      className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border/80 bg-surface/85 backdrop-blur-2xl lg:flex"
+      className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border/70 bg-surface-overlay/85 backdrop-blur-2xl lg:flex"
     >
       <div className="px-4 pb-2 pt-4">
         <Link
           href="/"
-          className="block rounded-2xl border border-border-subtle bg-surface-strong/90 p-4 shadow-sm transition-colors duration-200 hover:bg-surface-strong"
+          className="hf-panel-strong block rounded-2xl p-4 transition-transform duration-200 hover:-translate-y-0.5"
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-blue text-sm font-bold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/30 bg-accent-blue text-sm font-bold text-white shadow-[0_10px_20px_-14px_var(--accent-blue)]">
               HF
             </div>
             <div className="min-w-0">
               <p className="truncate text-base font-semibold text-text-primary">HabitFlow</p>
-              <p className="text-xs text-text-muted">Build momentum every day</p>
+              <p className="text-xs text-text-muted">Warm editorial mode</p>
             </div>
           </div>
         </Link>
@@ -84,8 +84,8 @@ export function Sidebar() {
                 "group relative flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-medium",
                 "transition-all duration-200",
                 active
-                  ? "border-border-subtle bg-surface-strong text-text-primary shadow-sm"
-                  : "border-transparent text-text-secondary hover:border-border hover:bg-surface-muted/70 hover:text-text-primary"
+                  ? "border-border-subtle bg-surface-paper text-text-primary shadow-[var(--shadow-editorial-sm)]"
+                  : "border-transparent text-text-secondary hover:border-border hover:bg-surface-tint/70 hover:text-text-primary"
               )}
             >
               <span
@@ -99,7 +99,7 @@ export function Sidebar() {
               <span
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-200",
-                  active ? "animate-nav-pop bg-surface-muted" : "group-hover:bg-surface-muted"
+                  active ? "animate-nav-pop bg-surface-tint/80" : "group-hover:bg-surface-tint/80"
                 )}
               >
                 <Icon className="h-4 w-4" style={active ? { color: item.accent } : undefined} />
@@ -115,7 +115,7 @@ export function Sidebar() {
           href="/habits/new"
           className={cn(
             "flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5",
-            "bg-accent-blue text-sm font-medium text-white shadow-[0_14px_30px_-20px_var(--accent-blue)]",
+            "border border-white/20 bg-accent-blue text-sm font-medium text-white shadow-[0_16px_28px_-18px_var(--accent-blue)]",
             "transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110"
           )}
         >
@@ -153,17 +153,17 @@ export function BottomNav() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "group relative flex h-full min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-1 text-[10px] font-medium",
+                  "group relative flex h-full min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-medium",
                   "transition-all duration-200",
                   active
-                    ? "text-text-primary"
-                    : "text-text-muted hover:text-text-secondary"
+                    ? "bg-surface-paper/90 text-text-primary shadow-[var(--shadow-editorial-sm)]"
+                    : "text-text-secondary/85 hover:text-text-primary"
                 )}
               >
                 <span
                   aria-hidden
                   className={cn(
-                    "absolute left-2 right-2 top-0 h-0.5 rounded-full transition-opacity duration-200",
+                    "absolute left-2 right-2 top-1 h-0.5 rounded-full transition-opacity duration-200",
                     active ? "opacity-100" : "opacity-0"
                   )}
                   style={{ backgroundColor: item.accent }}
@@ -171,12 +171,12 @@ export function BottomNav() {
                 <span
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200",
-                    active ? "animate-nav-pop bg-surface-muted shadow-sm" : "group-hover:bg-surface"
+                    active ? "animate-nav-pop bg-surface-tint/75 shadow-sm" : "group-hover:bg-surface"
                   )}
                 >
                   <Icon className="h-4 w-4" style={active ? { color: item.accent } : undefined} />
                 </span>
-                <span className={cn("leading-none", active && "-translate-y-0.5")}>{item.label}</span>
+                <span className={cn("leading-none tracking-[-0.01em]", active && "-translate-y-0.5")}>{item.label}</span>
               </Link>
             );
           })}

@@ -70,7 +70,7 @@ export default function EditHabitPage({
   if (!habit) {
     return (
       <PageContainer>
-        <Header title="Habit not found" eyebrow="Habit Library" />
+        <Header title="Habit not found" eyebrow="Habit Library" accentColor="var(--accent-emerald)" />
         <p className="text-text-secondary text-sm">
           This habit may have been deleted.
         </p>
@@ -80,7 +80,12 @@ export default function EditHabitPage({
 
   return (
     <PageContainer>
-      <Header title="Edit Habit" subtitle={habit.name} eyebrow="Habit Library" />
+      <Header
+        title="Edit Habit"
+        subtitle={habit.name}
+        eyebrow="Habit Library"
+        accentColor="var(--accent-emerald)"
+      />
       <div className="max-w-xl space-y-6">
         <HabitForm
           initialData={habit}
@@ -89,7 +94,7 @@ export default function EditHabitPage({
         />
 
         {!habit.isArchived && (
-          <div className="pt-4 border-t border-border-subtle">
+          <div className="hf-panel-muted rounded-2xl border-0 p-4 pt-4">
             <Button
               variant="destructive"
               onClick={() => setShowArchive(true)}

@@ -11,11 +11,11 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variantStyles: Record<CardVariant, string> = {
   default:
-    "bg-surface backdrop-blur-2xl border border-border shadow-[0_20px_38px_-30px_rgba(20,16,10,0.55)]",
+    "bg-surface-panel backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-sm)]",
   elevated:
-    "bg-surface-strong backdrop-blur-2xl border border-border-subtle shadow-[0_22px_44px_-30px_rgba(20,16,10,0.65)]",
+    "bg-surface-paper backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-md)]",
   interactive:
-    "bg-surface backdrop-blur-2xl border border-border shadow-[0_20px_38px_-30px_rgba(20,16,10,0.55)] hover:-translate-y-0.5 hover:border-border-subtle hover:shadow-[0_24px_46px_-28px_rgba(20,16,10,0.72)] transition-all duration-200 cursor-pointer",
+    "bg-surface-panel backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-sm)] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[var(--shadow-editorial-md)] transition-all duration-200 cursor-pointer",
 };
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
@@ -36,7 +36,7 @@ const CardHeader = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mb-4", className)} {...props} />
+  <div ref={ref} className={cn("mb-4 border-b border-border-subtle/70 pb-3", className)} {...props} />
 ));
 
 CardHeader.displayName = "CardHeader";
@@ -60,7 +60,7 @@ const CardDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-text-secondary mt-1", className)}
+    className={cn("mt-1 text-sm text-text-secondary", className)}
     {...props}
   />
 ));
