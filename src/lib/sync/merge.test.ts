@@ -1,168 +1,157 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { mergeSnapshots } from "./merge";
+import {
+  createHabit,
+  createCompletion,
+  createSettings,
+  resetFactories,
+} from "@/test/factories";
 import type { ExportData } from "@/lib/export-import";
-import type { Habit, HabitCompletion, UserSettings } from "@/types";
-
-// ── Factories ────────────────────────────────────────────────────────────────
-
-function makeSettings(overrides: Partial<UserSettings> = {}): UserSettings {
-  return {
-    id: "user_settings",
-    theme: "system",
-    weekStartsOn: 0,
-    showStreaks: true,
-    showCompletionRate: true,
-    defaultView: "today",
-    createdAt: "2025-01-01T00:00:00.000Z",
-    updatedAt: "2025-01-01T00:00:00.000Z",
-    ...overrides,
-  };
-}
-
-function makeHabit(id: string, updatedAt: string, overrides: Partial<Habit> = {}): Habit {
-  return {
-    id,
-    name: `Habit ${id}`,
-    icon: "⭐",
-    color: "#3B82F6",
-    frequency: "daily",
-    sortOrder: 0,
-    isArchived: false,
-    createdAt: "2025-01-01T00:00:00.000Z",
-    updatedAt,
-    ...overrides,
-  };
-}
-
-function makeCompletion(
-  habitId: string,
-  date: string,
-  completedAt: string,
-  overrides: Partial<HabitCompletion> = {}
-): HabitCompletion {
-  return {
-    id: `${habitId}-${date}`,
-    habitId,
-    date,
-    completedAt,
-    ...overrides,
-  };
-}
+import { EXPORT_VERSION } from "@/lib/export-import";
 
 function makeSnapshot(
-  habits: Habit[],
-  completions: HabitCompletion[],
-  settings: UserSettings
+  overrides: Partial<ExportData["data"]> = {}
 ): ExportData {
   return {
-    version: "1.0",
+    version: EXPORT_VERSION,
     exportedAt: new Date().toISOString(),
     app: "HabitFlow",
-    data: { habits, completions, settings },
+    data: {
+      habits: [],
+      completions: [],
+      settings: createSettings(),
+      ...overrides,
+    },
   };
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────────
-
 describe("mergeSnapshots", () => {
+  beforeEach(() => resetFactories());
+
+  // ── Habits ──────────────────────────────────────────────────────────────
+
   describe("habits", () => {
     it("keeps local habit when local is newer", () => {
-      const local = makeHabit("a", "2025-06-02T10:00:00.000Z", { name: "Local Name" });
-      const remote = makeHabit("a", "2025-06-01T10:00:00.000Z", { name: "Remote Name" });
+      const id = "11111111-1111-4111-8111-111111111111";
+      const localHabit = createHabit({ id, name: "Local Name", updatedAt: "2025-06-02T10:00:00.000Z" });
+      const remoteHabit = createHabit({ id, name: "Remote Name", updatedAt: "2025-06-01T10:00:00.000Z" });
 
       const { merged } = mergeSnapshots(
-        makeSnapshot([local], [], makeSettings()),
-        makeSnapshot([remote], [], makeSettings())
+        makeSnapshot({ habits: [localHabit] }),
+        makeSnapshot({ habits: [remoteHabit] })
       );
 
+      expect(merged.data.habits).toHaveLength(1);
       expect(merged.data.habits[0].name).toBe("Local Name");
     });
 
     it("adopts remote habit when remote is newer", () => {
-      const local = makeHabit("a", "2025-06-01T10:00:00.000Z", { name: "Local Name" });
-      const remote = makeHabit("a", "2025-06-02T10:00:00.000Z", { name: "Remote Name" });
+      const id = "11111111-1111-4111-8111-111111111111";
+      const localHabit = createHabit({ id, name: "Local Name", updatedAt: "2025-06-01T10:00:00.000Z" });
+      const remoteHabit = createHabit({ id, name: "Remote Name", updatedAt: "2025-06-02T10:00:00.000Z" });
 
-      const { merged } = mergeSnapshots(
-        makeSnapshot([local], [], makeSettings()),
-        makeSnapshot([remote], [], makeSettings())
+      const { merged, result } = mergeSnapshots(
+        makeSnapshot({ habits: [localHabit] }),
+        makeSnapshot({ habits: [remoteHabit] })
       );
 
       expect(merged.data.habits[0].name).toBe("Remote Name");
+      expect(result.stats.habitsUpdated).toBe(1);
     });
 
     it("adds remote-only habits to the merged result", () => {
-      const localHabit = makeHabit("local-only", "2025-06-01T00:00:00.000Z");
-      const remoteHabit = makeHabit("remote-only", "2025-06-01T00:00:00.000Z");
+      const localHabit = createHabit();
+      const remoteOnlyHabit = createHabit();
 
       const { merged, result } = mergeSnapshots(
-        makeSnapshot([localHabit], [], makeSettings()),
-        makeSnapshot([remoteHabit], [], makeSettings())
+        makeSnapshot({ habits: [localHabit] }),
+        makeSnapshot({ habits: [localHabit, remoteOnlyHabit] })
       );
 
       expect(merged.data.habits).toHaveLength(2);
       expect(result.stats.habitsUpdated).toBe(1);
     });
+
+    it("preserves local-only habits not present on remote", () => {
+      const localOnlyHabit = createHabit();
+      const sharedHabit = createHabit();
+
+      const { merged } = mergeSnapshots(
+        makeSnapshot({ habits: [localOnlyHabit, sharedHabit] }),
+        makeSnapshot({ habits: [sharedHabit] })
+      );
+
+      expect(merged.data.habits).toHaveLength(2);
+    });
   });
+
+  // ── Completions ─────────────────────────────────────────────────────────
 
   describe("completions", () => {
     it("unions completions from both sides", () => {
-      const c1 = makeCompletion("h1", "2025-06-01", "2025-06-01T08:00:00.000Z");
-      const c2 = makeCompletion("h1", "2025-06-02", "2025-06-02T08:00:00.000Z");
+      const habitId = "11111111-1111-4111-8111-111111111111";
+      const c1 = createCompletion({ habitId, date: "2025-06-01" });
+      const c2 = createCompletion({ habitId, date: "2025-06-02" });
 
       const { merged } = mergeSnapshots(
-        makeSnapshot([], [c1], makeSettings()),
-        makeSnapshot([], [c2], makeSettings())
+        makeSnapshot({ completions: [c1] }),
+        makeSnapshot({ completions: [c2] })
       );
 
       expect(merged.data.completions).toHaveLength(2);
     });
 
-    it("keeps the later completedAt when the same (habitId, date) appears on both sides", () => {
-      const earlier = makeCompletion("h1", "2025-06-01", "2025-06-01T07:00:00.000Z");
-      const later = makeCompletion("h1", "2025-06-01", "2025-06-01T09:00:00.000Z");
+    it("deduplicates completions with the same habitId and date", () => {
+      const c = createCompletion();
 
       const { merged, result } = mergeSnapshots(
-        makeSnapshot([], [earlier], makeSettings()),
-        makeSnapshot([], [later], makeSettings())
+        makeSnapshot({ completions: [c] }),
+        makeSnapshot({ completions: [c] })
+      );
+
+      expect(merged.data.completions).toHaveLength(1);
+      expect(result.stats.completionsAdded).toBe(0);
+    });
+
+    it("keeps the later completedAt when the same (habitId, date) appears on both sides", () => {
+      const habitId = "11111111-1111-4111-8111-111111111111";
+      const date = "2025-06-01";
+      const earlier = createCompletion({ habitId, date, completedAt: "2025-06-01T07:00:00.000Z" });
+      const later = createCompletion({ habitId, date, completedAt: "2025-06-01T09:00:00.000Z" });
+
+      const { merged, result } = mergeSnapshots(
+        makeSnapshot({ completions: [earlier] }),
+        makeSnapshot({ completions: [later] })
       );
 
       expect(merged.data.completions).toHaveLength(1);
       expect(merged.data.completions[0].completedAt).toBe("2025-06-01T09:00:00.000Z");
       expect(result.stats.completionsAdded).toBe(1);
     });
-
-    it("reports no change when both sides have identical completions", () => {
-      const c = makeCompletion("h1", "2025-06-01", "2025-06-01T08:00:00.000Z");
-
-      const { result } = mergeSnapshots(
-        makeSnapshot([], [c], makeSettings()),
-        makeSnapshot([], [c], makeSettings())
-      );
-
-      expect(result.stats.completionsAdded).toBe(0);
-    });
   });
+
+  // ── Settings ────────────────────────────────────────────────────────────
 
   describe("settings", () => {
     it("keeps local settings when local is newer", () => {
-      const localSettings = makeSettings({ theme: "dark", updatedAt: "2025-06-02T00:00:00.000Z" });
-      const remoteSettings = makeSettings({ theme: "light", updatedAt: "2025-06-01T00:00:00.000Z" });
+      const localSettings = createSettings({ theme: "dark", updatedAt: "2025-06-02T00:00:00.000Z" });
+      const remoteSettings = createSettings({ theme: "light", updatedAt: "2025-06-01T00:00:00.000Z" });
 
       const { merged } = mergeSnapshots(
-        makeSnapshot([], [], localSettings),
-        makeSnapshot([], [], remoteSettings)
+        makeSnapshot({ settings: localSettings }),
+        makeSnapshot({ settings: remoteSettings })
       );
 
       expect(merged.data.settings.theme).toBe("dark");
     });
 
     it("adopts remote settings when remote is newer", () => {
-      const localSettings = makeSettings({ theme: "dark", updatedAt: "2025-06-01T00:00:00.000Z" });
-      const remoteSettings = makeSettings({ theme: "light", updatedAt: "2025-06-02T00:00:00.000Z" });
+      const localSettings = createSettings({ theme: "dark", updatedAt: "2025-06-01T00:00:00.000Z" });
+      const remoteSettings = createSettings({ theme: "light", updatedAt: "2025-06-02T00:00:00.000Z" });
 
       const { merged, result } = mergeSnapshots(
-        makeSnapshot([], [], localSettings),
-        makeSnapshot([], [], remoteSettings)
+        makeSnapshot({ settings: localSettings }),
+        makeSnapshot({ settings: remoteSettings })
       );
 
       expect(merged.data.settings.theme).toBe("light");
@@ -170,25 +159,28 @@ describe("mergeSnapshots", () => {
     });
   });
 
+  // ── hasChanges flag ─────────────────────────────────────────────────────
+
   describe("hasChanges flag", () => {
     it("returns hasChanges=false when local and remote are identical", () => {
-      const habit = makeHabit("a", "2025-06-01T00:00:00.000Z");
-      const completion = makeCompletion("a", "2025-06-01", "2025-06-01T08:00:00.000Z");
-      const settings = makeSettings();
+      const habit = createHabit();
+      const completion = createCompletion({ habitId: habit.id });
+      const settings = createSettings();
 
-      const snapshot = makeSnapshot([habit], [completion], settings);
+      const snapshot = makeSnapshot({ habits: [habit], completions: [completion], settings });
       const { result } = mergeSnapshots(snapshot, snapshot);
 
       expect(result.hasChanges).toBe(false);
     });
 
     it("returns hasChanges=true when remote has a newer habit", () => {
-      const localHabit = makeHabit("a", "2025-06-01T00:00:00.000Z");
-      const remoteHabit = makeHabit("a", "2025-06-02T00:00:00.000Z", { name: "Updated" });
+      const id = "11111111-1111-4111-8111-111111111111";
+      const localHabit = createHabit({ id, updatedAt: "2025-06-01T00:00:00.000Z" });
+      const remoteHabit = createHabit({ id, name: "Updated", updatedAt: "2025-06-02T00:00:00.000Z" });
 
       const { result } = mergeSnapshots(
-        makeSnapshot([localHabit], [], makeSettings()),
-        makeSnapshot([remoteHabit], [], makeSettings())
+        makeSnapshot({ habits: [localHabit] }),
+        makeSnapshot({ habits: [remoteHabit] })
       );
 
       expect(result.hasChanges).toBe(true);
