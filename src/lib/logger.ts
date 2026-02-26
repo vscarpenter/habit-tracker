@@ -7,4 +7,7 @@ export const logger = {
   warn(message: string, context?: unknown): void {
     if (IS_DEV) console.warn(message, context);
   },
+  info(message: string, context?: unknown): void {
+    if (IS_DEV) console.info(message, context);
+  },
 };
