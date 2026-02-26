@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**HabitFlow** — a privacy-first, offline-capable habit tracking PWA. All data lives in IndexedDB (no server, no accounts). Built as a static export deployed to AWS S3 + CloudFront.
+**HabitFlow** — a privacy-first, offline-capable habit tracking PWA. All data lives in IndexedDB locally, with optional Supabase cloud sync across devices. Built as a static export deployed to AWS S3 + CloudFront.
 
 ## Tech Stack
 
@@ -18,6 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Icons:** Lucide React
 - **Testing:** Vitest 4 + React Testing Library 16
 - **Font:** Inter via `next/font/google`
+- **Sync:** Supabase (Auth + Storage) — optional cloud sync via snapshot merge
 - **Utilities:** clsx + tailwind-merge via `cn()` helper in `src/lib/utils.ts`
 
 ## Build & Development Commands
@@ -47,10 +48,21 @@ Domain logic lives in hooks, not components. `use-habit-stats.ts` owns all compu
 
 Dynamic routes under `[id]` use a layout-level `generateStaticParams` with a placeholder ID for static export. CloudFront's 404→index.html fallback enables client-side routing to actual habit IDs.
 
+### Sync Layer (`src/lib/sync/`)
+Optional Supabase cloud sync using snapshot merge (full `ExportData` JSON per user). Auth via magic link or Google OAuth. Key files:
+- `types.ts` — `SyncStatus`, `SyncState`, `SyncUser`, `MergeResult`
+- `merge.ts` — `mergeSnapshots()` (habits: LWW, completions: union, settings: LWW)
+- `supabase-client.ts` — lazy client singleton (requires `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+- `auth-service.ts` — magic link + Google OAuth sign-in/out
+- `sync-service.ts` — pull/push/sync operations via Supabase Storage
+
+Design docs: `docs/sync-design.md` (option analysis), `docs/sync-supabase-plan.md` (implementation plan).
+
 ### Components (`src/components/`)
 - `ui/` — shadcn-inspired primitives (all accept `className` prop)
 - `layout/` — AppShell, NavBar, Header
 - `habits/`, `dashboard/`, `stats/`, `settings/` — feature components
+- `sync/` — SyncAuthModal, SyncSection (settings page sync UI)
 - `shared/` — EmptyState, ErrorBoundary, Toast, ConfirmDialog
 
 ### Test files are co-located: `component.test.tsx` beside `component.tsx`. Factories in `src/test/factories.ts`, DB mocks in `src/test/mocks/db.ts`.
@@ -103,8 +115,9 @@ Glassmorphism: `bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-white/2
 
 ## Implementation Phases
 
-1. **Foundation:** Next.js scaffold, UI primitives, Dexie + Zod, app shell, PWA
-2. **Core:** Habit CRUD, today view, completion toggles, empty states
-3. **Views:** Week view, habit detail, streak engine, history
-4. **Stats:** Charts, analytics dashboard, heatmaps, leaderboard
-5. **Polish:** Export/import, settings, keyboard shortcuts, performance, deploy
+1. **Foundation:** Next.js scaffold, UI primitives, Dexie + Zod, app shell, PWA ✅
+2. **Core:** Habit CRUD, today view, completion toggles, empty states ✅
+3. **Views:** Week view, habit detail, streak engine, history ✅
+4. **Stats:** Charts, analytics dashboard, heatmaps, leaderboard ✅
+5. **Polish:** Export/import, settings, keyboard shortcuts, performance, deploy ✅
+6. **Sync:** Supabase cloud sync skeleton (types, merge, auth, sync service, UI components) ✅ — needs Supabase project setup + wiring into settings page

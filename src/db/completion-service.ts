@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { z } from "zod/v4";
 import { db } from "./database";
 import { habitCompletionSchema } from "./schemas";
+import { schedulePush } from "@/lib/sync/schedule-push";
 import { MAX_NOTE_LENGTH } from "@/lib/utils";
 import type { HabitCompletion } from "@/types";
 
@@ -48,6 +49,7 @@ export const completionService = {
 
     if (existing) {
       await db.completions.delete(existing.id);
+      schedulePush();
       return { completed: false };
     }
 
@@ -62,15 +64,19 @@ export const completionService = {
 
     habitCompletionSchema.parse(completion);
     await db.completions.add(completion);
+    schedulePush();
     return { completed: true, completion };
   },
 
   async addNote(id: string, note: string): Promise<void> {
     z.string().max(MAX_NOTE_LENGTH, "Note is too long").parse(note);
     await db.completions.update(id, { note });
+    schedulePush();
   },
 
   async deleteByHabitId(habitId: string): Promise<number> {
-    return db.completions.where("habitId").equals(habitId).delete();
+    const count = await db.completions.where("habitId").equals(habitId).delete();
+    schedulePush();
+    return count;
   },
 };

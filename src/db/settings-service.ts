@@ -1,5 +1,6 @@
 import { db } from "./database";
 import { userSettingsSchema } from "./schemas";
+import { schedulePush } from "@/lib/sync/schedule-push";
 import type { UserSettings } from "@/types";
 
 const DEFAULT_SETTINGS_ID = "user_settings";
@@ -11,6 +12,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   showStreaks: true,
   showCompletionRate: true,
   defaultView: "today",
+  syncEnabled: false,
+  lastSyncedAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
@@ -46,6 +49,7 @@ export const settingsService = {
 
     userSettingsSchema.parse(updated);
     await db.settings.put(updated);
+    schedulePush();
     return updated;
   },
 
@@ -59,6 +63,7 @@ export const settingsService = {
 
     userSettingsSchema.parse(defaults);
     await db.settings.put(defaults);
+    schedulePush();
     return defaults;
   },
 };
