@@ -1,10 +1,12 @@
 "use client";
 
 import { useSettings } from "@/hooks/use-settings";
+import { useSyncService } from "@/hooks/use-sync";
 import { useThemeContext } from "@/components/layout/theme-provider";
 import { ThemeToggle } from "./theme-toggle";
 import { DataManagement } from "./data-management";
 import { AboutSection } from "./about-section";
+import { SyncSection } from "@/components/sync/sync-section";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -53,6 +55,14 @@ function SettingRow({
 export function SettingsContent() {
   const { settings, loading, update } = useSettings();
   const { theme, setTheme } = useThemeContext();
+  const {
+    syncState,
+    isSyncConfigured,
+    signInWithMagicLink,
+    signInWithGoogle,
+    signOut,
+    syncNow,
+  } = useSyncService();
 
   if (loading || !settings) {
     return (
@@ -131,6 +141,17 @@ export function SettingsContent() {
             })}
           </div>
         </SettingRow>
+      </Card>
+
+      <Card title="Sync">
+        <SyncSection
+          syncState={syncState}
+          isSyncConfigured={isSyncConfigured}
+          onMagicLink={signInWithMagicLink}
+          onGoogle={signInWithGoogle}
+          onSignOut={signOut}
+          onSyncNow={syncNow}
+        />
       </Card>
 
       <Card title="Data">

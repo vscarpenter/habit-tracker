@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { db } from "./database";
 import { habitSchema, createHabitSchema, updateHabitSchema } from "./schemas";
+import { schedulePush } from "@/lib/sync/schedule-push";
 import type { CreateHabitInput, UpdateHabitInput } from "./schemas";
 import type { Habit } from "@/types";
 
@@ -44,6 +45,7 @@ export const habitService = {
 
     habitSchema.parse(habit);
     await db.habits.add(habit);
+    schedulePush();
     return habit;
   },
 
@@ -63,6 +65,7 @@ export const habitService = {
 
     habitSchema.parse(updated);
     await db.habits.put(updated);
+    schedulePush();
     return updated;
   },
 
@@ -76,6 +79,7 @@ export const habitService = {
       isArchived: true,
       updatedAt: new Date().toISOString(),
     });
+    schedulePush();
   },
 
   async restore(id: string): Promise<void> {
@@ -88,6 +92,7 @@ export const habitService = {
       isArchived: false,
       updatedAt: new Date().toISOString(),
     });
+    schedulePush();
   },
 
   async delete(id: string): Promise<void> {
@@ -95,6 +100,7 @@ export const habitService = {
       await db.completions.where("habitId").equals(id).delete();
       await db.habits.delete(id);
     });
+    schedulePush();
   },
 
   async reorder(orderedIds: string[]): Promise<void> {
@@ -104,6 +110,7 @@ export const habitService = {
       );
       await Promise.all(updates);
     });
+    schedulePush();
   },
 
   async getActiveCount(): Promise<number> {
