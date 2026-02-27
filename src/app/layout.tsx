@@ -19,6 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://habittracker.vinny.dev"),
   title: "HabitFlow",
   description:
     "Track your daily habits with a beautiful, private habit tracker",
@@ -27,6 +28,20 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "HabitFlow",
+  },
+  openGraph: {
+    title: "HabitFlow — Private Habit Tracking",
+    description:
+      "Build better habits with streaks, stats, and a beautiful offline-first tracker. Your data stays on your device.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HabitFlow — Private Habit Tracking",
+    description:
+      "Build better habits with streaks, stats, and a beautiful offline-first tracker.",
+    images: ["/og-image.png"],
   },
 };
 

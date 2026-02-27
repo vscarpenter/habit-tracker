@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200,height=630">
+<title>HabitFlow OG Image</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  :root{
+    --bg:#f7f3ec;
+    --surface:#fffefb;
+    --surface-overlay:rgba(255,255,255,0.52);
+    --text-primary:#1f1b16;
+    --text-secondary:#554e43;
+    --text-muted:#8f8578;
+    --border:rgba(64,50,31,0.14);
+    --border-subtle:#d9cfbf;
+    --accent-blue:#2563eb;
+    --accent-emerald:#059669;
+    --accent-violet:#7c3aed;
+    --accent-amber:#d97706;
+    --accent-rose:#f43f5e;
+  }
+
+  body{
+    width:1200px;height:630px;overflow:hidden;
+    font-family:'Instrument Sans',system-ui,sans-serif;
+    background:var(--bg);color:var(--text-primary);
+    position:relative;
+  }
+
+  /* Background grid + glows */
+  body::before{
+    content:'';position:absolute;inset:0;
+    background-image:
+      radial-gradient(circle at 15% 30%, rgba(14,165,233,0.12) 0%, transparent 50%),
+      radial-gradient(circle at 85% 70%, rgba(245,158,11,0.10) 0%, transparent 50%),
+      linear-gradient(rgba(102,83,58,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(102,83,58,0.06) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    z-index:0;
+  }
+
+  .layout{display:flex;height:100%;position:relative;z-index:1}
+
+  /* Sidebar sliver */
+  .sidebar{
+    width:72px;flex-shrink:0;
+    background:rgba(255,255,255,0.65);
+    backdrop-filter:blur(20px);
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;
+    padding:20px 0 16px;gap:16px;
+  }
+  .sidebar-icon{
+    width:40px;height:40px;border-radius:12px;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 16px -8px rgba(37,99,235,0.4);
+  }
+  .sidebar-icon svg{width:22px;height:22px}
+  .nav-dot{
+    width:32px;height:32px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-muted);
+  }
+  .nav-dot.active{background:rgba(245,236,223,0.72);color:var(--accent-blue)}
+
+  /* Main content */
+  .main{flex:1;padding:28px 36px;display:flex;flex-direction:column;gap:20px;overflow:hidden}
+
+  /* Header row */
+  .header{display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;
+    color:var(--text-primary);letter-spacing:-0.02em;
+  }
+  .header-left p{font-size:13px;color:var(--text-muted);margin-top:2px}
+  .header-right{display:flex;align-items:center;gap:12px}
+
+  /* Progress ring */
+  .progress-ring-wrap{position:relative;width:56px;height:56px}
+  .progress-ring{transform:rotate(-90deg)}
+  .progress-ring circle{fill:none;stroke-width:5}
+  .progress-ring .track{stroke:var(--border-subtle)}
+  .progress-ring .fill{stroke:var(--accent-blue);stroke-linecap:round}
+  .progress-text{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;
+    color:var(--accent-blue);
+  }
+
+  /* Stats bar */
+  .stat-bar{
+    display:flex;gap:24px;
+    padding:14px 20px;border-radius:16px;
+    background:rgba(255,255,255,0.7);
+    border:1px solid var(--border);
+    backdrop-filter:blur(12px);
+  }
+  .stat{display:flex;flex-direction:column;gap:1px}
+  .stat-val{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px}
+  .stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}
+
+  /* Cards row */
+  .cards-row{display:flex;gap:16px;flex:1;min-height:0}
+
+  /* Habit list card */
+  .card{
+    border-radius:20px;background:rgba(255,252,246,0.85);
+    border:1px solid var(--border);
+    backdrop-filter:blur(12px);
+    box-shadow:0 18px 34px -22px rgba(37,29,18,0.18);
+    overflow:hidden;
+  }
+  .card-header{
+    padding:14px 18px 10px;font-size:12px;font-weight:600;
+    color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;
+  }
+  .habits-card{flex:1.3;display:flex;flex-direction:column}
+  .habit-list{padding:0 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+
+  .habit-row{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 12px;border-radius:14px;
+    background:rgba(255,255,255,0.6);
+    border:1px solid rgba(64,50,31,0.08);
+    transition:background 0.15s;
+  }
+  .habit-emoji{
+    width:36px;height:36px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;flex-shrink:0;
+  }
+  .habit-info{flex:1;min-width:0}
+  .habit-name{font-weight:600;font-size:14px;color:var(--text-primary)}
+  .habit-meta{font-size:11px;color:var(--text-muted);margin-top:1px}
+  .habit-streak{
+    padding:3px 10px;border-radius:20px;
+    font-size:11px;font-weight:600;
+    background:rgba(37,99,235,0.08);color:var(--accent-blue);
+    white-space:nowrap;
+  }
+  .habit-check{
+    width:24px;height:24px;border-radius:8px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .habit-check.done{background:var(--accent-blue);color:white}
+  .habit-check.pending{border:2px solid var(--border-subtle)}
+
+  /* Right column */
+  .right-col{flex:0.7;display:flex;flex-direction:column;gap:14px}
+
+  /* Heatmap card */
+  .heatmap-card{flex:1}
+  .heatmap-grid{
+    padding:8px 14px 14px;
+    display:grid;grid-template-columns:repeat(12,1fr);gap:4px;
+  }
+  .heatmap-cell{
+    aspect-ratio:1;border-radius:4px;
+  }
+  .h0{background:#e6dfd4} .h1{background:#bfdbfe}
+  .h2{background:#7dd3fc} .h3{background:#60a5fa} .h4{background:#1d4ed8}
+
+  /* Chart card */
+  .chart-card{flex:1}
+  .mini-chart{padding:8px 14px 14px;position:relative;height:calc(100% - 36px)}
+  .chart-svg{width:100%;height:100%}
+
+  /* Wordmark bottom-right */
+  .wordmark{
+    position:absolute;bottom:18px;right:28px;z-index:2;
+    display:flex;align-items:center;gap:8px;
+  }
+  .wordmark-icon{
+    width:28px;height:28px;border-radius:8px;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 12px -4px rgba(37,99,235,0.35);
+  }
+  .wordmark-icon svg{width:16px;height:16px}
+  .wordmark-text{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;
+    color:var(--text-primary);letter-spacing:-0.02em;
+  }
+  .wordmark-sub{
+    font-size:11px;color:var(--text-muted);margin-left:6px;font-weight:400;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-icon">
+      <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="148" y="136" width="56" height="240" rx="14" fill="white"/>
+        <rect x="308" y="136" width="56" height="240" rx="14" fill="white"/>
+        <rect x="176" y="224" width="160" height="56" rx="14" fill="white"/>
+      </svg>
+    </div>
+    <div class="nav-dot active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><path d="m9 16 2 2 4-4"/></svg>
+    </div>
+    <div class="nav-dot">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+    <div class="nav-dot">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </div>
+    <div class="nav-dot">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>Daily Focus</h1>
+        <p>Wednesday, Feb 26 &middot; 5 of 7 habits</p>
+      </div>
+      <div class="header-right">
+        <div class="progress-ring-wrap">
+          <svg class="progress-ring" width="56" height="56" viewBox="0 0 56 56">
+            <circle class="track" cx="28" cy="28" r="22"/>
+            <circle class="fill" cx="28" cy="28" r="22"
+                    stroke-dasharray="138.23" stroke-dashoffset="40"/>
+          </svg>
+          <div class="progress-text">71%</div>
+        </div>
+        <div class="stat-bar">
+          <div class="stat">
+            <span class="stat-val" style="color:var(--accent-blue)">21</span>
+            <span class="stat-label">Best Streak</span>
+          </div>
+          <div class="stat">
+            <span class="stat-val" style="color:var(--accent-emerald)">87%</span>
+            <span class="stat-label">This Week</span>
+          </div>
+          <div class="stat">
+            <span class="stat-val" style="color:var(--accent-violet)">142</span>
+            <span class="stat-label">Total Done</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards row -->
+    <div class="cards-row">
+      <!-- Habits list -->
+      <div class="card habits-card">
+        <div class="card-header">Today&rsquo;s Habits</div>
+        <div class="habit-list">
+          <div class="habit-row">
+            <div class="habit-emoji" style="background:rgba(124,58,237,0.1)">🧘</div>
+            <div class="habit-info">
+              <div class="habit-name">Morning Meditation</div>
+              <div class="habit-meta">Daily &middot; 10 min</div>
+            </div>
+            <div class="habit-streak" style="background:rgba(124,58,237,0.08);color:var(--accent-violet)">🔥 14 days</div>
+            <div class="habit-check done">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="habit-row">
+            <div class="habit-emoji" style="background:rgba(37,99,235,0.1)">📚</div>
+            <div class="habit-info">
+              <div class="habit-name">Read 30 Minutes</div>
+              <div class="habit-meta">Daily &middot; 30 min</div>
+            </div>
+            <div class="habit-streak">🔥 7 days</div>
+            <div class="habit-check done">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="habit-row">
+            <div class="habit-emoji" style="background:rgba(5,150,105,0.1)">💪</div>
+            <div class="habit-info">
+              <div class="habit-name">Exercise</div>
+              <div class="habit-meta">Weekdays &middot; 45 min</div>
+            </div>
+            <div class="habit-streak" style="background:rgba(5,150,105,0.08);color:var(--accent-emerald)">🔥 21 days</div>
+            <div class="habit-check done">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="habit-row">
+            <div class="habit-emoji" style="background:rgba(217,119,6,0.1)">🎨</div>
+            <div class="habit-info">
+              <div class="habit-name">Practice Drawing</div>
+              <div class="habit-meta">3x per week</div>
+            </div>
+            <div class="habit-streak" style="background:rgba(217,119,6,0.08);color:var(--accent-amber)">🔥 5 days</div>
+            <div class="habit-check pending"></div>
+          </div>
+          <div class="habit-row">
+            <div class="habit-emoji" style="background:rgba(244,63,94,0.1)">🏃</div>
+            <div class="habit-info">
+              <div class="habit-name">Run 5K</div>
+              <div class="habit-meta">3x per week</div>
+            </div>
+            <div class="habit-streak" style="background:rgba(244,63,94,0.08);color:var(--accent-rose)">🔥 3 days</div>
+            <div class="habit-check pending"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: heatmap + chart -->
+      <div class="right-col">
+        <div class="card heatmap-card">
+          <div class="card-header">Activity &middot; Last 12 Weeks</div>
+          <div class="heatmap-grid" id="heatmap"></div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-header">Weekly Completion</div>
+          <div class="mini-chart">
+            <svg class="chart-svg" viewBox="0 0 280 100" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2563eb" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#2563eb" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,70 Q20,65 40,55 T80,40 T120,30 T160,35 T200,20 T240,15 T280,10 V100 H0 Z" fill="url(#chart-fill)"/>
+              <path d="M0,70 Q20,65 40,55 T80,40 T120,30 T160,35 T200,20 T240,15 T280,10" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- Data dots -->
+              <circle cx="0" cy="70" r="3" fill="#2563eb"/>
+              <circle cx="40" cy="55" r="3" fill="#2563eb"/>
+              <circle cx="80" cy="40" r="3" fill="#2563eb"/>
+              <circle cx="120" cy="30" r="3" fill="#2563eb"/>
+              <circle cx="160" cy="35" r="3" fill="#2563eb"/>
+              <circle cx="200" cy="20" r="3" fill="#2563eb"/>
+              <circle cx="240" cy="15" r="3" fill="#2563eb"/>
+              <circle cx="280" cy="10" r="4" fill="#2563eb" stroke="white" stroke-width="2"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Wordmark -->
+<div class="wordmark">
+  <div class="wordmark-icon">
+    <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="148" y="136" width="56" height="240" rx="14" fill="white"/>
+      <rect x="308" y="136" width="56" height="240" rx="14" fill="white"/>
+      <rect x="176" y="224" width="160" height="56" rx="14" fill="white"/>
+    </svg>
+  </div>
+  <span class="wordmark-text">HabitFlow</span>
+  <span class="wordmark-sub">Private habit tracking</span>
+</div>
+
+<script>
+  // Generate heatmap cells with realistic-looking data
+  const grid = document.getElementById('heatmap');
+  const levels = [0,0,0,1,1,2,2,3,3,4,4,4]; // weighted toward active
+  for (let i = 0; i < 84; i++) { // 12 weeks x 7 days
+    const cell = document.createElement('div');
+    const level = i < 10 ? levels[Math.floor(Math.random() * 8)]
+                 : i > 70 ? levels[Math.floor(Math.random() * 12)]
+                 : levels[Math.floor(Math.random() * 10)];
+    cell.className = `heatmap-cell h${level}`;
+    grid.appendChild(cell);
+  }
+</script>
+</body>
+</html>

@@ -1,53 +1,67 @@
 /**
- * One-off script to generate PWA icons from SVG source.
+ * Generate PWA icons + favicon from the master SVG source.
  * Run: node scripts/generate-icons.mjs
- * Delete this file after icons are generated.
+ *
+ * Reads scripts/icon-source.svg and outputs:
+ *   public/icons/icon-192.png
+ *   public/icons/icon-512.png
+ *   public/icons/icon-maskable-512.png
+ *   src/app/favicon.ico  (32x32 PNG)
  */
 import sharp from "sharp";
-import { mkdirSync } from "fs";
+import { readFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const outDir = join(__dirname, "..", "public", "icons");
+const root = join(__dirname, "..");
+const outDir = join(root, "public", "icons");
 mkdirSync(outDir, { recursive: true });
 
-const ACCENT_BLUE = "#3b82f6";
-const WHITE = "#ffffff";
+const svgSource = readFileSync(join(__dirname, "icon-source.svg"));
 
-function createSvg(size, maskable = false) {
-  const padding = maskable ? size * 0.1 : size * 0.15;
-  const innerSize = size - padding * 2;
-  const cx = size / 2;
-  const cy = size / 2;
-  const radius = innerSize / 2;
-  const fontSize = Math.round(innerSize * 0.55);
-
-  // Maskable icons need the background to fill the entire canvas
-  // (safe zone is the inner 80%, but the full icon is used for display)
-  const bgRect = maskable
-    ? `<rect width="${size}" height="${size}" fill="${ACCENT_BLUE}" />`
-    : "";
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  ${bgRect}
-  <circle cx="${cx}" cy="${cy}" r="${radius}" fill="${ACCENT_BLUE}" />
-  <text x="${cx}" y="${cy}" dy="0.35em" text-anchor="middle"
-        font-family="Inter, system-ui, sans-serif" font-weight="700"
-        font-size="${fontSize}" fill="${WHITE}">H</text>
-</svg>`;
-}
-
-const icons = [
-  { name: "icon-192.png", size: 192, maskable: false },
-  { name: "icon-512.png", size: 512, maskable: false },
-  { name: "icon-maskable-512.png", size: 512, maskable: true },
+// --- Standard icons (just resize the SVG) ---
+const standardSizes = [
+  { name: "icon-192.png", size: 192 },
+  { name: "icon-512.png", size: 512 },
 ];
 
-for (const { name, size, maskable } of icons) {
-  const svg = createSvg(size, maskable);
-  await sharp(Buffer.from(svg)).png().toFile(join(outDir, name));
+for (const { name, size } of standardSizes) {
+  await sharp(svgSource).resize(size, size).png().toFile(join(outDir, name));
   console.log(`✓ ${name}`);
 }
 
-console.log("Done — icons generated in public/icons/");
+// --- Maskable icon: full-bleed blue background with icon centered in safe zone ---
+const maskableSize = 512;
+const safeZone = Math.round(maskableSize * 0.8);
+const padding = Math.round((maskableSize - safeZone) / 2);
+
+const iconResized = await sharp(svgSource)
+  .resize(safeZone, safeZone)
+  .png()
+  .toBuffer();
+
+await sharp({
+  create: {
+    width: maskableSize,
+    height: maskableSize,
+    channels: 4,
+    background: { r: 37, g: 99, b: 235, alpha: 1 }, // #2563eb
+  },
+})
+  .composite([{ input: iconResized, left: padding, top: padding }])
+  .png()
+  .toFile(join(outDir, "icon-maskable-512.png"));
+
+console.log("✓ icon-maskable-512.png");
+
+// --- Favicon: 32x32 PNG saved as .ico extension ---
+// Modern browsers accept PNG favicons. No ICO container needed.
+await sharp(svgSource)
+  .resize(32, 32)
+  .png()
+  .toFile(join(root, "src", "app", "favicon.ico"));
+
+console.log("✓ favicon.ico");
+
+console.log("\nDone — icons generated.");

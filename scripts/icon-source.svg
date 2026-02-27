@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <!-- Main gradient: accent-blue to deeper blue -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <!-- Warm glow overlay -->
+    <radialGradient id="glow" cx="0.3" cy="0.3" r="0.8">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Progress arc gradient -->
+    <linearGradient id="arc-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle background -->
+  <rect x="16" y="16" width="480" height="480" rx="96" ry="96" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="96" ry="96" fill="url(#glow)"/>
+
+  <!-- Geometric "H" mark -->
+  <!-- Left pillar -->
+  <rect x="148" y="136" width="56" height="240" rx="14" fill="white"/>
+  <!-- Right pillar -->
+  <rect x="308" y="136" width="56" height="240" rx="14" fill="white"/>
+  <!-- Crossbar -->
+  <rect x="176" y="224" width="160" height="56" rx="14" fill="white"/>
+
+  <!-- Progress arc accent (top-right) — 270° sweep -->
+  <circle cx="404" cy="108" r="36" fill="none"
+          stroke="url(#arc-grad)" stroke-width="8" stroke-linecap="round"
+          stroke-dasharray="170 226.2"
+          transform="rotate(-90 404 108)"/>
+  <!-- Small dot at arc start -->
+  <circle cx="404" cy="72" r="5" fill="white" opacity="0.9"/>
+</svg>

@@ -59,9 +59,14 @@ export function Sidebar() {
           className="hf-panel-strong block rounded-2xl p-4 transition-transform duration-200 hover:-translate-y-0.5"
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/30 bg-accent-blue text-sm font-bold text-white shadow-[0_10px_20px_-14px_var(--accent-blue)]">
-              HF
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/icons/icon-192.png"
+              alt=""
+              width={36}
+              height={36}
+              className="rounded-xl shadow-[0_10px_20px_-14px_var(--accent-blue)]"
+            />
             <div className="min-w-0">
               <p className="truncate text-base font-semibold text-text-primary">HabitFlow</p>
               <p className="text-xs text-text-muted">Warm editorial mode</p>
