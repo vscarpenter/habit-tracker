@@ -51,7 +51,7 @@ export const authService = {
    */
   async signInWithMagicLink(
     email: string,
-    redirectTo: string = typeof window !== "undefined" ? window.location.origin : ""
+    redirectTo: string = typeof window !== "undefined" ? `${window.location.origin}/settings` : ""
   ): Promise<void> {
     const client = getSupabaseClient();
     const { error } = await client.auth.signInWithOtp({
