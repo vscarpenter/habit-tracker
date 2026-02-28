@@ -1,17 +1,17 @@
 /**
  * Sync module — provider-agnostic types.
  *
- * These types are shared by the Supabase implementation and any future
+ * These types are shared by the PocketBase implementation and any future
  * sync provider.  Import from here, not from the provider-specific module.
  */
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
 export interface SyncUser {
-  /** Supabase user UUID — used as the storage path prefix. */
+  /** Auth user id — used as the remote snapshot owner key. */
   id: string;
   email: string;
-  /** ISO 8601 — when the account was created in Supabase Auth. */
+  /** ISO 8601 — when the account was created in the auth provider. */
   createdAt: string;
 }
 

@@ -9,16 +9,29 @@ if [[ -f ".env" ]]; then
   set +a
 fi
 
+# Source .env.local if present (Next.js-style local overrides).
+if [[ -f ".env.local" ]]; then
+  set -a
+  # shellcheck source=/dev/null
+  source .env.local
+  set +a
+fi
+
 # AWS resource identifiers — must be provided via env vars or .env file.
 # See .env.example for the required variables.
 BUCKET_NAME="${BUCKET_NAME:-}"
 DIST_ID="${DIST_ID:-}"
 DOMAIN_NAME="${DOMAIN_NAME:-}"
+NEXT_PUBLIC_POCKETBASE_URL="${NEXT_PUBLIC_POCKETBASE_URL:-}"
 
 if [[ -z "$BUCKET_NAME" || -z "$DIST_ID" || -z "$DOMAIN_NAME" ]]; then
   echo "Error: Missing required environment variables." >&2
   echo "Set BUCKET_NAME, DIST_ID, and DOMAIN_NAME, or copy .env.example to .env and fill in values." >&2
   exit 1
+fi
+
+if [[ -z "$NEXT_PUBLIC_POCKETBASE_URL" ]]; then
+  echo "Warning: NEXT_PUBLIC_POCKETBASE_URL is not set. Sync will be disabled in this build." >&2
 fi
 
 readonly POLICY_NAME="HabitFlow-Security-Headers"
@@ -153,7 +166,7 @@ ensure_response_headers_policy() {
   "SecurityHeadersConfig": {
     "ContentSecurityPolicy": {
       "Override": true,
-      "ContentSecurityPolicy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+      "ContentSecurityPolicy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.vinny.io; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
     },
     "ContentTypeOptions": {
       "Override": true

@@ -58,7 +58,6 @@ export function SettingsContent() {
   const {
     syncState,
     isSyncConfigured,
-    signInWithMagicLink,
     signInWithGoogle,
     signOut,
     syncNow,
@@ -147,7 +146,6 @@ export function SettingsContent() {
         <SyncSection
           syncState={syncState}
           isSyncConfigured={isSyncConfigured}
-          onMagicLink={signInWithMagicLink}
           onGoogle={signInWithGoogle}
           onSignOut={signOut}
           onSyncNow={syncNow}

@@ -17,6 +17,7 @@ The idea is simple: track the things you want to do every day, see your streaks 
 - **Analytics dashboard** — Completion heatmap, category breakdown, habit leaderboard
 - **Dark mode** — Light, dark, or match your system preference
 - **Offline-first PWA** — Install it to your home screen; works without internet
+- **Optional cloud sync** — Google sign-in + PocketBase snapshot sync across devices
 - **Export & import** — Back up your data as JSON anytime
 - **Keyboard shortcuts** — Power-user navigation on desktop
 
@@ -36,6 +37,23 @@ bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) and start tracking.
+
+### Optional PocketBase Sync
+
+To enable cloud sync in development, create `.env.local`:
+
+```bash
+NEXT_PUBLIC_POCKETBASE_URL=https://api.vinny.io
+```
+
+To provision the required PocketBase collection and rules from code:
+
+```bash
+POCKETBASE_URL=https://api.vinny.io \
+POCKETBASE_ADMIN_EMAIL=admin@example.com \
+POCKETBASE_ADMIN_PASSWORD=your-password \
+bun run setup:pocketbase-sync
+```
 
 ### Commands
 

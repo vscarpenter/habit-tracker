@@ -3,8 +3,7 @@
  *
  * Provides:
  *   - syncState: current SyncState (status, user, lastSyncedAt, ...)
- *   - signInWithMagicLink(email): sends magic link, returns after email is sent
- *   - signInWithGoogle(): redirects to Google OAuth
+ *   - signInWithGoogle(): starts Google OAuth flow
  *   - signOut(): signs out and clears sync state
  *   - syncNow(): manual "Sync now" trigger
  *   - isSyncConfigured: true when env vars are present
@@ -32,10 +31,7 @@ const INITIAL_STATE: SyncState = {
 };
 
 function isSyncConfigured(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  return Boolean(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 }
 
 export function useSyncService() {
@@ -108,10 +104,6 @@ export function useSyncService() {
   }, []);
 
   // ── Public API ─────────────────────────────────────────────────────────
-  const signInWithMagicLink = useCallback(async (email: string) => {
-    await authService.signInWithMagicLink(email);
-  }, []);
-
   const signInWithGoogle = useCallback(async () => {
     await authService.signInWithGoogle();
   }, []);
@@ -124,7 +116,6 @@ export function useSyncService() {
   return {
     syncState,
     syncNow: performSync,
-    signInWithMagicLink,
     signInWithGoogle,
     signOut,
     isSyncConfigured: configured,

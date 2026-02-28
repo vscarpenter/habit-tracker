@@ -1,22 +1,17 @@
 /**
- * Sync service — coordinates pull/push between IndexedDB and Supabase Storage.
+ * Sync service — coordinates pull/push between IndexedDB and PocketBase.
  *
- * Storage layout (Supabase Storage bucket: "habit-data"):
- *   {userId}/data.json    ← the user's full snapshot in ExportData format
+ * Storage layout (PocketBase collection: "habitflow_sync_snapshots"):
+ *   ownerId=<userId>, payload=<full ExportData snapshot>
  *
  * Sync flow:
  *   pull()  — fetch remote snapshot, merge into local IndexedDB, apply
- *   push()  — build local snapshot, upload to Supabase Storage
+ *   push()  — build local snapshot, upsert into PocketBase
  *   sync()  — pull then push (the typical "sync now" operation)
- *
- * Conflict resolution (handled by mergeSnapshots in merge.ts):
- *   Habits      → last-write-wins per record (by updatedAt)
- *   Completions → union merge; same (habitId, date) → keep latest completedAt
- *   Settings    → last-write-wins (by updatedAt)
- *   Hard deletes → NOT propagated; use archive instead
  */
 
-import { getSupabaseClient } from "./supabase-client";
+import { ClientResponseError } from "pocketbase";
+import { getPocketBaseClient } from "./pocketbase-client";
 import { authService } from "./auth-service";
 import { mergeSnapshots } from "./merge";
 import {
@@ -29,15 +24,10 @@ import type { MergeResult } from "./types";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const STORAGE_BUCKET = "habit-data";
-
-function remotePath(userId: string): string {
-  return `${userId}/data.json`;
-}
+const SYNC_COLLECTION = "habitflow_sync_snapshots";
 
 // ── Error helpers ─────────────────────────────────────────────────────────────
 
-/** Extract HTTP status from a Supabase StorageApiError (or similar). */
 function getErrorStatus(error: unknown): number | null {
   if (typeof error !== "object" || error === null) return null;
   const e = error as Record<string, unknown>;
@@ -48,6 +38,9 @@ function getErrorStatus(error: unknown): number | null {
 }
 
 function getErrorMessage(error: unknown): string {
+  if (error instanceof ClientResponseError) {
+    return error.response?.message || error.message;
+  }
   if (error instanceof Error) return error.message;
   if (typeof error === "object" && error !== null) {
     const e = error as Record<string, unknown>;
@@ -56,29 +49,33 @@ function getErrorMessage(error: unknown): string {
   return "Unknown error";
 }
 
-/** Build a user-friendly error message with actionable guidance for storage failures. */
-function storageErrorWithContext(operation: string, error: unknown): Error {
+function syncErrorWithContext(operation: string, error: unknown): Error {
   const status = getErrorStatus(error);
   const msg = getErrorMessage(error);
 
-  if (msg.toLowerCase().includes("bucket not found")) {
+  if (status === 404) {
     return new Error(
-      'Storage bucket "habit-data" not found. Create it in Supabase Dashboard → Storage → New bucket (private).'
+      `PocketBase sync ${operation} failed (404): record or collection not found. ` +
+        'Verify the "habitflow_sync_snapshots" collection exists.'
     );
   }
   if (status === 400) {
     return new Error(
-      `Storage ${operation} failed (400): ${msg}. ` +
-        'Verify the "habit-data" bucket exists in Supabase Storage and RLS policies are applied.'
+      `PocketBase sync ${operation} failed (400): ${msg}. ` +
+        'Check collection fields and validation rules.'
     );
   }
   if (status === 403) {
     return new Error(
-      `Storage ${operation} denied (403): ${msg}. ` +
-        "Check that RLS policies allow authenticated users to read/write their own folder."
+      `PocketBase sync ${operation} denied (403): ${msg}. ` +
+        "Check collection API rules for ownerId access."
     );
   }
-  return new Error(`Sync ${operation} failed (${status ?? "?"}): ${msg}`);
+  return new Error(`PocketBase sync ${operation} failed (${status ?? "?"}): ${msg}`);
+}
+
+function isNotFound(error: unknown): boolean {
+  return getErrorStatus(error) === 404;
 }
 
 // ── Service ──────────────────────────────────────────────────────────────────
@@ -94,41 +91,25 @@ export const syncService = {
     const user = await authService.getUser();
     if (!user) return null;
 
-    const client = getSupabaseClient();
-    const storage = client.storage.from(STORAGE_BUCKET);
+    const client = getPocketBaseClient();
+    let remotePayload: unknown = null;
 
-    // Check if a remote snapshot exists before downloading.
-    // list() returns a reliable response; download() on a missing file returns
-    // unparseable errors in some Supabase configurations (StorageUnknownError).
-    const { data: files, error: listError } = await storage.list(user.id, {
-      limit: 1,
-      search: "data.json",
-    });
-
-    if (listError) {
-      logger.error("[sync] List failed:", { message: getErrorMessage(listError) });
-      throw storageErrorWithContext("list", listError);
-    }
-
-    const hasRemoteSnapshot = files?.some((f) => f.name === "data.json");
-    if (!hasRemoteSnapshot) {
-      logger.info("[sync] No remote snapshot found — first sync");
-      return null;
-    }
-
-    // Download the remote snapshot
-    const path = remotePath(user.id);
-    const { data, error } = await storage.download(path);
-
-    if (error) {
-      const status = getErrorStatus(error);
-      logger.error("[sync] Pull download failed:", { status, message: getErrorMessage(error) });
-      throw storageErrorWithContext("download", error);
+    try {
+      const record = await client
+        .collection(SYNC_COLLECTION)
+        .getFirstListItem(`ownerId="${user.id}"`, { requestKey: null });
+      remotePayload = record.payload;
+    } catch (error) {
+      if (isNotFound(error)) {
+        logger.info("[sync] No remote snapshot found — first sync");
+        return null;
+      }
+      logger.error("[sync] Pull failed:", { message: getErrorMessage(error) });
+      throw syncErrorWithContext("pull", error);
     }
 
     // Parse and validate the remote snapshot
-    const raw: unknown = JSON.parse(await data.text());
-    const validation = validateImportData(raw);
+    const validation = validateImportData(remotePayload);
     if (!validation.valid) {
       throw new Error(
         `Remote snapshot failed validation: ${validation.errors.join(", ")}`
@@ -151,27 +132,41 @@ export const syncService = {
   },
 
   /**
-   * Pushes the current local IndexedDB snapshot to Supabase Storage.
+   * Pushes the current local IndexedDB snapshot to PocketBase.
    * No-op if the user is not authenticated.
    */
   async push(): Promise<void> {
     const user = await authService.getUser();
     if (!user) return;
 
-    const client = getSupabaseClient();
+    const client = getPocketBaseClient();
     const snapshot = await buildExportPayload();
-    const json = JSON.stringify(snapshot);
-    const blob = new Blob([json], { type: "application/json" });
-    const path = remotePath(user.id);
+    const data = {
+      ownerId: user.id,
+      payload: snapshot,
+      exportedAt: snapshot.exportedAt,
+    };
 
-    const { error } = await client.storage
-      .from(STORAGE_BUCKET)
-      .upload(path, blob, { upsert: true, contentType: "application/json" });
+    try {
+      const existing = await client
+        .collection(SYNC_COLLECTION)
+        .getFirstListItem(`ownerId="${user.id}"`, { requestKey: null });
 
-    if (error) {
-      const status = getErrorStatus(error);
-      logger.error("[sync] Push failed:", { status, message: getErrorMessage(error) });
-      throw storageErrorWithContext("upload", error);
+      await client.collection(SYNC_COLLECTION).update(existing.id, data, {
+        requestKey: null,
+      });
+    } catch (error) {
+      if (!isNotFound(error)) {
+        logger.error("[sync] Push failed:", { message: getErrorMessage(error) });
+        throw syncErrorWithContext("push", error);
+      }
+
+      try {
+        await client.collection(SYNC_COLLECTION).create(data, { requestKey: null });
+      } catch (createError) {
+        logger.error("[sync] Push create failed:", { message: getErrorMessage(createError) });
+        throw syncErrorWithContext("push", createError);
+      }
     }
 
     logger.info("[sync] Push complete", {

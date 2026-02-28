@@ -1,87 +1,63 @@
 /**
  * SyncAuthModal — sign-in UI for enabling cloud sync.
  *
- * Two sign-in options:
- *   1. Magic link (email, no password) — primary
- *   2. Google OAuth — secondary (requires Google provider in Supabase dashboard)
- *
- * After sending a magic link the modal shows a confirmation message.
- * After Google OAuth the page is redirected by Supabase — no further action needed here.
+ * Sign-in option:
+ *   1. Google OAuth
  */
 
 "use client";
 
 import { useState } from "react";
-import { Mail, Chrome } from "lucide-react";
+import { Chrome } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 interface SyncAuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onMagicLink: (email: string) => Promise<void>;
   onGoogle: () => Promise<void>;
 }
 
-type Step = "choose" | "magic-link" | "magic-link-sent" | "loading";
+type Step = "ready" | "loading";
 
 export function SyncAuthModal({
   open,
   onOpenChange,
-  onMagicLink,
   onGoogle,
 }: SyncAuthModalProps) {
-  const [step, setStep] = useState<Step>("choose");
-  const [email, setEmail] = useState("");
+  const [step, setStep] = useState<Step>("ready");
   const [error, setError] = useState<string | null>(null);
-
-  async function handleMagicLink(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setError(null);
-    setStep("loading");
-    try {
-      await onMagicLink(email.trim());
-      setStep("magic-link-sent");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send link");
-      setStep("magic-link");
-    }
-  }
 
   async function handleGoogle() {
     setError(null);
     setStep("loading");
     try {
       await onGoogle();
-      // Page will redirect — no need to update step
+      // OAuth flow handles the post-auth navigation/popup lifecycle.
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed");
-      setStep("choose");
+      setStep("ready");
     }
   }
 
-  function handleClose() {
-    onOpenChange(false);
-    // Reset state after animation
+  function handleOpenChange(nextOpen: boolean) {
+    onOpenChange(nextOpen);
+    if (nextOpen) return;
+    // Reset state after close animation
     setTimeout(() => {
-      setStep("choose");
-      setEmail("");
+      setStep("ready");
       setError(null);
     }, 200);
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <div className="space-y-6 p-6">
         <div>
           <h2 className="text-lg font-semibold text-text-primary">Enable Sync</h2>
           <p className="mt-1 text-sm text-text-muted">
-            Sign in to sync your habits across devices. Your data is stored securely
-            and encrypted in transit.
+            Sign in with Google to sync your habits across devices. Your data is
+            encrypted in transit.
           </p>
         </div>
 
@@ -91,20 +67,8 @@ export function SyncAuthModal({
           </p>
         )}
 
-        {step === "choose" && (
+        {step === "ready" && (
           <div className="space-y-3">
-            <button
-              className={cn(
-                "flex w-full items-center gap-3 rounded-xl border border-border-subtle",
-                "bg-surface-overlay/45 px-4 py-3 text-left text-sm font-medium",
-                "text-text-primary transition-colors hover:bg-surface-paper/70"
-              )}
-              onClick={() => setStep("magic-link")}
-            >
-              <Mail className="h-4 w-4 shrink-0 text-accent-blue" />
-              <span>Continue with email (magic link)</span>
-            </button>
-
             <button
               className={cn(
                 "flex w-full items-center gap-3 rounded-xl border border-border-subtle",
@@ -116,57 +80,6 @@ export function SyncAuthModal({
               <Chrome className="h-4 w-4 shrink-0 text-text-muted" />
               <span>Continue with Google</span>
             </button>
-          </div>
-        )}
-
-        {step === "magic-link" && (
-          <form onSubmit={handleMagicLink} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="sync-email">Email address</Label>
-              <Input
-                id="sync-email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoFocus
-                required
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                className="flex-1"
-                onClick={() => setStep("choose")}
-              >
-                Back
-              </Button>
-              <Button type="submit" className="flex-1" disabled={!email.trim()}>
-                Send magic link
-              </Button>
-            </div>
-          </form>
-        )}
-
-        {step === "magic-link-sent" && (
-          <div className="space-y-4 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-blue/10">
-                <Mail className="h-6 w-6 text-accent-blue" />
-              </div>
-            </div>
-            <div>
-              <p className="font-medium text-text-primary">Check your email</p>
-              <p className="mt-1 text-sm text-text-muted">
-                We sent a sign-in link to{" "}
-                <span className="font-medium text-text-secondary">{email}</span>.
-                Click the link to finish signing in.
-              </p>
-            </div>
-            <Button variant="ghost" className="w-full" onClick={handleClose}>
-              Done
-            </Button>
           </div>
         )}
 

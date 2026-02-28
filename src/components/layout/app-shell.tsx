@@ -9,7 +9,6 @@ import { useServiceWorker } from "@/hooks/use-service-worker";
 import { KeyboardShortcutsModal } from "@/components/shared/keyboard-shortcuts-modal";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { UpdateBanner } from "@/components/shared/update-banner";
-import { AuthCallbackHandler } from "@/components/sync/auth-callback-handler";
 import type { ShortcutConfig } from "@/hooks/use-keyboard-shortcuts";
 
 export interface AppShellProps {
@@ -62,7 +61,6 @@ export function AppShell({ children }: AppShellProps) {
         {children}
       </main>
 
-      <AuthCallbackHandler />
       <KeyboardShortcutsModal open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} habits={activeHabits} />
       <UpdateBanner visible={updateAvailable} onRefresh={applyUpdate} />

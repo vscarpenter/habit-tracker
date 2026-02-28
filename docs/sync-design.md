@@ -1,8 +1,10 @@
 # HabitFlow Sync Design
 
-**Status:** Proposed
+**Status:** Historical design options
 **Issue:** #4
 **Date:** 2026-02-26
+
+> Active implementation uses PocketBase. See `docs/sync-pocketbase-plan.md`.
 
 ---
 

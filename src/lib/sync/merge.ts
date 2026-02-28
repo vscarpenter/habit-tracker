@@ -91,7 +91,7 @@ export interface MergeOutput {
  * Merges a remote snapshot into a local snapshot.
  *
  * @param local  - The snapshot built from the local IndexedDB.
- * @param remote - The snapshot fetched from Supabase Storage.
+ * @param remote - The snapshot fetched from the configured sync provider.
  * @returns      An object containing the merged ExportData and a MergeResult.
  */
 export function mergeSnapshots(local: ExportData, remote: ExportData): MergeOutput {

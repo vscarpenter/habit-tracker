@@ -1,103 +1,61 @@
 /**
- * Auth service — wraps Supabase Auth with HabitFlow-specific helpers.
+ * Auth service — wraps PocketBase auth with HabitFlow-specific helpers.
  *
- * Supported sign-in methods:
- *   1. Magic link (email, no password) — recommended for privacy-first UX
- *   2. Google OAuth (optional, configured in Supabase dashboard)
- *
- * Usage:
- *   const user = await authService.getUser();
- *   await authService.signInWithMagicLink("user@example.com");
- *   await authService.signOut();
- *   authService.onAuthChange((user) => { ... });
+ * Supported sign-in method:
+ *   1. Google OAuth
  */
 
-import type { AuthChangeEvent, Session, Subscription } from "@supabase/supabase-js";
-import { getSupabaseClient } from "./supabase-client";
+import type { BaseAuthStore, RecordModel } from "pocketbase";
+import { getPocketBaseClient } from "./pocketbase-client";
 import type { SyncUser } from "./types";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function sessionToSyncUser(session: Session): SyncUser {
-  const { user } = session;
+function modelToSyncUser(model: RecordModel | null): SyncUser | null {
+  if (!model) return null;
   return {
-    id: user.id,
-    email: user.email ?? "",
-    createdAt: user.created_at,
+    id: model.id,
+    email: typeof model.email === "string" ? model.email : "",
+    createdAt: typeof model.created === "string" ? model.created : new Date().toISOString(),
   };
 }
 
-// ── Service ──────────────────────────────────────────────────────────────────
+function authStoreUser(authStore: BaseAuthStore): SyncUser | null {
+  if (!authStore.isValid) return null;
+  return modelToSyncUser(authStore.record);
+}
 
 export const authService = {
   /**
    * Returns the currently authenticated user, or null if not signed in.
    */
   async getUser(): Promise<SyncUser | null> {
-    const client = getSupabaseClient();
-    const { data } = await client.auth.getSession();
-    if (!data.session) return null;
-    return sessionToSyncUser(data.session);
-  },
-
-  /**
-   * Sends a magic link to the provided email address.
-   * The user clicks the link and is redirected back to the app,
-   * where Supabase automatically exchanges the token for a session.
-   *
-   * @param email    - The user's email address.
-   * @param redirectTo - The URL to redirect to after sign-in.
-   *                   Defaults to the current page.
-   */
-  async signInWithMagicLink(
-    email: string,
-    redirectTo: string = typeof window !== "undefined" ? `${window.location.origin}/settings` : ""
-  ): Promise<void> {
-    const client = getSupabaseClient();
-    const { error } = await client.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: redirectTo },
-    });
-    if (error) throw error;
+    const client = getPocketBaseClient();
+    return authStoreUser(client.authStore);
   },
 
   /**
    * Signs in with Google OAuth.
-   * Redirects the browser — no return value.
    */
   async signInWithGoogle(): Promise<void> {
-    const client = getSupabaseClient();
-    const redirectTo =
-      typeof window !== "undefined" ? `${window.location.origin}/settings` : "";
-    const { error } = await client.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-    if (error) throw error;
+    const client = getPocketBaseClient();
+    await client.collection("users").authWithOAuth2({ provider: "google" });
   },
 
   /**
-   * Signs the current user out and clears the local session.
+   * Signs the current user out and clears the local auth store.
    */
   async signOut(): Promise<void> {
-    const client = getSupabaseClient();
-    const { error } = await client.auth.signOut();
-    if (error) throw error;
+    const client = getPocketBaseClient();
+    client.authStore.clear();
   },
 
   /**
    * Subscribes to auth state changes.
    * Returns an unsubscribe function — call it in useEffect cleanup.
-   *
-   * @param callback - Called with the new user (or null on sign-out).
    */
   onAuthChange(callback: (user: SyncUser | null) => void): () => void {
-    const client = getSupabaseClient();
-    const handler = (_event: AuthChangeEvent, session: Session | null) => {
-      callback(session ? sessionToSyncUser(session) : null);
-    };
-    const { data } = client.auth.onAuthStateChange(handler);
-    const sub = data.subscription as Subscription;
-    return () => sub.unsubscribe();
+    const client = getPocketBaseClient();
+    return client.authStore.onChange(() => {
+      callback(authStoreUser(client.authStore));
+    });
   },
 };

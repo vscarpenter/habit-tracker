@@ -2,7 +2,7 @@
  * Debounced push — call after every local DB write to schedule a cloud push.
  *
  * Safe to call unconditionally:
- *   - No-op when Supabase env vars are missing
+ *   - No-op when PocketBase env var is missing
  *   - No-op when the user is not authenticated
  *   - Silently catches all errors (push failures surface in useSyncService)
  *   - Debounced at 2 s so rapid-fire writes (bulk import, multiple toggles)

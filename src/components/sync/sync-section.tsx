@@ -20,7 +20,6 @@ import type { SyncState } from "@/lib/sync/types";
 interface SyncSectionProps {
   syncState: SyncState;
   isSyncConfigured: boolean;
-  onMagicLink: (email: string) => Promise<void>;
   onGoogle: () => Promise<void>;
   onSignOut: () => Promise<void>;
   onSyncNow: () => Promise<void>;
@@ -29,7 +28,6 @@ interface SyncSectionProps {
 export function SyncSection({
   syncState,
   isSyncConfigured,
-  onMagicLink,
   onGoogle,
   onSignOut,
   onSyncNow,
@@ -43,8 +41,8 @@ export function SyncSection({
         <div>
           <p className="text-sm font-medium text-text-primary">Sync not configured</p>
           <p className="mt-0.5 text-xs text-text-muted">
-            Add <code className="font-mono">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-            <code className="font-mono">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to enable cloud sync.
+            Add <code className="font-mono">NEXT_PUBLIC_POCKETBASE_URL</code> to enable cloud
+            sync.
           </p>
         </div>
       </div>
@@ -69,7 +67,6 @@ export function SyncSection({
         <SyncAuthModal
           open={authModalOpen}
           onOpenChange={setAuthModalOpen}
-          onMagicLink={onMagicLink}
           onGoogle={onGoogle}
         />
       </>
