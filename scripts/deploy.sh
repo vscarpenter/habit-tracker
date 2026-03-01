@@ -133,32 +133,17 @@ ensure_response_headers_policy() {
 
   if [[ "$DRY_RUN" == "1" ]]; then
     echo "[dry-run] aws cloudfront list-response-headers-policies --type custom"
-    echo "[dry-run] aws cloudfront create-response-headers-policy (if needed)"
+    echo "[dry-run] aws cloudfront create/update-response-headers-policy"
     POLICY_ID="dry-run-policy-id"
     return 0
   fi
 
-  local existing
-  existing=$(aws cloudfront list-response-headers-policies \
-    --type custom --no-cli-pager 2>/dev/null || echo '{}')
-
-  POLICY_ID=$(echo "$existing" | jq -r \
-    ".ResponseHeadersPolicyList.Items[]?
-     | select(.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.Name == \"${POLICY_NAME}\")
-     | .ResponseHeadersPolicy.Id")
-
-  if [[ -n "$POLICY_ID" ]]; then
-    echo "Policy '${POLICY_NAME}' already exists (ID: ${POLICY_ID})"
-    return 0
-  fi
-
-  echo "Creating response headers policy '${POLICY_NAME}'..."
-
+  # CSP notes:
+  # - script-src 'unsafe-inline': Next.js RSC injects inline <script> tags for hydration data.
+  # - script-src 'unsafe-eval': PocketBase SDK compiles filter expressions via new Function().
+  # - style-src 'unsafe-inline': Recharts v3 applies inline style attributes on SVG elements.
+  # Nonce-based CSP is not feasible with static export.
   local policy_config
-  # CSP note: 'unsafe-inline' is required for both script-src and style-src.
-  # - script-src: Next.js React Server Components inject inline <script> tags for hydration data.
-  # - style-src: Recharts v3 applies inline style attributes on SVG chart elements.
-  # Removing either will break the app. Nonce-based CSP is not feasible with static export.
   policy_config=$(cat <<'POLICY_JSON'
 {
   "Name": "HabitFlow-Security-Headers",
@@ -166,7 +151,7 @@ ensure_response_headers_policy() {
   "SecurityHeadersConfig": {
     "ContentSecurityPolicy": {
       "Override": true,
-      "ContentSecurityPolicy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.vinny.io; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+      "ContentSecurityPolicy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.vinny.io; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
     },
     "ContentTypeOptions": {
       "Override": true
@@ -199,6 +184,34 @@ ensure_response_headers_policy() {
 }
 POLICY_JSON
 )
+
+  local existing
+  existing=$(aws cloudfront list-response-headers-policies \
+    --type custom --no-cli-pager 2>/dev/null || echo '{}')
+
+  POLICY_ID=$(echo "$existing" | jq -r \
+    ".ResponseHeadersPolicyList.Items[]?
+     | select(.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.Name == \"${POLICY_NAME}\")
+     | .ResponseHeadersPolicy.Id")
+
+  if [[ -n "$POLICY_ID" ]]; then
+    echo "Updating response headers policy '${POLICY_NAME}' (ID: ${POLICY_ID})..."
+
+    local etag
+    etag=$(aws cloudfront get-response-headers-policy \
+      --id "${POLICY_ID}" --no-cli-pager | jq -r '.ETag')
+
+    aws cloudfront update-response-headers-policy \
+      --id "${POLICY_ID}" \
+      --response-headers-policy-config "$policy_config" \
+      --if-match "$etag" \
+      --no-cli-pager > /dev/null
+
+    echo "Updated policy '${POLICY_NAME}'"
+    return 0
+  fi
+
+  echo "Creating response headers policy '${POLICY_NAME}'..."
 
   local result
   result=$(aws cloudfront create-response-headers-policy \

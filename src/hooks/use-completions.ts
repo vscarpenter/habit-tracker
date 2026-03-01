@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { completionService } from "@/db/completion-service";
 import { useToast } from "@/components/shared/toast";
+import { useSyncRefresh } from "@/contexts/sync-refresh-context";
 import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import type { HabitCompletion } from "@/types";
@@ -11,6 +12,7 @@ export function useCompletions(date: string) {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { refreshKey } = useSyncRefresh();
 
   const refresh = useCallback(async () => {
     try {
@@ -26,7 +28,7 @@ export function useCompletions(date: string) {
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+  }, [refresh, refreshKey]);
 
   const toggle = useCallback(
     async (habitId: string) => {
@@ -75,6 +77,7 @@ export function useCompletionRange(startDate: string, endDate: string) {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { refreshKey } = useSyncRefresh();
 
   const refresh = useCallback(async () => {
     try {
@@ -90,7 +93,7 @@ export function useCompletionRange(startDate: string, endDate: string) {
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+  }, [refresh, refreshKey]);
 
   return { completions, loading, refresh };
 }

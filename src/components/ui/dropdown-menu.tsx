@@ -28,10 +28,15 @@ function useDropdownContext(): DropdownContextValue {
 
 export interface DropdownMenuProps {
   children: React.ReactNode;
+  onOpenChange?: (open: boolean) => void;
 }
 
-function DropdownMenu({ children }: DropdownMenuProps) {
-  const [open, setOpen] = useState(false);
+function DropdownMenu({ children, onOpenChange }: DropdownMenuProps) {
+  const [open, setOpenState] = useState(false);
+  const setOpen = useCallback((value: boolean) => {
+    setOpenState(value);
+    onOpenChange?.(value);
+  }, [onOpenChange]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = useCallback(
@@ -105,17 +110,31 @@ export interface DropdownMenuContentProps
 const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuContentProps>(
   ({ className, align = "end", ...props }, ref) => {
     const { open } = useDropdownContext();
+    const innerRef = useRef<HTMLDivElement>(null);
+    const [flipUp, setFlipUp] = useState(false);
+
+    useEffect(() => {
+      if (!open || !innerRef.current) return;
+      const el = innerRef.current;
+      const rect = el.getBoundingClientRect();
+      setFlipUp(rect.bottom > window.innerHeight - 8);
+    }, [open]);
 
     if (!open) return null;
 
     return (
       <div
-        ref={ref}
+        ref={(node) => {
+          innerRef.current = node;
+          if (typeof ref === "function") ref(node);
+          else if (ref) ref.current = node;
+        }}
         role="menu"
         className={cn(
-          "absolute z-50 mt-1 min-w-[160px] overflow-hidden rounded-xl",
+          "absolute z-50 min-w-[160px] overflow-hidden rounded-xl",
           "bg-surface-paper/96 backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-lg)]",
           "p-1 animate-fade-in",
+          flipUp ? "bottom-full mb-1" : "top-full mt-1",
           align === "start" && "left-0",
           align === "center" && "left-1/2 -translate-x-1/2",
           align === "end" && "right-0",
