@@ -31,6 +31,7 @@ bunx vitest run src/db/schemas.test.ts  # Single test file
 bun run test:watch     # Vitest watch mode
 bun run lint           # ESLint
 bun run type-check     # tsc --noEmit
+bun run setup:pocketbase-sync  # Create/update PocketBase sync collection (requires admin env vars)
 ```
 
 Deploy: `aws s3 sync out/ s3://BUCKET --delete` then invalidate CloudFront.
@@ -50,13 +51,16 @@ Dynamic routes under `[id]` use a layout-level `generateStaticParams` with a pla
 
 ### Sync Layer (`src/lib/sync/`)
 Optional PocketBase cloud sync using snapshot merge (full `ExportData` JSON per user). Auth via Google OAuth. Key files:
-- `types.ts` — `SyncStatus`, `SyncState`, `SyncUser`, `MergeResult`
+- `types.ts` — `SyncStatus`, `SyncState`, `SyncUser`, `MergeResult` (provider-agnostic)
 - `merge.ts` — `mergeSnapshots()` (habits: LWW, completions: union, settings: LWW)
 - `pocketbase-client.ts` — lazy client singleton (requires `NEXT_PUBLIC_POCKETBASE_URL`)
-- `auth-service.ts` — Google OAuth sign-in/out
-- `sync-service.ts` — pull/push/sync operations via `habitflow_sync_snapshots`
+- `auth-service.ts` — Google OAuth sign-in/out via PocketBase SDK
+- `sync-service.ts` — pull/push/sync operations via `habitflow_sync_snapshots` collection
+- `schedule-push.ts` — 2s debounced fire-and-forget push (called after every DB write)
 
-Design docs: `docs/sync-design.md` (option analysis), `docs/sync-supabase-plan.md` (historical Supabase plan).
+Hook: `src/hooks/use-sync.ts` — manages sync state, auto-syncs on mount if authenticated, exposes `syncNow`/`signInWithGoogle`/`signOut`.
+
+Design docs: `docs/sync-design.md` (option analysis), `docs/sync-pocketbase-plan.md` (active), `docs/sync-supabase-plan.md` (archived).
 
 ### Components (`src/components/`)
 - `ui/` — shadcn-inspired primitives (all accept `className` prop)

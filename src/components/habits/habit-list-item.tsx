@@ -40,6 +40,7 @@ export function HabitListItem({
   streak = 0,
 }: HabitListItemProps) {
   const [showDelete, setShowDelete] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const showStreak = streak >= 2 && !habit.isArchived;
 
   return (
@@ -47,7 +48,8 @@ export function HabitListItem({
       <div
         className={cn(
           "hf-row group relative rounded-2xl px-4 py-3",
-          "transition-all duration-200 hover:-translate-y-0.5"
+          "transition-all duration-200 hover:-translate-y-0.5",
+          menuOpen && "z-10"
         )}
       >
         <span
@@ -88,7 +90,7 @@ export function HabitListItem({
             </div>
           </Link>
 
-          <DropdownMenu>
+          <DropdownMenu onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger
               className="rounded-xl border border-transparent p-2 text-text-muted transition-colors hover:border-border-subtle hover:bg-surface-paper/70 hover:text-text-primary"
               aria-label="Actions"

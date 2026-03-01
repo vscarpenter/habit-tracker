@@ -69,7 +69,7 @@ export function Sidebar() {
             />
             <div className="min-w-0">
               <p className="truncate text-base font-semibold text-text-primary">HabitFlow</p>
-              <p className="text-xs text-text-muted">Warm editorial mode</p>
+              <p className="text-xs text-text-muted">Consistency wins</p>
             </div>
           </div>
         </Link>

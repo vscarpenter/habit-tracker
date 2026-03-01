@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { completionService } from "@/db/completion-service";
 import { useToast } from "@/components/shared/toast";
+import { useSyncRefresh } from "@/contexts/sync-refresh-context";
 import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import type { HabitCompletion } from "@/types";
@@ -15,6 +16,7 @@ export function useWeekCompletions(startDate: string, endDate: string) {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { refreshKey } = useSyncRefresh();
 
   const refresh = useCallback(async () => {
     try {
@@ -30,7 +32,7 @@ export function useWeekCompletions(startDate: string, endDate: string) {
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+  }, [refresh, refreshKey]);
 
   const completionSet = useMemo(() => {
     const set = new Set<string>();

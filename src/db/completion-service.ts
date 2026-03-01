@@ -3,6 +3,10 @@ import { z } from "zod/v4";
 import { db } from "./database";
 import { habitCompletionSchema } from "./schemas";
 import { schedulePush } from "@/lib/sync/schedule-push";
+import {
+  scheduleCompletionPush,
+  scheduleCompletionDelete,
+} from "@/lib/sync/completion-sync-service";
 import { MAX_NOTE_LENGTH } from "@/lib/utils";
 import type { HabitCompletion } from "@/types";
 
@@ -50,6 +54,7 @@ export const completionService = {
     if (existing) {
       await db.completions.delete(existing.id);
       schedulePush();
+      scheduleCompletionDelete(habitId, date, existing.id);
       return { completed: false };
     }
 
@@ -65,6 +70,7 @@ export const completionService = {
     habitCompletionSchema.parse(completion);
     await db.completions.add(completion);
     schedulePush();
+    scheduleCompletionPush(completion);
     return { completed: true, completion };
   },
 
@@ -72,6 +78,10 @@ export const completionService = {
     z.string().max(MAX_NOTE_LENGTH, "Note is too long").parse(note);
     await db.completions.update(id, { note });
     schedulePush();
+
+    // Re-push the full completion so the note syncs immediately
+    const updated = await db.completions.get(id);
+    if (updated) scheduleCompletionPush(updated);
   },
 
   async deleteByHabitId(habitId: string): Promise<number> {
