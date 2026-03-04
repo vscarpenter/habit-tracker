@@ -86,12 +86,32 @@ describe("completionSyncService", () => {
     });
 
     it("silently handles duplicate create (unique violation)", async () => {
-      const create = vi.fn().mockRejectedValue({ status: 400 });
+      const create = vi.fn().mockRejectedValue({
+        status: 400,
+        response: { message: "Value must be unique" },
+      });
       const getFirstListItem = vi.fn().mockRejectedValue({ status: 404 });
       mockCollection({ getFirstListItem, create, update: vi.fn() });
 
       // Should not throw
       await completionSyncService.pushCompletion("user_1", makeCompletion());
+    });
+
+    it("throws on non-unique create failure", async () => {
+      const create = vi.fn().mockRejectedValue({
+        status: 400,
+        response: { message: "Validation failed" },
+      });
+      const getFirstListItem = vi.fn().mockRejectedValue({ status: 404 });
+      mockCollection({ getFirstListItem, create, update: vi.fn() });
+
+      await expect(
+        completionSyncService.pushCompletion("user_1", makeCompletion())
+      ).rejects.toEqual(
+        expect.objectContaining({
+          status: 400,
+        })
+      );
     });
   });
 

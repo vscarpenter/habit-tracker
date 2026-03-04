@@ -33,10 +33,7 @@ export default function HabitDetailPage() {
     () => format(subMonths(parseISO(today), 6), "yyyy-MM-dd"),
     [today]
   );
-  const { completions, loading: completionsLoading } = useCompletionRange(
-    sixMonthsAgo,
-    today
-  );
+  const { completions } = useCompletionRange(sixMonthsAgo, today);
 
   // Filter completions to this habit only
   const habitCompletions = useMemo(

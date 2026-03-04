@@ -88,9 +88,9 @@ export const completionSyncService = {
         await client.collection(COLLECTION).create(data, { requestKey: null });
       } catch (createError) {
         // Duplicate key means another device already created it — that's fine
-        if (!isUniqueViolation(createError)) {
-          logger.error("[completion-sync] Push create failed", createError);
-        }
+        if (isUniqueViolation(createError)) return;
+        logger.error("[completion-sync] Push create failed", createError);
+        throw createError;
       }
     }
   },
@@ -206,9 +206,34 @@ function isNotFoundError(error: unknown): boolean {
 function isUniqueViolation(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false;
   const e = error as Record<string, unknown>;
-  // PocketBase returns 400 for unique constraint violations
-  if (e.status === 400 || e.statusCode === 400) return true;
-  return false;
+  const status = e.status ?? e.statusCode;
+  if (status !== 400) return false;
+
+  const message = typeof e.message === "string" ? e.message : "";
+  if (message.toLowerCase().includes("unique")) return true;
+
+  const response =
+    typeof e.response === "object" && e.response !== null
+      ? (e.response as Record<string, unknown>)
+      : null;
+  const responseMessage =
+    response && typeof response.message === "string" ? response.message : "";
+  if (responseMessage.toLowerCase().includes("unique")) return true;
+
+  const responseData = response?.data;
+  if (typeof responseData !== "object" || responseData === null) return false;
+
+  return Object.values(responseData).some((field) => {
+    if (typeof field !== "object" || field === null) return false;
+    const entry = field as Record<string, unknown>;
+    const code = entry.code;
+    const entryMessage = entry.message;
+    return (
+      code === "validation_not_unique" ||
+      (typeof entryMessage === "string" &&
+        entryMessage.toLowerCase().includes("unique"))
+    );
+  });
 }
 
 /**

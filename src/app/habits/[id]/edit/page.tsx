@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageContainer } from "@/components/layout/page-container";
 import { Header } from "@/components/layout/header";
@@ -12,7 +12,6 @@ import { useToast } from "@/components/shared/toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
-import type { Habit } from "@/types";
 
 export default function EditHabitPage({
   params,
@@ -23,15 +22,12 @@ export default function EditHabitPage({
   const router = useRouter();
   const { habits, update, archive, loading } = useHabits();
   const { toast } = useToast();
-  const [habit, setHabit] = useState<Habit | null>(null);
   const [showArchive, setShowArchive] = useState(false);
 
-  useEffect(() => {
-    if (!loading) {
-      const found = habits.find((h) => h.id === id);
-      setHabit(found ?? null);
-    }
-  }, [habits, id, loading]);
+  const habit = useMemo(
+    () => habits.find((h) => h.id === id) ?? null,
+    [habits, id]
+  );
 
   const handleSubmit = async (data: Parameters<typeof update>[1]) => {
     try {

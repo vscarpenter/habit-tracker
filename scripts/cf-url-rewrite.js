@@ -2,7 +2,7 @@
 // Rewrites extensionless paths to .html so S3 can serve
 // Next.js static-export pages (e.g. /settings → /settings.html).
 
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handler(event) {
   var request = event.request;
   var uri = request.uri;

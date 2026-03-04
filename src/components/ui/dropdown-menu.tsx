@@ -48,14 +48,14 @@ function DropdownMenu({ children, onOpenChange }: DropdownMenuProps) {
         setOpen(false);
       }
     },
-    []
+    [setOpen]
   );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     },
-    []
+    [setOpen]
   );
 
   useEffect(() => {

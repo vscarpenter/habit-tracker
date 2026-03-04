@@ -102,6 +102,7 @@ export default function RootLayout({
               `,
             }}
           />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icons/icon-192.png" alt="" width={72} height={72} />
           <div style={{ textAlign: "center" }}>
             <div className="splash-name">HabitFlow</div>
