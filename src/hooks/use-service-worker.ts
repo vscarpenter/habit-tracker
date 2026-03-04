@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { logger } from "@/lib/logger";
 
+// Check for SW updates every 60 seconds.
+// Safari on iOS can miss the initial update check, especially in standalone PWA mode.
+const UPDATE_CHECK_INTERVAL_MS = 60_000;
+
 export function useServiceWorker() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
@@ -11,8 +15,14 @@ export function useServiceWorker() {
       return;
     }
 
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+
     navigator.serviceWorker
-      .register("/sw.js")
+      .register("/sw.js", {
+        // Bypass browser HTTP cache when checking for SW updates.
+        // Critical for Safari/iOS which aggressively caches sw.js.
+        updateViaCache: "none",
+      })
       .then((registration) => {
         registration.addEventListener("updatefound", () => {
           const newWorker = registration.installing;
@@ -27,16 +37,44 @@ export function useServiceWorker() {
             }
           });
         });
+
+        // Periodically check for updates — Safari may miss the first check
+        intervalId = setInterval(() => {
+          registration.update().catch(() => {
+            // Silently ignore update check failures (offline, etc.)
+          });
+        }, UPDATE_CHECK_INTERVAL_MS);
       })
       .catch((error) => {
         logger.error("Service worker registration failed:", error);
       });
+
+    // Also listen for the controlling SW changing (e.g. after skipWaiting)
+    // to auto-reload so the user always gets the fresh version.
+    let refreshing = false;
+    const onControllerChange = () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    };
+    navigator.serviceWorker.addEventListener(
+      "controllerchange",
+      onControllerChange
+    );
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      navigator.serviceWorker.removeEventListener(
+        "controllerchange",
+        onControllerChange
+      );
+    };
   }, []);
 
   const applyUpdate = () => {
     navigator.serviceWorker.getRegistration().then((registration) => {
       registration?.waiting?.postMessage("skipWaiting");
-      window.location.reload();
+      // The controllerchange listener above handles the reload
     });
   };
 

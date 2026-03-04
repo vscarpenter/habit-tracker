@@ -1,11 +1,14 @@
-const CACHE_NAME = "habitflow-v1";
+// Version is updated at build time by the deploy script.
+// Changing this value triggers SW update detection and full cache eviction.
+const CACHE_VERSION = "__BUILD_VERSION__";
+const CACHE_NAME = `habitflow-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",
 ];
 
-// Install: cache static assets
+// Install: cache static assets and immediately activate
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
@@ -13,7 +16,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate: clean up old caches
+// Activate: delete ALL old caches, then claim clients
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -22,12 +25,11 @@ self.addEventListener("activate", (event) => {
           .filter((key) => key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Fetch: network-first for navigations, cache-first for static assets
+// Fetch: network-first for navigations, cache-first for hashed static assets
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -38,10 +40,10 @@ self.addEventListener("fetch", (event) => {
   // Skip cross-origin requests
   if (url.origin !== self.location.origin) return;
 
-  // Network-first for page navigations
+  // Network-first for page navigations — bypass browser HTTP cache
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: "no-store" })
         .then((response) => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
@@ -52,7 +54,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache-first for static assets (_next/static, icons, fonts)
+  // Cache-first for content-hashed static assets (_next/static, icons, fonts)
   if (
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icons/") ||
@@ -73,9 +75,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Default: network-first with cache fallback
+  // Default: network-first with cache fallback — bypass browser HTTP cache
   event.respondWith(
-    fetch(request)
+    fetch(request, { cache: "no-store" })
       .then((response) => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
