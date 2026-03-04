@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar, BottomNav } from "./nav-bar";
+import { AppFooter } from "./app-footer";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useHabits } from "@/hooks/use-habits";
 import { useServiceWorker } from "@/hooks/use-service-worker";
@@ -77,6 +78,7 @@ export function AppShell({ children }: AppShellProps) {
 
         <main id="main-content" className="relative z-10 pb-32 lg:pl-64 lg:pb-0">
           {children}
+          <AppFooter />
         </main>
 
         <KeyboardShortcutsModal open={shortcutsOpen} onOpenChange={setShortcutsOpen} />

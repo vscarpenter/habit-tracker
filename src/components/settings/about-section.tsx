@@ -1,6 +1,5 @@
 import { Shield } from "lucide-react";
-
-const APP_VERSION = "1.0.0";
+import { APP_VERSION } from "@/lib/version";
 
 export function AboutSection() {
   return (

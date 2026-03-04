@@ -310,19 +310,29 @@ if [[ ! -d "$OUT_DIR" ]]; then
   exit 1
 fi
 
+# Stamp sw.js with a build version so the browser detects a new SW on every deploy.
+# This causes cache eviction of the old versioned cache bucket.
+BUILD_VERSION=$(date +%s)
+echo "Stamping sw.js with build version ${BUILD_VERSION}..."
+if [[ "$DRY_RUN" != "1" ]]; then
+  sed -i '' "s/__BUILD_VERSION__/${BUILD_VERSION}/" "${OUT_DIR}/sw.js"
+fi
+
 echo "Syncing static assets to s3://${BUCKET_NAME}..."
 run aws s3 sync "${OUT_DIR}/" "s3://${BUCKET_NAME}" \
   --delete \
   --exclude "*.html" \
   --exclude "sw.js" \
+  --exclude "manifest.json" \
   --cache-control "public,max-age=31536000,immutable" \
   --no-progress
 
-echo "Syncing HTML and service worker with revalidation cache policy..."
+echo "Syncing HTML, service worker, and manifest with no-cache policy..."
 run aws s3 sync "${OUT_DIR}/" "s3://${BUCKET_NAME}" \
   --exclude "*" \
   --include "*.html" \
   --include "sw.js" \
+  --include "manifest.json" \
   --cache-control "public,max-age=0,must-revalidate" \
   --no-progress
 
