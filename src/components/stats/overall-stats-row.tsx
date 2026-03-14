@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, TrendingUp, Flame, Hash } from "lucide-react";
+import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 import type { OverallStatsResult } from "@/lib/stats-utils";
 
 interface OverallStatsRowProps {
@@ -13,13 +14,20 @@ interface OverallStatsRowProps {
 interface StatCardProps {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
-  value: string | number;
+  value: number;
+  suffix?: string;
   accent: string;
+  index: number;
 }
 
-function StatCard({ icon: Icon, label, value, accent }: StatCardProps) {
+const STAGGER_DELAY_MS = 60;
+
+function StatCard({ icon: Icon, label, value, suffix, accent, index }: StatCardProps) {
   return (
-    <Card className="relative overflow-hidden py-4">
+    <Card
+      className="relative overflow-hidden py-4 animate-stagger-in"
+      style={{ animationDelay: `${index * STAGGER_DELAY_MS}ms` }}
+    >
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-1"
@@ -34,7 +42,9 @@ function StatCard({ icon: Icon, label, value, accent }: StatCardProps) {
       </div>
       <div className="min-w-0">
         <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">{label}</div>
-        <div className="mt-1 text-2xl font-bold text-text-primary">{value}</div>
+        <div className="mt-1 text-2xl font-bold text-text-primary">
+          <AnimatedCounter value={value} suffix={suffix} />
+        </div>
       </div>
       </div>
     </Card>
@@ -59,24 +69,29 @@ export function OverallStatsRow({ stats, loading }: OverallStatsRowProps) {
         label="Active Habits"
         value={stats.totalActiveHabits}
         accent="var(--chart-1)"
+        index={0}
       />
       <StatCard
         icon={TrendingUp}
         label="Completion Rate"
-        value={`${stats.overallCompletionRate}%`}
+        value={stats.overallCompletionRate}
+        suffix="%"
         accent="var(--chart-2)"
+        index={1}
       />
       <StatCard
         icon={Flame}
         label="Best Streak"
         value={stats.bestCurrentStreak}
         accent="var(--chart-4)"
+        index={2}
       />
       <StatCard
         icon={Hash}
         label="Total Completions"
         value={stats.totalCompletions}
         accent="var(--chart-3)"
+        index={3}
       />
     </div>
   );

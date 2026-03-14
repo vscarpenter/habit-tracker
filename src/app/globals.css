@@ -350,3 +350,190 @@ h6 {
 .animate-cell-fill {
   animation: cell-fill 200ms ease-out;
 }
+
+/* ─── Staggered List Fade-In ────────────────────────────── */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-in {
+  opacity: 0;
+  animation: stagger-in 300ms ease-out forwards;
+}
+
+/* ─── Shimmer Skeleton ──────────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--border-subtle) 25%,
+    color-mix(in srgb, var(--border-subtle) 60%, white 40%) 50%,
+    var(--border-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.dark .animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--border-subtle) 25%,
+    color-mix(in srgb, var(--border-subtle) 70%, var(--surface-elevated) 30%) 50%,
+    var(--border-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ─── Completion Ripple ─────────────────────────────────── */
+@keyframes completion-ripple {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--ripple-color, rgba(37, 99, 235, 0.4));
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px var(--ripple-color, rgba(37, 99, 235, 0));
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+.animate-completion-ripple {
+  animation: completion-ripple 400ms ease-out;
+}
+
+/* ─── Progress Ring Entry ───────────────────────────────── */
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: var(--ring-circumference);
+  }
+  to {
+    stroke-dashoffset: var(--ring-target-offset);
+  }
+}
+
+.animate-ring-draw {
+  animation: ring-draw 800ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ─── Confetti Particle ─────────────────────────────────── */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(120px) rotate(var(--confetti-rotation, 360deg)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 1;
+  }
+  20% {
+    transform: translate(var(--confetti-x), var(--confetti-y)) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--confetti-x), calc(var(--confetti-y) + 60px)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ─── Animated Mesh Gradient Background ─────────────────── */
+@keyframes mesh-drift {
+  0%, 100% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+  }
+  33% {
+    background-position: 100% 25%, 0% 75%, 75% 100%;
+  }
+  66% {
+    background-position: 50% 100%, 50% 0%, 0% 50%;
+  }
+}
+
+body {
+  --progress-warmth: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: calc(0.06 + var(--progress-warmth, 0) * 0.08);
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 30%, var(--bg-glow-1), transparent),
+    radial-gradient(ellipse 500px 350px at 80% 70%, var(--bg-glow-2), transparent),
+    radial-gradient(ellipse 450px 300px at 50% 50%, color-mix(in srgb, var(--accent-emerald) 12%, transparent), transparent);
+  animation: mesh-drift 30s ease-in-out infinite;
+  transition: opacity 2s ease;
+}
+
+/* ─── Streak Flame Flicker ──────────────────────────────── */
+@keyframes flame-flicker {
+  0%, 100% {
+    transform: scaleY(1) scaleX(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scaleY(1.08) scaleX(0.95);
+    filter: brightness(1.1);
+  }
+  50% {
+    transform: scaleY(0.94) scaleX(1.04);
+    filter: brightness(0.95);
+  }
+  75% {
+    transform: scaleY(1.05) scaleX(0.97);
+    filter: brightness(1.05);
+  }
+}
+
+.animate-flame-flicker {
+  animation: flame-flicker 1.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* ─── Celebration Glow Pulse ────────────────────────────── */
+@keyframes glow-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 1.2s ease-out;
+}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { COMPLETION_ANIMATION_MS } from "@/lib/constants";
+
 import { Check } from "lucide-react";
 
 interface CompletionToggleProps {
@@ -23,7 +23,7 @@ export function CompletionToggle({
   const handleClick = () => {
     if (!completed) {
       setAnimating(true);
-      setTimeout(() => setAnimating(false), COMPLETION_ANIMATION_MS);
+      setTimeout(() => setAnimating(false), 400);
     }
     onToggle();
   };
@@ -39,12 +39,13 @@ export function CompletionToggle({
         "flex shrink-0 items-center justify-center rounded-full",
         "transition-all duration-200 border-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
         sizeClass,
-        animating && "animate-completion-bounce"
+        animating && "animate-completion-ripple"
       )}
       style={{
         borderColor: completed ? color : "var(--border-subtle)",
         backgroundColor: completed ? color : "var(--surface-paper)",
-      }}
+        "--ripple-color": `color-mix(in srgb, ${color} 40%, transparent)`,
+      } as React.CSSProperties}
       aria-label={completed ? "Mark as incomplete" : "Mark as complete"}
       aria-pressed={completed}
     >
