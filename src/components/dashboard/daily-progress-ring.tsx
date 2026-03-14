@@ -14,10 +14,9 @@ export function DailyProgressRing({
   className,
 }: DailyProgressRingProps) {
   const percentage = total > 0 ? (completed / total) * 100 : 0;
-  // Radius tuned to the 120x120 viewBox with strokeWidth=8
   const RING_RADIUS = 54;
   const circumference = 2 * Math.PI * RING_RADIUS;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const targetOffset = circumference - (percentage / 100) * circumference;
 
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)}>
@@ -31,7 +30,7 @@ export function DailyProgressRing({
           stroke="var(--border-subtle)"
           strokeWidth="8"
         />
-        {/* Progress ring */}
+        {/* Progress ring — animates from 0 on mount */}
         <circle
           cx="60"
           cy="60"
@@ -41,8 +40,12 @@ export function DailyProgressRing({
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          className="transition-all duration-500 ease-out"
+          strokeDashoffset={targetOffset}
+          className="animate-ring-draw"
+          style={{
+            "--ring-circumference": circumference,
+            "--ring-target-offset": targetOffset,
+          } as React.CSSProperties}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { PageContainer } from "@/components/layout/page-container";
 import { Header } from "@/components/layout/header";
 import { TodayView } from "@/components/dashboard/today-view";
@@ -53,6 +53,17 @@ export default function DashboardPage() {
   );
 
   useKeyboardShortcuts(digitShortcuts);
+
+  // Drive the ambient background warmth based on daily completion progress
+  const completedCount = scheduledHabits.filter((h) => isCompleted(h.id)).length;
+  const progressWarmth = scheduledHabits.length > 0
+    ? completedCount / scheduledHabits.length
+    : 0;
+
+  useEffect(() => {
+    document.body.style.setProperty("--progress-warmth", String(progressWarmth));
+    return () => { document.body.style.removeProperty("--progress-warmth"); };
+  }, [progressWarmth]);
 
   return (
     <PageContainer>

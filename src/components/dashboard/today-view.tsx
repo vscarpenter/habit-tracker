@@ -156,6 +156,7 @@ export function TodayView({
                 streak={showStreaks ? streak : 0}
                 onToggle={() => onToggle(habit.id)}
                 isLast={isLast}
+                index={idx}
               />
             );
           })}
@@ -178,18 +179,21 @@ interface ChecklistRowProps {
   streak: number;
   onToggle: () => void;
   isLast: boolean;
+  index: number;
 }
 
 const MIN_STREAK_DISPLAY = 2;
+const STAGGER_DELAY_MS = 40;
 
-function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistRowProps) {
+function ChecklistRow({ habit, completed, streak, onToggle, isLast, index }: ChecklistRowProps) {
   return (
     <div
       className={cn(
-        "group relative flex items-center gap-3 px-4 py-3.5",
+        "group relative flex items-center gap-3 px-4 py-3.5 animate-stagger-in",
         "transition-all duration-150 hover:bg-surface-paper/40",
         !isLast && "border-b border-border-subtle/50"
       )}
+      style={{ animationDelay: `${index * STAGGER_DELAY_MS}ms` }}
     >
       <span
         aria-hidden
@@ -227,7 +231,7 @@ function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistR
 
       {streak >= MIN_STREAK_DISPLAY && (
         <div className="flex items-center gap-1 rounded-full bg-surface-muted px-2 py-1 text-xs font-medium text-accent-amber shrink-0">
-          <Flame className="h-3.5 w-3.5" />
+          <Flame className="h-3.5 w-3.5 animate-flame-flicker" />
           <span>{streak}</span>
         </div>
       )}

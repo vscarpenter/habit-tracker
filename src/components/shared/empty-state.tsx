@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Plus, BarChart3, CalendarCheck } from "lucide-react";
+import { Confetti } from "@/components/shared/Confetti";
 
 interface EmptyStateProps {
   icon?: React.ComponentType<{ className?: string }>;
@@ -27,7 +28,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "hf-panel-strong mx-auto flex w-full max-w-3xl flex-col items-center justify-center rounded-3xl px-4 py-10 text-center sm:py-16",
+        "hf-panel-strong mx-auto flex w-full max-w-3xl flex-col items-center justify-center rounded-3xl px-4 py-10 text-center sm:py-16 animate-fade-in",
         className
       )}
     >
@@ -80,14 +81,18 @@ export function NoStatsEmpty() {
 
 export function AllCompleteMessage() {
   return (
-    <div className="hf-panel-strong animate-fade-in rounded-3xl py-8 text-center">
-      <div className="text-4xl mb-3">🎉</div>
-      <h3 className="text-lg font-semibold text-text-primary mb-1">
-        All done for today!
-      </h3>
-      <p className="text-sm text-text-secondary">
-        Great job staying consistent. See you tomorrow!
-      </p>
+    <div className="hf-panel-strong relative animate-fade-in overflow-hidden rounded-3xl py-8 text-center">
+      <Confetti active />
+      <div className="animate-glow-pulse pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-accent-amber/10 via-transparent to-transparent" />
+      <div className="relative z-[1]">
+        <div className="text-4xl mb-3">🎉</div>
+        <h3 className="text-lg font-semibold text-text-primary mb-1">
+          All done for today!
+        </h3>
+        <p className="text-sm text-text-secondary">
+          Great job staying consistent. See you tomorrow!
+        </p>
+      </div>
     </div>
   );
 }
