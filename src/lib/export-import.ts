@@ -5,6 +5,7 @@ import {
   habitCompletionSchema,
   userSettingsSchema,
 } from "@/db/schemas";
+import type { Habit, HabitCompletion } from "@/types";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -58,6 +59,97 @@ export function downloadJson(data: ExportData, filename?: string): void {
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = name;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── CSV Export ───────────────────────────────────────────────────────
+
+export function escapeCSVField(value: string): string {
+  if (value.includes(",") || value.includes('"') || value.includes("\n") || value.includes("\r")) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+export function toCSVRow(fields: string[]): string {
+  return fields.map(escapeCSVField).join(",");
+}
+
+const HABIT_CSV_COLUMNS = [
+  "id", "name", "description", "icon", "color", "frequency",
+  "targetDays", "targetCount", "reminderTime", "category",
+  "isArchived", "createdAt", "updatedAt",
+] as const;
+
+const COMPLETION_CSV_COLUMNS = [
+  "id", "habitId", "habitName", "date", "completedAt", "note",
+] as const;
+
+export function buildHabitCSVRow(habit: Habit): string {
+  return toCSVRow([
+    habit.id,
+    habit.name,
+    habit.description ?? "",
+    habit.icon,
+    habit.color,
+    habit.frequency,
+    habit.targetDays?.join(";") ?? "",
+    habit.targetCount?.toString() ?? "",
+    habit.reminderTime ?? "",
+    habit.category ?? "",
+    String(habit.isArchived),
+    habit.createdAt,
+    habit.updatedAt,
+  ]);
+}
+
+export function buildCompletionCSVRow(
+  completion: HabitCompletion,
+  habitNameMap: Map<string, string>
+): string {
+  return toCSVRow([
+    completion.id,
+    completion.habitId,
+    habitNameMap.get(completion.habitId) ?? "Unknown",
+    completion.date,
+    completion.completedAt,
+    completion.note ?? "",
+  ]);
+}
+
+export async function exportAsCSV(): Promise<Blob> {
+  const { default: JSZip } = await import("jszip");
+
+  const [habits, completions] = await Promise.all([
+    db.habits.toArray(),
+    db.completions.toArray(),
+  ]);
+
+  const habitNameMap = new Map(habits.map((h) => [h.id, h.name]));
+
+  const habitsCSV = [
+    toCSVRow([...HABIT_CSV_COLUMNS]),
+    ...habits.map(buildHabitCSVRow),
+  ].join("\n");
+
+  const completionsCSV = [
+    toCSVRow([...COMPLETION_CSV_COLUMNS]),
+    ...completions.map((c) => buildCompletionCSVRow(c, habitNameMap)),
+  ].join("\n");
+
+  const zip = new JSZip();
+  zip.file("habits.csv", habitsCSV);
+  zip.file("completions.csv", completionsCSV);
+
+  return zip.generateAsync({ type: "blob" });
+}
+
+export function downloadZip(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
 }

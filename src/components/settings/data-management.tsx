@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Download, Upload, Trash2, Sprout, Layers3, Rocket } from "lucide-react";
+import { Download, Upload, Trash2, Sprout, Layers3, Rocket, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,6 +17,8 @@ import { logger } from "@/lib/logger";
 import {
   buildExportPayload,
   downloadJson,
+  exportAsCSV,
+  downloadZip,
   parseImportFile,
   validateImportData,
   applyImport,
@@ -78,6 +80,18 @@ export function DataManagement() {
     } catch (error) {
       logger.error("Failed to export data:", error);
       toast("Failed to export data", "error");
+    }
+  }
+
+  async function handleExportCSV() {
+    try {
+      const blob = await exportAsCSV();
+      const today = new Date().toISOString().split("T")[0];
+      downloadZip(blob, `habitflow-export-${today}.zip`);
+      toast("CSV exported");
+    } catch (error) {
+      logger.error("Failed to export CSV:", error);
+      toast("Failed to export CSV", "error");
     }
   }
 
@@ -164,6 +178,13 @@ export function DataManagement() {
           <Button variant="secondary" className="w-full justify-start gap-3" onClick={handleExport}>
             <Download className="h-4 w-4" />
             Export Data
+          </Button>
+        </div>
+
+        <div className="rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-2">
+          <Button variant="secondary" className="w-full justify-start gap-3" onClick={handleExportCSV}>
+            <FileSpreadsheet className="h-4 w-4" />
+            Export as CSV
           </Button>
         </div>
 
