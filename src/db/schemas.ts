@@ -66,12 +66,21 @@ export const habitSchema = habitBaseSchema
     { message: "X per week frequency requires a target count" }
   );
 
+export const effortRatingSchema = z.union([
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+]);
+
 export const habitCompletionSchema = z.object({
   id: z.string().regex(UUID_REGEX, "Invalid UUID format"),
   habitId: z.string().regex(UUID_REGEX, "Invalid habit ID format"),
   date: dateString,
   completedAt: z.iso.datetime(),
   note: z.string().max(250, "Note is too long").optional(),
+  effort: effortRatingSchema.nullable().optional(),
 });
 
 export const userSettingsSchema = z.object({

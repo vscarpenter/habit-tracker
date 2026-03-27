@@ -3,10 +3,12 @@ import { format, subDays, parseISO } from "date-fns";
 import {
   computeHabitStats,
   computeOverallStats,
+  calculateAverageEffort,
   buildDailyCompletionTrend,
   buildAggregateHeatmapData,
   buildCategoryBreakdown,
   buildLeaderboard,
+  buildEffortTrend,
 } from "./stats-utils";
 import { createHabit, createCompletion, resetFactories } from "@/test/factories";
 
@@ -383,6 +385,94 @@ describe("buildAggregateHeatmapData — weekStartsOn=1", () => {
     expect(grid).toHaveLength(52);
     for (const col of grid) {
       expect(col).toHaveLength(7);
+    }
+  });
+});
+
+// ── calculateAverageEffort ──────────────────────────────
+
+describe("calculateAverageEffort", () => {
+  it("returns null when no completions have effort", () => {
+    const completions = [
+      createCompletion({ effort: null }),
+      createCompletion({ effort: undefined }),
+    ];
+    expect(calculateAverageEffort(completions)).toBeNull();
+  });
+
+  it("returns null for empty array", () => {
+    expect(calculateAverageEffort([])).toBeNull();
+  });
+
+  it("calculates average of non-null effort values", () => {
+    const completions = [
+      createCompletion({ effort: 3 }),
+      createCompletion({ effort: 5 }),
+      createCompletion({ effort: 4 }),
+    ];
+    expect(calculateAverageEffort(completions)).toBe(4);
+  });
+
+  it("skips null effort values in calculation", () => {
+    const completions = [
+      createCompletion({ effort: 2 }),
+      createCompletion({ effort: null }),
+      createCompletion({ effort: 4 }),
+    ];
+    expect(calculateAverageEffort(completions)).toBe(3);
+  });
+
+  it("rounds to one decimal place", () => {
+    const completions = [
+      createCompletion({ effort: 1 }),
+      createCompletion({ effort: 2 }),
+      createCompletion({ effort: 3 }),
+    ];
+    expect(calculateAverageEffort(completions)).toBe(2);
+  });
+});
+
+// ── buildEffortTrend ──────────────────────────────────
+
+describe("buildEffortTrend", () => {
+  it("returns empty for habits with fewer than 5 effort ratings", () => {
+    const habit = createHabit({ createdAt: `${daysAgo(10)}T00:00:00.000Z` });
+    const completions = [0, 1, 2, 3].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: 3 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    expect(result).toHaveLength(0);
+  });
+
+  it("returns entries for habits with 5+ effort ratings", () => {
+    const habit = createHabit({ createdAt: `${daysAgo(10)}T00:00:00.000Z` });
+    const completions = [0, 1, 2, 3, 4].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: (i + 1) as 1 | 2 | 3 | 4 | 5 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    expect(result).toHaveLength(5);
+  });
+
+  it("excludes archived habits", () => {
+    const habit = createHabit({
+      isArchived: true,
+      createdAt: `${daysAgo(10)}T00:00:00.000Z`,
+    });
+    const completions = [0, 1, 2, 3, 4].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: 3 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    expect(result).toHaveLength(0);
+  });
+
+  it("sorts entries by date ascending", () => {
+    const habit = createHabit({ createdAt: `${daysAgo(10)}T00:00:00.000Z` });
+    const completions = [4, 2, 0, 1, 3].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: 3 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i].date >= result[i - 1].date).toBe(true);
     }
   });
 });

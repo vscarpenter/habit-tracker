@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Flame, TrendingUp, Target, Zap } from "lucide-react";
 import { CompactProgressBar } from "./compact-progress-bar";
 import { CompletionToggle } from "@/components/habits/completion-toggle";
+import { EffortPicker } from "@/components/habits/effort-picker";
 import { NoHabitsEmpty, AllCompleteMessage } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +22,7 @@ import {
 } from "@/components/shared/motion";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import { useDashboardStats } from "@/hooks/use-habit-stats";
-import type { Habit, HabitCompletion } from "@/types";
+import type { Habit, HabitCompletion, EffortRating } from "@/types";
 
 interface TodayViewProps {
   habits: Habit[];
@@ -29,7 +30,9 @@ interface TodayViewProps {
   today: string;
   loading: boolean;
   onToggle: (habitId: string) => void;
+  onEffort?: (completionId: string, effort: EffortRating | null) => void;
   isCompleted: (habitId: string) => boolean;
+  getCompletionId?: (habitId: string) => string | undefined;
   showStreaks?: boolean;
   streakMap?: Map<string, number>;
 }
@@ -40,7 +43,9 @@ export function TodayView({
   today,
   loading,
   onToggle,
+  onEffort,
   isCompleted,
+  getCompletionId,
   showStreaks = false,
   streakMap,
 }: TodayViewProps) {
@@ -75,6 +80,35 @@ export function TodayView({
         (habit) => (streakMap?.get(habit.id) ?? 0) >= MIN_STREAK_DISPLAY
       ).length,
     [scheduledHabits, streakMap]
+  );
+
+  const [effortPickerHabitId, setEffortPickerHabitId] = useState<string | null>(null);
+
+  const handleToggle = useCallback(
+    (habitId: string) => {
+      const wasCompleted = isCompleted(habitId);
+      onToggle(habitId);
+      // Show effort picker when marking complete (not when un-completing)
+      if (!wasCompleted && onEffort) {
+        setEffortPickerHabitId(habitId);
+      } else {
+        setEffortPickerHabitId(null);
+      }
+    },
+    [onToggle, isCompleted, onEffort]
+  );
+
+  const handleEffort = useCallback(
+    (effort: EffortRating | null) => {
+      if (effortPickerHabitId && onEffort) {
+        const completionId = getCompletionId?.(effortPickerHabitId);
+        if (completionId && effort !== null) {
+          onEffort(completionId, effort);
+        }
+      }
+      setEffortPickerHabitId(null);
+    },
+    [effortPickerHabitId, onEffort, getCompletionId]
   );
 
   if (loading) {
@@ -203,8 +237,12 @@ export function TodayView({
                     habit={habit}
                     completed={completed}
                     streak={showStreaks ? streak : 0}
-                    onToggle={() => onToggle(habit.id)}
-                    isLast={isLast}
+                    onToggle={() => handleToggle(habit.id)}
+                    isLast={isLast && effortPickerHabitId !== habit.id}
+                  />
+                  <EffortPicker
+                    visible={effortPickerHabitId === habit.id}
+                    onSelect={handleEffort}
                   />
                 </MotionListItem>
               );

@@ -8,7 +8,7 @@ import {
   scheduleCompletionDelete,
 } from "@/lib/sync/completion-sync-service";
 import { MAX_NOTE_LENGTH } from "@/lib/utils";
-import type { HabitCompletion } from "@/types";
+import type { HabitCompletion, EffortRating } from "@/types";
 
 export const completionService = {
   async getByHabitId(habitId: string): Promise<HabitCompletion[]> {
@@ -44,7 +44,8 @@ export const completionService = {
   async toggle(
     habitId: string,
     date: string,
-    note?: string
+    note?: string,
+    effort?: EffortRating | null
   ): Promise<{ completed: boolean; completion?: HabitCompletion }> {
     const existing = await db.completions
       .where("[habitId+date]")
@@ -65,6 +66,7 @@ export const completionService = {
       date,
       completedAt: now,
       note,
+      effort: effort ?? null,
     };
 
     habitCompletionSchema.parse(completion);
@@ -72,6 +74,17 @@ export const completionService = {
     schedulePush();
     scheduleCompletionPush(completion);
     return { completed: true, completion };
+  },
+
+  async updateEffort(id: string, effort: EffortRating | null): Promise<void> {
+    if (effort !== null) {
+      z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).parse(effort);
+    }
+    await db.completions.update(id, { effort });
+    schedulePush();
+
+    const updated = await db.completions.get(id);
+    if (updated) scheduleCompletionPush(updated);
   },
 
   async addNote(id: string, note: string): Promise<void> {

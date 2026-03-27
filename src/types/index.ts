@@ -22,12 +22,15 @@ export interface Habit {
   updatedAt: string;
 }
 
+export type EffortRating = 1 | 2 | 3 | 4 | 5;
+
 export interface HabitCompletion {
   id: string;
   habitId: string;
   date: string;
   completedAt: string;
   note?: string;
+  effort?: EffortRating | null;
 }
 
 export interface UserSettings {

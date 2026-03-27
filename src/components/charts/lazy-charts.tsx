@@ -46,3 +46,11 @@ export const LazyHabitWeeklyPattern = dynamic(
     ),
   { ssr: false, loading: ChartSkeleton }
 );
+
+export const LazyEffortTrendChart = dynamic(
+  () =>
+    import("@/components/stats/effort-trend-chart").then(
+      (mod) => mod.EffortTrendChart
+    ),
+  { ssr: false, loading: ChartSkeleton }
+);

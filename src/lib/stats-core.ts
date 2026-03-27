@@ -135,6 +135,25 @@ export function computeHabitStats(
   };
 }
 
+// ── Effort Stats ────────────────────────────────────────
+
+/**
+ * Calculates the average effort rating from completions with non-null effort.
+ * Returns null if no effort ratings exist.
+ */
+export function calculateAverageEffort(
+  completions: HabitCompletion[]
+): number | null {
+  const withEffort = completions.filter(
+    (c): c is HabitCompletion & { effort: number } =>
+      c.effort != null
+  );
+  if (withEffort.length === 0) return null;
+
+  const sum = withEffort.reduce((acc, c) => acc + c.effort, 0);
+  return Math.round((sum / withEffort.length) * 10) / 10;
+}
+
 // ── Overall / Aggregate Stats ──────────────────────────
 
 export function computeOverallStats(
