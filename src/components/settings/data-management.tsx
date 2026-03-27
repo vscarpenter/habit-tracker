@@ -237,6 +237,7 @@ export function DataManagement() {
           accept=".json"
           className="hidden"
           onChange={handleFileSelected}
+          aria-label="Import JSON file"
         />
       </div>
 

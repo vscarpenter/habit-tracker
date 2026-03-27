@@ -1,0 +1,175 @@
+import {
+  parseISO,
+  format,
+  subDays,
+  differenceInCalendarDays,
+} from "date-fns";
+import { isHabitScheduledForDate } from "@/lib/date-utils";
+import type { Habit, HabitCompletion } from "@/types";
+
+// ── Types ──────────────────────────────────────────────
+
+export interface DateRangePreset {
+  label: string;
+  value: string;
+  days: number; // 0 = "all time"
+}
+
+export interface HabitStatsResult {
+  currentStreak: number;
+  bestStreak: number;
+  totalCompletions: number;
+  completionRate: number;
+}
+
+export interface OverallStatsResult {
+  totalActiveHabits: number;
+  overallCompletionRate: number;
+  bestCurrentStreak: number;
+  totalCompletions: number;
+}
+
+// ── Presets ─────────────────────────────────────────────
+
+export const DATE_RANGE_PRESETS: DateRangePreset[] = [
+  { label: "7D", value: "7d", days: 7 },
+  { label: "30D", value: "30d", days: 30 },
+  { label: "90D", value: "90d", days: 90 },
+  { label: "1Y", value: "1y", days: 365 },
+  { label: "All", value: "all", days: 0 },
+];
+
+// ── Shared Helpers ───────────────────────────────────────
+
+export function getActiveHabits(habits: Habit[]): Habit[] {
+  return habits.filter((habit) => !habit.isArchived);
+}
+
+// ── Streak / Rate Helpers ──────────────────────────────
+
+/** Walks backwards from today; skips today if not yet completed. */
+function calcCurrentStreak(
+  habit: Habit,
+  completedDates: Set<string>,
+  today: string,
+  daysSinceCreation: number
+): number {
+  let streak = 0;
+  for (let i = 0; i <= daysSinceCreation; i++) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!isHabitScheduledForDate(habit, dateStr)) continue;
+
+    if (completedDates.has(dateStr)) {
+      streak++;
+    } else if (i === 0) {
+      continue; // Today not yet completed — don't break streak
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+/** Walks forward from creation to find the longest consecutive run. */
+function calcBestStreak(
+  habit: Habit,
+  completedDates: Set<string>,
+  today: string,
+  daysSinceCreation: number
+): number {
+  let best = 0;
+  let run = 0;
+  for (let i = daysSinceCreation; i >= 0; i--) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!isHabitScheduledForDate(habit, dateStr)) continue;
+
+    if (completedDates.has(dateStr)) {
+      run++;
+      best = Math.max(best, run);
+    } else {
+      run = 0;
+    }
+  }
+  return best;
+}
+
+/** Counts scheduled days and completed scheduled days. */
+function calcCompletionRate(
+  habit: Habit,
+  completedDates: Set<string>,
+  today: string,
+  daysSinceCreation: number
+): number {
+  let scheduled = 0;
+  let completed = 0;
+  for (let i = 0; i <= daysSinceCreation; i++) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!isHabitScheduledForDate(habit, dateStr)) continue;
+    scheduled++;
+    if (completedDates.has(dateStr)) completed++;
+  }
+  return scheduled > 0 ? Math.round((completed / scheduled) * 100) : 0;
+}
+
+// ── Per-Habit Stats ────────────────────────────────────
+
+export function computeHabitStats(
+  habit: Habit,
+  completions: HabitCompletion[],
+  today: string
+): HabitStatsResult {
+  const habitCompletions = completions.filter((c) => c.habitId === habit.id);
+  const completedDates = new Set(habitCompletions.map((c) => c.date));
+
+  const createdDate = habit.createdAt.split("T")[0];
+  const daysSinceCreation = differenceInCalendarDays(
+    parseISO(today),
+    parseISO(createdDate)
+  );
+
+  return {
+    currentStreak: calcCurrentStreak(habit, completedDates, today, daysSinceCreation),
+    bestStreak: calcBestStreak(habit, completedDates, today, daysSinceCreation),
+    totalCompletions: habitCompletions.length,
+    completionRate: calcCompletionRate(habit, completedDates, today, daysSinceCreation),
+  };
+}
+
+// ── Overall / Aggregate Stats ──────────────────────────
+
+export function computeOverallStats(
+  habits: Habit[],
+  completions: HabitCompletion[],
+  today: string
+): OverallStatsResult {
+  const activeHabits = getActiveHabits(habits);
+  if (activeHabits.length === 0) {
+    return {
+      totalActiveHabits: 0,
+      overallCompletionRate: 0,
+      bestCurrentStreak: 0,
+      totalCompletions: 0,
+    };
+  }
+
+  let totalCompletions = 0;
+  let bestCurrentStreak = 0;
+  let weightedRateSum = 0;
+  let habitCount = 0;
+
+  for (const habit of activeHabits) {
+    const stats = computeHabitStats(habit, completions, today);
+    totalCompletions += stats.totalCompletions;
+    bestCurrentStreak = Math.max(bestCurrentStreak, stats.currentStreak);
+    weightedRateSum += stats.completionRate;
+    habitCount++;
+  }
+
+  return {
+    totalActiveHabits: activeHabits.length,
+    overallCompletionRate:
+      habitCount > 0 ? Math.round(weightedRateSum / habitCount) : 0,
+    bestCurrentStreak,
+    totalCompletions,
+  };
+}

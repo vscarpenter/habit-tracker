@@ -8,6 +8,7 @@ import { useHabits } from "@/hooks/use-habits";
 import { useToast } from "@/components/shared/toast";
 import { MAX_ACTIVE_HABITS, HABIT_WARN_THRESHOLD } from "@/lib/utils";
 import { DB_ERROR_MSG } from "@/lib/constants";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { logger } from "@/lib/logger";
 
 export default function NewHabitPage() {
@@ -39,16 +40,18 @@ export default function NewHabitPage() {
   };
 
   return (
-    <PageContainer>
-      <Header
-        title="New Habit"
-        subtitle="Create a new habit to track"
-        eyebrow="Habit Library"
-        accentColor="var(--accent-emerald)"
-      />
-      <div className="max-w-xl">
-        <HabitForm onSubmit={handleSubmit} submitLabel="Create Habit" />
-      </div>
-    </PageContainer>
+    <ErrorBoundary>
+      <PageContainer>
+        <Header
+          title="New Habit"
+          subtitle="Create a new habit to track"
+          eyebrow="Habit Library"
+          accentColor="var(--accent-emerald)"
+        />
+        <div className="max-w-xl">
+          <HabitForm onSubmit={handleSubmit} submitLabel="Create Habit" />
+        </div>
+      </PageContainer>
+    </ErrorBoundary>
   );
 }

@@ -14,7 +14,8 @@ import { EmojiPicker } from "./emoji-picker";
 import { ColorPicker } from "./color-picker";
 import { FrequencySelector } from "./frequency-selector";
 import { useToast } from "@/components/shared/toast";
-import { DB_ERROR_MSG } from "@/lib/constants";
+import { DB_ERROR_MSG, DEFAULT_HABIT_ICON, DEFAULT_X_PER_WEEK_TARGET } from "@/lib/constants";
+import { ACCENT_COLORS } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 
 interface HabitFormProps {
@@ -43,15 +44,15 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
 
   const [name, setName] = useState(initialData?.name ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
-  const [icon, setIcon] = useState(initialData?.icon ?? "🏃");
-  const [color, setColor] = useState(initialData?.color ?? "#3b82f6");
+  const [icon, setIcon] = useState(initialData?.icon ?? DEFAULT_HABIT_ICON);
+  const [color, setColor] = useState(initialData?.color ?? ACCENT_COLORS[0].value);
   const [frequency, setFrequency] = useState<HabitFrequency>(
     initialData?.frequency ?? "daily"
   );
   const [targetDays, setTargetDays] = useState<number[]>(
     initialData?.targetDays ?? []
   );
-  const [targetCount, setTargetCount] = useState(initialData?.targetCount ?? 3);
+  const [targetCount, setTargetCount] = useState(initialData?.targetCount ?? DEFAULT_X_PER_WEEK_TARGET);
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
   const [errors, setErrors] = useState<FormErrors>({});
@@ -151,19 +152,21 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       <Card>
         <div className="space-y-2" data-error={errors.icon ? "" : undefined}>
           <p className="hf-kicker">Identity</p>
-          <Label>Icon</Label>
-          <div className="flex items-center gap-4 mb-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border-subtle bg-surface-paper text-3xl shadow-[var(--shadow-editorial-sm)]">
-              {icon}
+          <fieldset className="border-0 p-0 m-0">
+            <legend className="text-sm font-medium text-text-primary mb-1">Icon</legend>
+            <div className="flex items-center gap-4 mb-3">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border-subtle bg-surface-paper text-3xl shadow-[var(--shadow-editorial-sm)]">
+                {icon}
+              </div>
+              <span className="text-sm text-text-secondary">
+                Choose an icon that represents this habit
+              </span>
             </div>
-            <span className="text-sm text-text-secondary">
-              Choose an icon that represents this habit
-            </span>
-          </div>
-          <EmojiPicker value={icon} onChange={setIcon} />
-          {errors.icon && (
-            <p className="text-xs text-error">{errors.icon}</p>
-          )}
+            <EmojiPicker value={icon} onChange={setIcon} />
+            {errors.icon && (
+              <p className="text-xs text-error">{errors.icon}</p>
+            )}
+          </fieldset>
         </div>
       </Card>
 
@@ -171,8 +174,10 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       <Card>
         <div className="space-y-2">
           <p className="hf-kicker">Color</p>
-          <Label>Color</Label>
-          <ColorPicker value={color} onChange={setColor} />
+          <fieldset className="border-0 p-0 m-0">
+            <legend className="text-sm font-medium text-text-primary mb-1">Color</legend>
+            <ColorPicker value={color} onChange={setColor} />
+          </fieldset>
         </div>
       </Card>
 
@@ -183,21 +188,23 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
           data-error={errors.targetDays || errors.targetCount ? "" : undefined}
         >
           <p className="hf-kicker">Schedule</p>
-          <Label>Frequency *</Label>
-          <FrequencySelector
-            frequency={frequency}
-            targetDays={targetDays}
-            targetCount={targetCount}
-            onFrequencyChange={setFrequency}
-            onTargetDaysChange={setTargetDays}
-            onTargetCountChange={setTargetCount}
-          />
-          {errors.targetDays && (
-            <p className="text-xs text-error">{errors.targetDays}</p>
-          )}
-          {errors.targetCount && (
-            <p className="text-xs text-error">{errors.targetCount}</p>
-          )}
+          <fieldset className="border-0 p-0 m-0">
+            <legend className="text-sm font-medium text-text-primary mb-1">Frequency *</legend>
+            <FrequencySelector
+              frequency={frequency}
+              targetDays={targetDays}
+              targetCount={targetCount}
+              onFrequencyChange={setFrequency}
+              onTargetDaysChange={setTargetDays}
+              onTargetCountChange={setTargetCount}
+            />
+            {errors.targetDays && (
+              <p className="text-xs text-error">{errors.targetDays}</p>
+            )}
+            {errors.targetCount && (
+              <p className="text-xs text-error">{errors.targetCount}</p>
+            )}
+          </fieldset>
         </div>
       </Card>
 

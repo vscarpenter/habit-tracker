@@ -22,6 +22,8 @@ const DAY_LABELS = [
   { value: 6, label: "S" },
 ];
 
+const FULL_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 interface FrequencySelectorProps {
   frequency: HabitFrequency;
   targetDays: number[];
@@ -82,7 +84,7 @@ export function FrequencySelector({
                   ? "bg-accent-blue text-white"
                   : "bg-surface text-text-secondary border border-border-subtle hover:bg-surface-elevated"
               )}
-              aria-label={`Toggle ${day.label}`}
+              aria-label={`Toggle ${FULL_DAY_NAMES[day.value]}`}
               aria-pressed={targetDays.includes(day.value)}
             >
               {day.label}
@@ -100,6 +102,7 @@ export function FrequencySelector({
             value={targetCount}
             onChange={(e) => onTargetCountChange(Number(e.target.value))}
             className="w-20"
+            aria-label="Times per week"
           />
           <span className="text-sm text-text-secondary">times per week</span>
         </div>

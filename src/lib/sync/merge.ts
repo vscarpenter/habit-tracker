@@ -17,8 +17,8 @@ import type { MergeResult } from "./types";
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
 
-function newerHabit(a: Habit, b: Habit): Habit {
-  return new Date(a.updatedAt) >= new Date(b.updatedAt) ? a : b;
+function newerHabit(localHabit: Habit, remoteHabit: Habit): Habit {
+  return new Date(localHabit.updatedAt) >= new Date(remoteHabit.updatedAt) ? localHabit : remoteHabit;
 }
 
 function mergeHabits(local: Habit[], remote: Habit[]): { habits: Habit[]; updated: number } {

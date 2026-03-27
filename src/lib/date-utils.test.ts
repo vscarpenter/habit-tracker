@@ -7,8 +7,8 @@ import {
   isHabitScheduledForDate,
   frequencyLabel,
 } from "./date-utils";
-import { resetFactories } from "@/test/factories";
-import type { Habit, HabitCompletion } from "@/types";
+import { createHabit, resetFactories } from "@/test/factories";
+import type { HabitCompletion } from "@/types";
 
 beforeEach(() => {
   resetFactories();
@@ -119,17 +119,11 @@ describe("buildMonthlyCompletionData", () => {
 // --- isHabitScheduledForDate ---
 
 describe("isHabitScheduledForDate", () => {
-  const baseHabit: Habit = {
-    id: "h1",
-    name: "Test",
-    icon: "🧪",
-    color: "#3b82f6",
-    frequency: "daily",
-    sortOrder: 0,
-    isArchived: false,
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-  };
+  beforeEach(() => {
+    resetFactories();
+  });
+
+  const baseHabit = createHabit({ frequency: "daily" });
 
   it("returns true for daily habits on any day", () => {
     expect(isHabitScheduledForDate(baseHabit, "2026-02-17")).toBe(true); // Tuesday
@@ -137,25 +131,25 @@ describe("isHabitScheduledForDate", () => {
   });
 
   it("returns true for weekday habits on weekdays only", () => {
-    const habit = { ...baseHabit, frequency: "weekdays" as const };
+    const habit = createHabit({ frequency: "weekdays" });
     expect(isHabitScheduledForDate(habit, "2026-02-17")).toBe(true);  // Tuesday
     expect(isHabitScheduledForDate(habit, "2026-02-15")).toBe(false); // Sunday
   });
 
   it("returns true for weekend habits on weekends only", () => {
-    const habit = { ...baseHabit, frequency: "weekends" as const };
+    const habit = createHabit({ frequency: "weekends" });
     expect(isHabitScheduledForDate(habit, "2026-02-15")).toBe(true);  // Sunday
     expect(isHabitScheduledForDate(habit, "2026-02-17")).toBe(false); // Tuesday
   });
 
   it("respects specific_days", () => {
-    const habit = { ...baseHabit, frequency: "specific_days" as const, targetDays: [1, 3, 5] };
+    const habit = createHabit({ frequency: "specific_days", targetDays: [1, 3, 5] });
     expect(isHabitScheduledForDate(habit, "2026-02-16")).toBe(true);  // Monday=1
     expect(isHabitScheduledForDate(habit, "2026-02-17")).toBe(false); // Tuesday=2
   });
 
   it("returns true for x_per_week on any day", () => {
-    const habit = { ...baseHabit, frequency: "x_per_week" as const, targetCount: 3 };
+    const habit = createHabit({ frequency: "x_per_week", targetCount: 3 });
     expect(isHabitScheduledForDate(habit, "2026-02-15")).toBe(true); // Sunday
     expect(isHabitScheduledForDate(habit, "2026-02-17")).toBe(true); // Tuesday
     expect(isHabitScheduledForDate(habit, "2026-02-21")).toBe(true); // Saturday
@@ -165,38 +159,30 @@ describe("isHabitScheduledForDate", () => {
 // --- frequencyLabel ---
 
 describe("frequencyLabel", () => {
-  const baseHabit: Habit = {
-    id: "h1",
-    name: "Test",
-    icon: "🧪",
-    color: "#3b82f6",
-    frequency: "daily",
-    sortOrder: 0,
-    isArchived: false,
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-  };
+  beforeEach(() => {
+    resetFactories();
+  });
+
+  const baseHabit = createHabit({ frequency: "daily" });
 
   it('returns "Every day" for daily', () => {
     expect(frequencyLabel(baseHabit)).toBe("Every day");
   });
 
   it('returns "Weekdays" for weekdays', () => {
-    expect(frequencyLabel({ ...baseHabit, frequency: "weekdays" })).toBe("Weekdays");
+    expect(frequencyLabel(createHabit({ frequency: "weekdays" }))).toBe("Weekdays");
   });
 
   it("formats x_per_week", () => {
     expect(
-      frequencyLabel({ ...baseHabit, frequency: "x_per_week", targetCount: 3 })
+      frequencyLabel(createHabit({ frequency: "x_per_week", targetCount: 3 }))
     ).toBe("3x per week");
   });
 
   it("formats specific_days", () => {
-    const label = frequencyLabel({
-      ...baseHabit,
-      frequency: "specific_days",
-      targetDays: [1, 3, 5],
-    });
+    const label = frequencyLabel(
+      createHabit({ frequency: "specific_days", targetDays: [1, 3, 5] })
+    );
     expect(label).toBe("Mon, Wed, Fri");
   });
 });

@@ -21,6 +21,7 @@ import {
   type CompletionChangeEvent,
 } from "@/lib/sync/completion-sync-service";
 import { syncService } from "@/lib/sync/sync-service";
+import { isSyncConfigured } from "@/lib/sync/config";
 import { db } from "@/db/database";
 import { logger } from "@/lib/logger";
 import type { SyncUser } from "@/lib/sync/types";
@@ -28,10 +29,6 @@ import type { HabitCompletion } from "@/types";
 
 interface UseRealtimeSyncOptions {
   onRemoteChange: () => void;
-}
-
-function isSyncConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 }
 
 export function useRealtimeSync({ onRemoteChange }: UseRealtimeSyncOptions): void {

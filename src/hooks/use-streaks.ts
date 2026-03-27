@@ -14,7 +14,12 @@ const STREAK_LOOKBACK_DAYS = 60;
  * Batch-computes current streak for all given habits with a single DB query.
  * Returns a Map from habitId → currentStreak.
  */
-export function useStreaks(habits: Habit[], today: string) {
+interface UseStreaksReturn {
+  streakMap: Map<string, number>;
+  loading: boolean;
+}
+
+export function useStreaks(habits: Habit[], today: string): UseStreaksReturn {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

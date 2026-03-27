@@ -34,7 +34,10 @@ export function HabitCalendarHeatmap({
         <CardDescription>Last 26 weeks of scheduled vs completed activity</CardDescription>
       </CardHeader>
 
-      <div className="overflow-x-auto rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-3">
+      <div
+        className="overflow-x-auto rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-3"
+        aria-label="Habit completion heatmap for the last 6 months"
+      >
         {/* Month labels */}
         <div className="flex ml-8 mb-1">
           {monthLabels.map(({ col, label }, i) => {

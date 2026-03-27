@@ -45,9 +45,9 @@ export function HabitListItem({
 
   return (
     <>
-      <div
+      <li
         className={cn(
-          "hf-row group relative rounded-2xl px-4 py-3",
+          "hf-row group relative list-none rounded-2xl px-4 py-3",
           "transition-all duration-200 hover:-translate-y-0.5",
           menuOpen && "z-10"
         )}
@@ -142,7 +142,7 @@ export function HabitListItem({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
+      </li>
 
       <ConfirmDialog
         open={showDelete}

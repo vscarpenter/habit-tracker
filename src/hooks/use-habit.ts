@@ -7,7 +7,14 @@ import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import type { Habit } from "@/types";
 
-export function useHabit(id: string | undefined) {
+interface UseHabitReturn {
+  habit: Habit | null;
+  loading: boolean;
+  notFound: boolean;
+  refresh: () => Promise<void>;
+}
+
+export function useHabit(id: string | undefined): UseHabitReturn {
   const [habit, setHabit] = useState<Habit | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);

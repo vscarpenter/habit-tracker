@@ -11,12 +11,13 @@
 import type { RecordSubscription } from "pocketbase";
 import { getPocketBaseClient } from "./pocketbase-client";
 import { authService } from "./auth-service";
+import { escapeFilterValue } from "./filter-utils";
+import { COLLECTIONS } from "./config";
 import { logger } from "@/lib/logger";
 import type { HabitCompletion } from "@/types";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const COLLECTION = "habitflow_completions";
 const ECHO_SUPPRESSION_TTL_MS = 5_000;
 
 // ── Self-echo suppression ────────────────────────────────────────────────────
@@ -46,6 +47,65 @@ export type CompletionChangeEvent =
   | { action: "create" | "update"; completion: RemoteCompletion }
   | { action: "delete"; completion: RemoteCompletion };
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function isNotFoundError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const errorRecord = error as Record<string, unknown>;
+  return errorRecord.status === 404 || errorRecord.statusCode === 404;
+}
+
+/** Check whether a single field entry indicates a unique constraint violation */
+function hasUniqueViolationInField(field: unknown): boolean {
+  if (typeof field !== "object" || field === null) return false;
+  const entry = field as Record<string, unknown>;
+  if (entry.code === "validation_not_unique") return true;
+  return (
+    typeof entry.message === "string" &&
+    entry.message.toLowerCase().includes("unique")
+  );
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const errorRecord = error as Record<string, unknown>;
+  const status = errorRecord.status ?? errorRecord.statusCode;
+  if (status !== 400) return false;
+
+  const message = typeof errorRecord.message === "string" ? errorRecord.message : "";
+  if (message.toLowerCase().includes("unique")) return true;
+
+  const response =
+    typeof errorRecord.response === "object" && errorRecord.response !== null
+      ? (errorRecord.response as Record<string, unknown>)
+      : null;
+  const responseMessage =
+    response && typeof response.message === "string" ? response.message : "";
+  if (responseMessage.toLowerCase().includes("unique")) return true;
+
+  const responseData = response?.data;
+  if (typeof responseData !== "object" || responseData === null) return false;
+
+  return Object.values(responseData).some(hasUniqueViolationInField);
+}
+
+function buildOwnerHabitDateFilter(userId: string, habitId: string, date: string): string {
+  return `ownerId="${escapeFilterValue(userId)}" && habitId="${escapeFilterValue(habitId)}" && date="${escapeFilterValue(date)}"`;
+}
+
+/** Creates a new completion record in PocketBase. Returns silently on duplicate. */
+async function createCompletionRecord(data: Record<string, unknown>): Promise<void> {
+  const client = getPocketBaseClient();
+  try {
+    await client.collection(COLLECTIONS.COMPLETIONS).create(data, { requestKey: null });
+  } catch (createError) {
+    // Duplicate key means another device already created it — that's fine
+    if (isUniqueViolation(createError)) return;
+    logger.error("[completion-sync] Push create failed", createError);
+    throw createError;
+  }
+}
+
 // ── Service ──────────────────────────────────────────────────────────────────
 
 export const completionSyncService = {
@@ -68,30 +128,19 @@ export const completionSyncService = {
     markAsLocal(completion.id);
 
     try {
-      // Try to find existing record for this (ownerId, habitId, date)
+      const filter = buildOwnerHabitDateFilter(userId, completion.habitId, completion.date);
       const existing = await client
-        .collection(COLLECTION)
-        .getFirstListItem(
-          `ownerId="${userId}" && habitId="${completion.habitId}" && date="${completion.date}"`,
-          { requestKey: null }
-        );
+        .collection(COLLECTIONS.COMPLETIONS)
+        .getFirstListItem(filter, { requestKey: null });
 
-      await client.collection(COLLECTION).update(existing.id, data, {
+      await client.collection(COLLECTIONS.COMPLETIONS).update(existing.id, data, {
         requestKey: null,
       });
     } catch (error) {
       if (!isNotFoundError(error)) {
         logger.error("[completion-sync] Push update failed, trying create", error);
       }
-
-      try {
-        await client.collection(COLLECTION).create(data, { requestKey: null });
-      } catch (createError) {
-        // Duplicate key means another device already created it — that's fine
-        if (isUniqueViolation(createError)) return;
-        logger.error("[completion-sync] Push create failed", createError);
-        throw createError;
-      }
+      await createCompletionRecord(data);
     }
   },
 
@@ -104,14 +153,12 @@ export const completionSyncService = {
     markAsLocal(localId);
 
     try {
+      const filter = buildOwnerHabitDateFilter(userId, habitId, date);
       const existing = await client
-        .collection(COLLECTION)
-        .getFirstListItem(
-          `ownerId="${userId}" && habitId="${habitId}" && date="${date}"`,
-          { requestKey: null }
-        );
+        .collection(COLLECTIONS.COMPLETIONS)
+        .getFirstListItem(filter, { requestKey: null });
 
-      await client.collection(COLLECTION).delete(existing.id, { requestKey: null });
+      await client.collection(COLLECTIONS.COMPLETIONS).delete(existing.id, { requestKey: null });
     } catch (error) {
       // Already deleted or never existed — both are fine
       if (!isNotFoundError(error)) {
@@ -135,7 +182,7 @@ export const completionSyncService = {
 
     // PocketBase SSE subscription with server-side filter
     const unsubscribePromise = client
-      .collection(COLLECTION)
+      .collection(COLLECTIONS.COMPLETIONS)
       .subscribe("*", (event: RecordSubscription) => {
         const record = event.record;
 
@@ -160,7 +207,7 @@ export const completionSyncService = {
 
         onChange({ action: event.action as "create" | "update" | "delete", completion });
       }, {
-        filter: `ownerId="${userId}"`,
+        filter: `ownerId="${escapeFilterValue(userId)}"`,
       });
 
     // Return a synchronous cleanup function for use in React useEffect
@@ -172,69 +219,27 @@ export const completionSyncService = {
   /**
    * Pulls all remote completions for catch-up after reconnect.
    * Returns the full list so the caller can reconcile with IndexedDB.
+   * Throws on fetch failure so callers can distinguish "no data" from errors.
    */
   async pullAllCompletions(userId: string): Promise<RemoteCompletion[]> {
     const client = getPocketBaseClient();
 
-    try {
-      const records = await client
-        .collection(COLLECTION)
-        .getFullList({ filter: `ownerId="${userId}"`, requestKey: null });
+    const records = await client
+      .collection(COLLECTIONS.COMPLETIONS)
+      .getFullList({
+        filter: `ownerId="${escapeFilterValue(userId)}"`,
+        requestKey: null,
+      });
 
-      return records.map((r) => ({
-        habitId: r.habitId as string,
-        date: r.date as string,
-        completedAt: r.completedAt as string,
-        note: r.note as string | undefined,
-        localId: r.localId as string,
-      }));
-    } catch (error) {
-      logger.error("[completion-sync] Pull all failed", error);
-      return [];
-    }
+    return records.map((r) => ({
+      habitId: r.habitId as string,
+      date: r.date as string,
+      completedAt: r.completedAt as string,
+      note: r.note as string | undefined,
+      localId: r.localId as string,
+    }));
   },
 };
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function isNotFoundError(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) return false;
-  const e = error as Record<string, unknown>;
-  return e.status === 404 || e.statusCode === 404;
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) return false;
-  const e = error as Record<string, unknown>;
-  const status = e.status ?? e.statusCode;
-  if (status !== 400) return false;
-
-  const message = typeof e.message === "string" ? e.message : "";
-  if (message.toLowerCase().includes("unique")) return true;
-
-  const response =
-    typeof e.response === "object" && e.response !== null
-      ? (e.response as Record<string, unknown>)
-      : null;
-  const responseMessage =
-    response && typeof response.message === "string" ? response.message : "";
-  if (responseMessage.toLowerCase().includes("unique")) return true;
-
-  const responseData = response?.data;
-  if (typeof responseData !== "object" || responseData === null) return false;
-
-  return Object.values(responseData).some((field) => {
-    if (typeof field !== "object" || field === null) return false;
-    const entry = field as Record<string, unknown>;
-    const code = entry.code;
-    const entryMessage = entry.message;
-    return (
-      code === "validation_not_unique" ||
-      (typeof entryMessage === "string" &&
-        entryMessage.toLowerCase().includes("unique"))
-    );
-  });
-}
 
 /**
  * Fire-and-forget wrapper — call after a local toggle/addNote.

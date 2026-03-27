@@ -6,6 +6,9 @@ import { ToastProvider } from "@/components/shared/toast";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
 import "./globals.css";
 
+const THEME_COLOR_LIGHT = "#f7f3ec";
+const THEME_COLOR_DARK = "#13100d";
+
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
   subsets: ["latin"],
@@ -19,7 +22,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://habittracker.vinny.dev"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://habittracker.vinny.dev"),
   title: "HabitFlow",
   description:
     "Track your daily habits with a beautiful, private habit tracker",
@@ -50,8 +53,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f3ec" },
-    { media: "(prefers-color-scheme: dark)", color: "#13100d" },
+    { media: "(prefers-color-scheme: light)", color: THEME_COLOR_LIGHT },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR_DARK },
   ],
 };
 
@@ -91,8 +94,8 @@ export default function RootLayout({
           <style
             dangerouslySetInnerHTML={{
               __html: `
-                #splash{background:#f7f3ec}
-                .dark #splash{background:#13100d}
+                #splash{background:${THEME_COLOR_LIGHT}}
+                .dark #splash{background:${THEME_COLOR_DARK}}
                 #splash img{width:72px;height:72px;border-radius:16px;animation:splash-pulse 1.8s ease-in-out infinite}
                 #splash .splash-name{font-size:1.25rem;font-weight:600;letter-spacing:-0.01em;color:#1a1714}
                 .dark #splash .splash-name{color:#e8e0d4}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-
+import { TOGGLE_ANIMATION_RESET_MS } from "@/lib/constants";
 import { Check } from "lucide-react";
 
 interface CompletionToggleProps {
@@ -23,7 +23,7 @@ export function CompletionToggle({
   const handleClick = () => {
     if (!completed) {
       setAnimating(true);
-      setTimeout(() => setAnimating(false), 400);
+      setTimeout(() => setAnimating(false), TOGGLE_ANIMATION_RESET_MS);
     }
     onToggle();
   };

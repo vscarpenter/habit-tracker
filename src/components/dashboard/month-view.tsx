@@ -5,6 +5,7 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { MonthCell } from "./month-cell";
+import { LegendPill } from "@/components/shared/legend-pill";
 import { NoHabitsEmpty } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
@@ -53,10 +54,10 @@ export function MonthView({
         )}
       >
         <div className="flex flex-wrap items-center gap-2 border-b border-border-subtle/70 bg-surface-paper/35 px-4 py-3 text-xs text-text-secondary">
-          <LegendChip label="Done" className="bg-accent-blue" />
-          <LegendChip label="Scheduled" className="bg-surface-muted border border-border-subtle" />
-          <LegendChip label="Future" className="bg-transparent border border-text-muted/45" />
-          <LegendChip label="No schedule" className="bg-text-muted/35" />
+          <LegendPill label="Done" colorClass="bg-accent-blue" />
+          <LegendPill label="Scheduled" colorClass="bg-surface-muted border border-border-subtle" />
+          <LegendPill label="Future" colorClass="bg-transparent border border-text-muted/45" />
+          <LegendPill label="No schedule" colorClass="bg-text-muted/35" />
         </div>
 
         <div
@@ -196,11 +197,3 @@ function MonthSkeleton({ daysCount }: { daysCount: number }) {
   );
 }
 
-function LegendChip({ label, className }: { label: string; className: string }) {
-  return (
-    <div className="inline-flex items-center gap-1.5 rounded-full border border-border-subtle/70 bg-surface-paper/50 px-2 py-1">
-      <span className={cn("h-2.5 w-2.5 rounded-full", className)} />
-      <span>{label}</span>
-    </div>
-  );
-}

@@ -32,7 +32,13 @@ function applyTheme(theme: Theme): void {
   }
 }
 
-export function useTheme() {
+interface UseThemeReturn {
+  theme: Theme;
+  setTheme: (newTheme: Theme) => void;
+  resolvedTheme: "light" | "dark";
+}
+
+export function useTheme(): UseThemeReturn {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === "undefined") return "system";
     const stored = localStorage.getItem(THEME_STORAGE_KEY);

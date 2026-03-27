@@ -7,7 +7,12 @@ import { logger } from "@/lib/logger";
 // Safari on iOS can miss the initial update check, especially in standalone PWA mode.
 const UPDATE_CHECK_INTERVAL_MS = 60_000;
 
-export function useServiceWorker() {
+interface UseServiceWorkerReturn {
+  updateAvailable: boolean;
+  applyUpdate: () => void;
+}
+
+export function useServiceWorker(): UseServiceWorkerReturn {
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
   useEffect(() => {
@@ -52,7 +57,7 @@ export function useServiceWorker() {
     // Also listen for the controlling SW changing (e.g. after skipWaiting)
     // to auto-reload so the user always gets the fresh version.
     let refreshing = false;
-    const onControllerChange = () => {
+    const onControllerChange = (): void => {
       if (refreshing) return;
       refreshing = true;
       window.location.reload();
@@ -71,7 +76,7 @@ export function useServiceWorker() {
     };
   }, []);
 
-  const applyUpdate = () => {
+  const applyUpdate = (): void => {
     navigator.serviceWorker.getRegistration().then((registration) => {
       registration?.waiting?.postMessage("skipWaiting");
       // The controllerchange listener above handles the reload

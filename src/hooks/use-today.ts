@@ -10,7 +10,7 @@ function getLocalDateString(): string {
 /**
  * Returns today's local date string (YYYY-MM-DD) and refreshes at midnight.
  */
-export function useToday() {
+export function useToday(): string {
   const [today, setToday] = useState(getLocalDateString);
 
   useEffect(() => {

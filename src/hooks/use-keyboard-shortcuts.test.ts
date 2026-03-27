@@ -2,10 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useKeyboardShortcuts, type ShortcutConfig } from "./use-keyboard-shortcuts";
 
-// Mock useIsDesktop
-let isDesktop = true;
+const mockIsDesktop = vi.fn(() => true);
 vi.mock("./use-media-query", () => ({
-  useIsDesktop: () => isDesktop,
+  useIsDesktop: () => mockIsDesktop(),
 }));
 
 function fireKey(key: string, opts: Partial<KeyboardEventInit> = {}) {
@@ -19,7 +18,7 @@ function fireKey(key: string, opts: Partial<KeyboardEventInit> = {}) {
 
 describe("useKeyboardShortcuts", () => {
   beforeEach(() => {
-    isDesktop = true;
+    mockIsDesktop.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -37,7 +36,7 @@ describe("useKeyboardShortcuts", () => {
   });
 
   it("does not call handler on mobile", () => {
-    isDesktop = false;
+    mockIsDesktop.mockReturnValue(false);
     const handler = vi.fn();
     const shortcuts: ShortcutConfig[] = [{ key: "n", handler }];
 

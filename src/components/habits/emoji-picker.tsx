@@ -57,15 +57,14 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
           onChange={(e) => {
             const val = e.target.value;
             setCustomEmoji(val);
-            if (val.trim()) {
-              // Extract first emoji or character
-              const segments = [...new Intl.Segmenter().segment(val.trim())];
-              if (segments.length > 0) {
-                onChange(segments[0].segment);
-              }
-            }
+            if (!val.trim()) return;
+            // Segmenter handles multi-codepoint emoji correctly; plain slice would corrupt them
+            const segments = [...new Intl.Segmenter().segment(val.trim())];
+            if (!segments.length) return;
+            onChange(segments[0].segment);
           }}
           placeholder="Type or paste emoji"
+          aria-label="Custom emoji"
           className="h-9 w-full rounded-lg border border-border-subtle bg-surface px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-ring"
           maxLength={4}
         />

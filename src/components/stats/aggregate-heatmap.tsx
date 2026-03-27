@@ -32,7 +32,10 @@ export function AggregateHeatmap({ data, today }: AggregateHeatmapProps) {
         <CardDescription>52-week completion intensity across all habits</CardDescription>
       </CardHeader>
 
-      <div className="overflow-x-auto rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-3">
+      <div
+        className="overflow-x-auto rounded-2xl border border-border-subtle/70 bg-surface-overlay/45 p-3"
+        aria-label="Aggregate habit completion heatmap for the last 12 months"
+      >
         {/* Month labels */}
         <div className="mb-1 ml-8 flex">
           {monthLabels.map(({ col, label }, i) => {

@@ -11,6 +11,7 @@ import { useHabits } from "@/hooks/use-habits";
 import { useToast } from "@/components/shared/toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DB_ERROR_MSG } from "@/lib/constants";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { logger } from "@/lib/logger";
 
 export default function EditHabitPage({
@@ -75,42 +76,44 @@ export default function EditHabitPage({
   }
 
   return (
-    <PageContainer>
-      <Header
-        title="Edit Habit"
-        subtitle={habit.name}
-        eyebrow="Habit Library"
-        accentColor="var(--accent-emerald)"
-      />
-      <div className="max-w-xl space-y-6">
-        <HabitForm
-          initialData={habit}
-          onSubmit={handleSubmit}
-          submitLabel="Save Changes"
+    <ErrorBoundary>
+      <PageContainer>
+        <Header
+          title="Edit Habit"
+          subtitle={habit.name}
+          eyebrow="Habit Library"
+          accentColor="var(--accent-emerald)"
         />
+        <div className="max-w-xl space-y-6">
+          <HabitForm
+            initialData={habit}
+            onSubmit={handleSubmit}
+            submitLabel="Save Changes"
+          />
 
-        {!habit.isArchived && (
-          <div className="hf-panel-muted rounded-2xl border-0 p-4 pt-4">
-            <Button
-              variant="destructive"
-              onClick={() => setShowArchive(true)}
-              className="w-full sm:w-auto"
-            >
-              Archive Habit
-            </Button>
-          </div>
-        )}
+          {!habit.isArchived && (
+            <div className="hf-panel-muted rounded-2xl border-0 p-4 pt-4">
+              <Button
+                variant="destructive"
+                onClick={() => setShowArchive(true)}
+                className="w-full sm:w-auto"
+              >
+                Archive Habit
+              </Button>
+            </div>
+          )}
 
-        <ConfirmDialog
-          open={showArchive}
-          onOpenChange={setShowArchive}
-          title={`Archive "${habit.name}"?`}
-          description="You can restore it later from the habits list."
-          confirmLabel="Archive"
-          variant="destructive"
-          onConfirm={handleArchive}
-        />
-      </div>
-    </PageContainer>
+          <ConfirmDialog
+            open={showArchive}
+            onOpenChange={setShowArchive}
+            title={`Archive "${habit.name}"?`}
+            description="You can restore it later from the habits list."
+            confirmLabel="Archive"
+            variant="destructive"
+            onConfirm={handleArchive}
+          />
+        </div>
+      </PageContainer>
+    </ErrorBoundary>
   );
 }

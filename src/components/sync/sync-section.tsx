@@ -90,6 +90,7 @@ export function SyncSection({
           onClick={onSignOut}
           className="shrink-0 rounded-lg p-1.5 text-text-muted hover:bg-surface-paper/70 hover:text-text-primary transition-colors"
           title="Sign out"
+          aria-label="Sign out"
         >
           <LogOut className="h-4 w-4" />
         </button>
@@ -109,7 +110,10 @@ export function SyncSection({
               </p>
             )}
             {syncState.status === "error" && syncState.errorMessage && (
-              <p className="text-xs text-red-400 mt-0.5">{syncState.errorMessage}</p>
+              <p className="text-xs text-red-400 mt-0.5">
+                <AlertCircle className="mr-1 inline-block h-3 w-3 align-text-bottom" />
+                {syncState.errorMessage}
+              </p>
             )}
           </div>
         </div>

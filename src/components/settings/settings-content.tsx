@@ -94,6 +94,7 @@ export function SettingsContent() {
             onCheckedChange={(checked) =>
               update({ weekStartsOn: checked ? 1 : 0 })
             }
+            aria-label="Week starts on Monday"
           />
         </SettingRow>
 
@@ -101,6 +102,7 @@ export function SettingsContent() {
           <Switch
             checked={settings.showStreaks}
             onCheckedChange={(showStreaks) => update({ showStreaks })}
+            aria-label="Show streaks"
           />
         </SettingRow>
 
@@ -111,6 +113,7 @@ export function SettingsContent() {
           <Switch
             checked={settings.showCompletionRate}
             onCheckedChange={(showCompletionRate) => update({ showCompletionRate })}
+            aria-label="Show completion rate"
           />
         </SettingRow>
 

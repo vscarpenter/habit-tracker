@@ -53,7 +53,43 @@ function DropdownMenu({ children, onOpenChange }: DropdownMenuProps) {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+
+      const menu = containerRef.current?.querySelector('[role="menu"]');
+      if (!menu) return;
+
+      const items = Array.from(menu.querySelectorAll('[role="menuitem"]')) as HTMLElement[];
+      if (!items.length) return;
+
+      const currentIndex = items.indexOf(document.activeElement as HTMLElement);
+
+      switch (e.key) {
+        case "ArrowDown": {
+          e.preventDefault();
+          const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+          items[nextIndex].focus();
+          break;
+        }
+        case "ArrowUp": {
+          e.preventDefault();
+          const prevIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+          items[prevIndex].focus();
+          break;
+        }
+        case "Home": {
+          e.preventDefault();
+          items[0].focus();
+          break;
+        }
+        case "End": {
+          e.preventDefault();
+          items[items.length - 1].focus();
+          break;
+        }
+      }
     },
     [setOpen]
   );

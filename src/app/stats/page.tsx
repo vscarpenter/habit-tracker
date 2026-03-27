@@ -29,6 +29,7 @@ import {
   buildLeaderboard,
 } from "@/lib/stats-utils";
 import { buildWeeklyPatternData } from "@/lib/date-utils";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 
 export default function StatsPage() {
   const today = useToday();
@@ -85,6 +86,7 @@ export default function StatsPage() {
   );
 
   return (
+    <ErrorBoundary>
     <PageContainer>
       <Header
         title="Statistics"
@@ -120,5 +122,6 @@ export default function StatsPage() {
         </div>
       )}
     </PageContainer>
+    </ErrorBoundary>
   );
 }

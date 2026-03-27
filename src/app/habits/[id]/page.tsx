@@ -19,6 +19,7 @@ import { useHabitStats } from "@/hooks/use-habit-stats";
 import { useCompletionRange } from "@/hooks/use-completions";
 import { useToday } from "@/hooks/use-today";
 import { useSettings } from "@/hooks/use-settings";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { CalendarDays } from "lucide-react";
 
 export default function HabitDetailPage() {
@@ -79,6 +80,7 @@ export default function HabitDetailPage() {
   }
 
   return (
+    <ErrorBoundary>
     <PageContainer>
       <div className="space-y-6">
         <HabitDetailHeader habit={habit} />
@@ -114,5 +116,6 @@ export default function HabitDetailPage() {
         />
       </div>
     </PageContainer>
+    </ErrorBoundary>
   );
 }

@@ -9,6 +9,7 @@ import {
   type ExportData,
 } from "@/lib/export-import";
 import { mergeSnapshots } from "./merge";
+import { createSettings, resetFactories } from "@/test/factories";
 
 vi.mock("./auth-service", () => ({
   authService: {
@@ -46,18 +47,7 @@ function makeSnapshot(): ExportData {
     data: {
       habits: [],
       completions: [],
-      settings: {
-        id: "user_settings",
-        theme: "system",
-        weekStartsOn: 0,
-        showStreaks: true,
-        showCompletionRate: true,
-        defaultView: "today",
-        syncEnabled: false,
-        lastSyncedAt: null,
-        createdAt: "2026-02-28T00:00:00.000Z",
-        updatedAt: "2026-02-28T00:00:00.000Z",
-      },
+      settings: createSettings({ syncEnabled: false, lastSyncedAt: null }),
     },
   };
 }
@@ -65,6 +55,7 @@ function makeSnapshot(): ExportData {
 describe("syncService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetFactories();
   });
 
   it("returns null on pull when user is not authenticated", async () => {

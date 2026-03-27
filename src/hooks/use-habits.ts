@@ -8,15 +8,29 @@ import { logger } from "@/lib/logger";
 import type { Habit } from "@/types";
 import type { CreateHabitInput, UpdateHabitInput } from "@/db/schemas";
 
-export function useHabits() {
+interface UseHabitsReturn {
+  habits: Habit[];
+  activeHabits: Habit[];
+  archivedHabits: Habit[];
+  loading: boolean;
+  refresh: () => Promise<void>;
+  create: (input: CreateHabitInput) => Promise<Habit>;
+  update: (id: string, input: UpdateHabitInput) => Promise<Habit>;
+  archive: (id: string) => Promise<void>;
+  restore: (id: string) => Promise<void>;
+  remove: (id: string) => Promise<void>;
+  reorder: (orderedIds: string[]) => Promise<void>;
+}
+
+export function useHabits(): UseHabitsReturn {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const refresh = useCallback(async () => {
     try {
-      const all = await habitService.getAll();
-      setHabits(all);
+      const allHabits = await habitService.getAll();
+      setHabits(allHabits);
     } catch (error) {
       logger.error("Failed to load habits:", error);
       toast(DB_ERROR_MSG, "error");

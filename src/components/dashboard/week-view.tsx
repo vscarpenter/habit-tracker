@@ -5,6 +5,7 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { WeekCell } from "./week-cell";
+import { LegendPill } from "@/components/shared/legend-pill";
 import { NoHabitsEmpty } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
@@ -68,10 +69,10 @@ export function WeekView({
         )}
       >
         <div className="flex flex-wrap items-center gap-2 border-b border-border-subtle/70 bg-surface-paper/35 px-4 py-3 text-xs text-text-secondary">
-          <LegendItem label="Completed" colorClass="bg-accent-blue" />
-          <LegendItem label="Scheduled" colorClass="bg-surface-muted border border-border-subtle" />
-          <LegendItem label="Future" colorClass="bg-transparent border border-text-muted/45" />
-          <LegendItem label="Not scheduled" colorClass="bg-text-muted/35" />
+          <LegendPill label="Completed" colorClass="bg-accent-blue" />
+          <LegendPill label="Scheduled" colorClass="bg-surface-muted border border-border-subtle" />
+          <LegendPill label="Future" colorClass="bg-transparent border border-text-muted/45" />
+          <LegendPill label="Not scheduled" colorClass="bg-text-muted/35" />
         </div>
 
         <div
@@ -199,11 +200,3 @@ function HabitRow({
   );
 }
 
-function LegendItem({ label, colorClass }: { label: string; colorClass: string }) {
-  return (
-    <div className="inline-flex items-center gap-1.5 rounded-full border border-border-subtle/70 bg-surface-paper/50 px-2 py-1">
-      <span className={cn("h-2.5 w-2.5 rounded-full", colorClass)} />
-      <span>{label}</span>
-    </div>
-  );
-}

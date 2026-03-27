@@ -11,7 +11,14 @@ const ALL_TIME_START = "2000-01-01";
  * Manages date range preset selection for the stats page.
  * Switching presets is instant — no re-fetch needed.
  */
-export function useDateRange(today: string) {
+interface UseDateRangeReturn {
+  selectedPreset: string;
+  setPreset: (preset: string) => void;
+  startDate: string;
+  endDate: string;
+}
+
+export function useDateRange(today: string): UseDateRangeReturn {
   const [selectedPreset, setPreset] = useState(DEFAULT_PRESET);
 
   const { startDate, endDate } = useMemo(() => {

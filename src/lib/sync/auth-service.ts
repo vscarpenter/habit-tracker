@@ -7,6 +7,7 @@
 
 import type { BaseAuthStore, RecordModel } from "pocketbase";
 import { getPocketBaseClient } from "./pocketbase-client";
+import { COLLECTIONS } from "./config";
 import type { SyncUser } from "./types";
 
 function modelToSyncUser(model: RecordModel | null): SyncUser | null {
@@ -37,7 +38,7 @@ export const authService = {
    */
   async signInWithGoogle(): Promise<void> {
     const client = getPocketBaseClient();
-    await client.collection("users").authWithOAuth2({ provider: "google" });
+    await client.collection(COLLECTIONS.USERS).authWithOAuth2({ provider: "google" });
   },
 
   /**

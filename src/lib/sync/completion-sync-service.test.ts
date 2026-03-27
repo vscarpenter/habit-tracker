@@ -6,7 +6,7 @@ import {
 } from "./completion-sync-service";
 import { getPocketBaseClient } from "./pocketbase-client";
 import { authService } from "./auth-service";
-import type { HabitCompletion } from "@/types";
+import { createCompletion, resetFactories } from "@/test/factories";
 
 vi.mock("./pocketbase-client", () => ({
   getPocketBaseClient: vi.fn(),
@@ -26,16 +26,6 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-function makeCompletion(overrides: Partial<HabitCompletion> = {}): HabitCompletion {
-  return {
-    id: "local-id-1",
-    habitId: "habit-1",
-    date: "2026-02-28",
-    completedAt: "2026-02-28T10:00:00.000Z",
-    ...overrides,
-  };
-}
-
 function mockCollection(methods: Record<string, unknown>) {
   vi.mocked(getPocketBaseClient).mockReturnValue({
     collection: vi.fn(() => methods),
@@ -46,6 +36,7 @@ function mockCollection(methods: Record<string, unknown>) {
 describe("completionSyncService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetFactories();
   });
 
   describe("pushCompletion", () => {
@@ -54,7 +45,7 @@ describe("completionSyncService", () => {
       const getFirstListItem = vi.fn().mockResolvedValue({ id: "rec_1" });
       mockCollection({ getFirstListItem, update, create: vi.fn() });
 
-      await completionSyncService.pushCompletion("user_1", makeCompletion());
+      await completionSyncService.pushCompletion("user_1", createCompletion({ id: "local-id-1", habitId: "habit-1", date: "2026-02-28", completedAt: "2026-02-28T10:00:00.000Z" }));
 
       expect(update).toHaveBeenCalledWith(
         "rec_1",
@@ -73,7 +64,7 @@ describe("completionSyncService", () => {
       const getFirstListItem = vi.fn().mockRejectedValue({ status: 404 });
       mockCollection({ getFirstListItem, create, update: vi.fn() });
 
-      await completionSyncService.pushCompletion("user_1", makeCompletion());
+      await completionSyncService.pushCompletion("user_1", createCompletion({ id: "local-id-1", habitId: "habit-1", date: "2026-02-28", completedAt: "2026-02-28T10:00:00.000Z" }));
 
       expect(create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -94,7 +85,7 @@ describe("completionSyncService", () => {
       mockCollection({ getFirstListItem, create, update: vi.fn() });
 
       // Should not throw
-      await completionSyncService.pushCompletion("user_1", makeCompletion());
+      await completionSyncService.pushCompletion("user_1", createCompletion({ id: "local-id-1", habitId: "habit-1", date: "2026-02-28", completedAt: "2026-02-28T10:00:00.000Z" }));
     });
 
     it("throws on non-unique create failure", async () => {
@@ -106,7 +97,7 @@ describe("completionSyncService", () => {
       mockCollection({ getFirstListItem, create, update: vi.fn() });
 
       await expect(
-        completionSyncService.pushCompletion("user_1", makeCompletion())
+        completionSyncService.pushCompletion("user_1", createCompletion({ id: "local-id-1", habitId: "habit-1", date: "2026-02-28", completedAt: "2026-02-28T10:00:00.000Z" }))
       ).rejects.toEqual(
         expect.objectContaining({
           status: 400,
@@ -229,7 +220,7 @@ describe("completionSyncService", () => {
 
       mockCollection({ getFirstListItem, update, create: vi.fn(), subscribe: subscribeFn });
 
-      const completion = makeCompletion({ id: "echo-test-id" });
+      const completion = createCompletion({ id: "echo-test-id", habitId: "habit-1", date: "2026-02-28", completedAt: "2026-02-28T10:00:00.000Z" });
       await completionSyncService.pushCompletion("user_1", completion);
 
       const onChange = vi.fn();
@@ -286,12 +277,13 @@ describe("completionSyncService", () => {
       ]);
     });
 
-    it("returns empty array on failure", async () => {
+    it("throws on failure so callers can distinguish errors from empty data", async () => {
       const getFullList = vi.fn().mockRejectedValue(new Error("network"));
       mockCollection({ getFullList });
 
-      const result = await completionSyncService.pullAllCompletions("user_1");
-      expect(result).toEqual([]);
+      await expect(
+        completionSyncService.pullAllCompletions("user_1")
+      ).rejects.toThrow("network");
     });
   });
 });
@@ -299,12 +291,13 @@ describe("completionSyncService", () => {
 describe("fire-and-forget wrappers", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetFactories();
   });
 
   it("scheduleCompletionPush skips when not authenticated", async () => {
     vi.mocked(authService.getUser).mockResolvedValue(null);
 
-    await scheduleCompletionPush(makeCompletion());
+    await scheduleCompletionPush(createCompletion({ id: "local-id-1", habitId: "habit-1", date: "2026-02-28", completedAt: "2026-02-28T10:00:00.000Z" }));
 
     expect(getPocketBaseClient).not.toHaveBeenCalled();
   });
@@ -320,7 +313,7 @@ describe("fire-and-forget wrappers", () => {
     const getFirstListItem = vi.fn().mockResolvedValue({ id: "rec_1" });
     mockCollection({ getFirstListItem, update, create: vi.fn() });
 
-    await scheduleCompletionPush(makeCompletion());
+    await scheduleCompletionPush(createCompletion({ id: "local-id-1", habitId: "habit-1", date: "2026-02-28", completedAt: "2026-02-28T10:00:00.000Z" }));
 
     expect(update).toHaveBeenCalled();
   });

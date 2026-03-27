@@ -37,19 +37,20 @@ describe("validateImportData", () => {
     const result = validateImportData(payload);
 
     expect(result.valid).toBe(true);
-    if (!result.valid) return;
+    if (!result.valid) throw new Error("Expected valid result");
     expect(result.data).toBeDefined();
     expect(result.data.version).toBe(EXPORT_VERSION);
   });
 
   it("rejects when version is missing", () => {
     const payload = buildValidPayload();
+    // as any: intentionally constructing an invalid payload to test validation rejection
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (payload as any).version;
 
     const result = validateImportData(payload);
     expect(result.valid).toBe(false);
-    if (result.valid) return;
+    if (result.valid) throw new Error("Expected invalid result");
     expect(result.errors).toBeDefined();
     expect(result.errors.some((e: string) => e.includes("version"))).toBe(true);
   });
@@ -66,7 +67,7 @@ describe("validateImportData", () => {
 
     const result = validateImportData(payload);
     expect(result.valid).toBe(false);
-    if (result.valid) return;
+    if (result.valid) throw new Error("Expected invalid result");
     expect(result.errors.some((e: string) => e.includes("name") || e.includes("Name"))).toBe(true);
   });
 
@@ -77,6 +78,7 @@ describe("validateImportData", () => {
 
   it("rejects wrong app identifier", () => {
     const payload = buildValidPayload();
+    // as any: intentionally constructing a payload with wrong app identifier to test rejection
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (payload as any).app = "SomeOtherApp";
 
@@ -89,7 +91,7 @@ describe("validateImportData", () => {
     const result = validateImportData(payload);
 
     expect(result.valid).toBe(true);
-    if (!result.valid) return;
+    if (!result.valid) throw new Error("Expected valid result");
     expect(result.data.data.habits).toHaveLength(1);
     expect(result.data.data.completions).toHaveLength(1);
   });

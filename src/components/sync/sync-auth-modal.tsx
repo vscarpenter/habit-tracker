@@ -8,9 +8,10 @@
 "use client";
 
 import { useState } from "react";
-import { Chrome } from "lucide-react";
+import { Chrome, AlertCircle } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface SyncAuthModalProps {
   open: boolean;
@@ -19,6 +20,8 @@ interface SyncAuthModalProps {
 }
 
 type Step = "ready" | "loading";
+
+const DIALOG_CLOSE_ANIMATION_MS = 200;
 
 export function SyncAuthModal({
   open,
@@ -35,6 +38,7 @@ export function SyncAuthModal({
       await onGoogle();
       // OAuth flow handles the post-auth navigation/popup lifecycle.
     } catch (err) {
+      logger.warn("Google sign-in failed:", err);
       setError(err instanceof Error ? err.message : "Google sign-in failed");
       setStep("ready");
     }
@@ -47,7 +51,7 @@ export function SyncAuthModal({
     setTimeout(() => {
       setStep("ready");
       setError(null);
-    }, 200);
+    }, DIALOG_CLOSE_ANIMATION_MS);
   }
 
   return (
@@ -63,6 +67,7 @@ export function SyncAuthModal({
 
         {error && (
           <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+            <AlertCircle className="mr-1.5 inline-block h-4 w-4 align-text-bottom" />
             {error}
           </p>
         )}
@@ -70,6 +75,7 @@ export function SyncAuthModal({
         {step === "ready" && (
           <div className="space-y-3">
             <button
+              type="button"
               className={cn(
                 "flex w-full items-center gap-3 rounded-xl border border-border-subtle",
                 "bg-surface-overlay/45 px-4 py-3 text-left text-sm font-medium",

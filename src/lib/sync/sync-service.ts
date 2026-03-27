@@ -14,6 +14,8 @@ import { ClientResponseError } from "pocketbase";
 import { getPocketBaseClient } from "./pocketbase-client";
 import { authService } from "./auth-service";
 import { mergeSnapshots } from "./merge";
+import { escapeFilterValue } from "./filter-utils";
+import { COLLECTIONS } from "./config";
 import {
   buildExportPayload,
   applyImport,
@@ -22,18 +24,14 @@ import {
 import { logger } from "@/lib/logger";
 import type { MergeResult } from "./types";
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const SYNC_COLLECTION = "habitflow_sync_snapshots";
-
 // ── Error helpers ─────────────────────────────────────────────────────────────
 
 function getErrorStatus(error: unknown): number | null {
   if (typeof error !== "object" || error === null) return null;
-  const e = error as Record<string, unknown>;
-  if (typeof e.status === "number") return e.status;
-  if (typeof e.statusCode === "number") return e.statusCode;
-  if (typeof e.statusCode === "string") return parseInt(e.statusCode, 10) || null;
+  const errorRecord = error as Record<string, unknown>;
+  if (typeof errorRecord.status === "number") return errorRecord.status;
+  if (typeof errorRecord.statusCode === "number") return errorRecord.statusCode;
+  if (typeof errorRecord.statusCode === "string") return parseInt(errorRecord.statusCode, 10) || null;
   return null;
 }
 
@@ -43,8 +41,8 @@ function getErrorMessage(error: unknown): string {
   }
   if (error instanceof Error) return error.message;
   if (typeof error === "object" && error !== null) {
-    const e = error as Record<string, unknown>;
-    if (typeof e.message === "string") return e.message;
+    const errorRecord = error as Record<string, unknown>;
+    if (typeof errorRecord.message === "string") return errorRecord.message;
   }
   return "Unknown error";
 }
@@ -78,6 +76,19 @@ function isNotFound(error: unknown): boolean {
   return getErrorStatus(error) === 404;
 }
 
+// ── Push helpers ─────────────────────────────────────────────────────────────
+
+/** Creates a new sync snapshot record in PocketBase */
+async function createSyncSnapshot(data: Record<string, unknown>): Promise<void> {
+  const client = getPocketBaseClient();
+  try {
+    await client.collection(COLLECTIONS.SYNC_SNAPSHOTS).create(data, { requestKey: null });
+  } catch (createError) {
+    logger.error("[sync] Push create failed:", { message: getErrorMessage(createError) });
+    throw syncErrorWithContext("push", createError);
+  }
+}
+
 // ── Service ──────────────────────────────────────────────────────────────────
 
 export const syncService = {
@@ -92,12 +103,13 @@ export const syncService = {
     if (!user) return null;
 
     const client = getPocketBaseClient();
+    const ownerFilter = `ownerId="${escapeFilterValue(user.id)}"`;
     let remotePayload: unknown = null;
 
     try {
       const record = await client
-        .collection(SYNC_COLLECTION)
-        .getFirstListItem(`ownerId="${user.id}"`, { requestKey: null });
+        .collection(COLLECTIONS.SYNC_SNAPSHOTS)
+        .getFirstListItem(ownerFilter, { requestKey: null });
       remotePayload = record.payload;
     } catch (error) {
       if (isNotFound(error)) {
@@ -141,6 +153,7 @@ export const syncService = {
 
     const client = getPocketBaseClient();
     const snapshot = await buildExportPayload();
+    const ownerFilter = `ownerId="${escapeFilterValue(user.id)}"`;
     const data = {
       ownerId: user.id,
       payload: snapshot,
@@ -149,10 +162,10 @@ export const syncService = {
 
     try {
       const existing = await client
-        .collection(SYNC_COLLECTION)
-        .getFirstListItem(`ownerId="${user.id}"`, { requestKey: null });
+        .collection(COLLECTIONS.SYNC_SNAPSHOTS)
+        .getFirstListItem(ownerFilter, { requestKey: null });
 
-      await client.collection(SYNC_COLLECTION).update(existing.id, data, {
+      await client.collection(COLLECTIONS.SYNC_SNAPSHOTS).update(existing.id, data, {
         requestKey: null,
       });
     } catch (error) {
@@ -160,13 +173,7 @@ export const syncService = {
         logger.error("[sync] Push failed:", { message: getErrorMessage(error) });
         throw syncErrorWithContext("push", error);
       }
-
-      try {
-        await client.collection(SYNC_COLLECTION).create(data, { requestKey: null });
-      } catch (createError) {
-        logger.error("[sync] Push create failed:", { message: getErrorMessage(createError) });
-        throw syncErrorWithContext("push", createError);
-      }
+      await createSyncSnapshot(data);
     }
 
     logger.info("[sync] Push complete", {

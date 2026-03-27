@@ -13,10 +13,16 @@ import type { HabitStatsResult } from "@/lib/stats-utils";
 // Re-export for backward compatibility
 export type HabitStats = HabitStatsResult;
 
+interface UseHabitStatsReturn {
+  stats: HabitStats;
+  loading: boolean;
+  refresh: () => Promise<void>;
+}
+
 /**
  * Calculates stats for a single habit.
  */
-export function useHabitStats(habit: Habit | null, today: string) {
+export function useHabitStats(habit: Habit | null, today: string): UseHabitStatsReturn {
   const [stats, setStats] = useState<HabitStats>({
     currentStreak: 0,
     bestStreak: 0,
@@ -48,6 +54,13 @@ export function useHabitStats(habit: Habit | null, today: string) {
   return { stats, loading, refresh: calculate };
 }
 
+interface UseDashboardStatsReturn {
+  scheduledCount: number;
+  completedCount: number;
+  todayProgress: number;
+  allComplete: boolean;
+}
+
 /**
  * Aggregate stats across all active habits for the dashboard.
  */
@@ -55,7 +68,7 @@ export function useDashboardStats(
   habits: Habit[],
   completions: HabitCompletion[],
   today: string
-) {
+): UseDashboardStatsReturn {
   const completedToday = new Set(completions.map((c) => c.habitId));
   const scheduledHabits = habits.filter((h) =>
     isHabitScheduledForDate(h, today)

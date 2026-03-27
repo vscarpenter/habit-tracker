@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/page-container";
 import { Header } from "@/components/layout/header";
 import { TodayView } from "@/components/dashboard/today-view";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { fadeUpItem, staggerContainer } from "@/components/shared/motion";
 import { useHabits } from "@/hooks/use-habits";
 import { useCompletions } from "@/hooks/use-completions";
 import { useToday } from "@/hooks/use-today";
@@ -66,23 +69,33 @@ export default function DashboardPage() {
   }, [progressWarmth]);
 
   return (
-    <PageContainer>
-      <Header
-        title="Today"
-        subtitle={formatted}
-        eyebrow="Daily Focus"
-        accentColor="var(--accent-blue)"
-      />
-      <TodayView
-        habits={habits}
-        completions={completions}
-        today={today}
-        loading={habitsLoading || completionsLoading}
-        onToggle={toggle}
-        isCompleted={isCompleted}
-        showStreaks={showStreaks}
-        streakMap={streakMap}
-      />
-    </PageContainer>
+    <ErrorBoundary>
+      <PageContainer>
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div variants={fadeUpItem}>
+            <Header
+              title="Today"
+              subtitle={formatted}
+              eyebrow="Daily Focus"
+              accentColor="var(--accent-blue)"
+            />
+          </motion.div>
+          <TodayView
+            habits={habits}
+            completions={completions}
+            today={today}
+            loading={habitsLoading || completionsLoading}
+            onToggle={toggle}
+            isCompleted={isCompleted}
+            showStreaks={showStreaks}
+            streakMap={streakMap}
+          />
+        </motion.div>
+      </PageContainer>
+    </ErrorBoundary>
   );
 }

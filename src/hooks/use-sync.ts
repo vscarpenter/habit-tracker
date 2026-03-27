@@ -19,8 +19,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { authService } from "@/lib/sync/auth-service";
 import { syncService } from "@/lib/sync/sync-service";
+import { isSyncConfigured } from "@/lib/sync/config";
 import { logger } from "@/lib/logger";
 import type { SyncState, SyncUser } from "@/lib/sync/types";
+
+interface UseSyncServiceReturn {
+  syncState: SyncState;
+  syncNow: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  isSyncConfigured: boolean;
+}
 
 const INITIAL_STATE: SyncState = {
   status: "idle",
@@ -30,11 +39,7 @@ const INITIAL_STATE: SyncState = {
   user: null,
 };
 
-function isSyncConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_POCKETBASE_URL);
-}
-
-export function useSyncService() {
+export function useSyncService(): UseSyncServiceReturn {
   const [syncState, setSyncState] = useState<SyncState>(INITIAL_STATE);
   const configured = isSyncConfigured();
 

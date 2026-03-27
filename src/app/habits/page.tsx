@@ -15,8 +15,9 @@ import { useHabits } from "@/hooks/use-habits";
 import { useToday } from "@/hooks/use-today";
 import { useStreaks } from "@/hooks/use-streaks";
 import { useToast } from "@/components/shared/toast";
-import { DB_ERROR_MSG } from "@/lib/constants";
+import { DB_ERROR_MSG, HOT_STREAK_MIN_DAYS } from "@/lib/constants";
 import { logger } from "@/lib/logger";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { Plus, Search, Flame, Layers3, FolderKanban } from "lucide-react";
 
 export default function HabitsPage() {
@@ -58,7 +59,7 @@ export default function HabitsPage() {
 
   const streakingCount = useMemo(
     () =>
-      activeHabits.filter((habit) => (streakMap.get(habit.id) ?? 0) >= 3).length,
+      activeHabits.filter((habit) => (streakMap.get(habit.id) ?? 0) >= HOT_STREAK_MIN_DAYS).length,
     [activeHabits, streakMap]
   );
 
@@ -119,6 +120,7 @@ export default function HabitsPage() {
   }
 
   return (
+    <ErrorBoundary>
     <PageContainer>
       <Header
         title="Habits"
@@ -177,6 +179,7 @@ export default function HabitsPage() {
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search habits..."
                   className="pl-9"
+                  aria-label="Search habits"
                 />
               </div>
               <CategoryFilter
@@ -198,7 +201,7 @@ export default function HabitsPage() {
                 {filteredHabits.length} shown
               </span>
             </div>
-            <div className="space-y-2">
+            <ul className="space-y-2">
               {filteredHabits.map((habit, idx) => (
                 <HabitListItem
                   key={habit.id}
@@ -219,7 +222,7 @@ export default function HabitsPage() {
                   No habits match your search.
                 </p>
               )}
-            </div>
+            </ul>
           </div>
 
           {/* Archived Section */}
@@ -234,7 +237,7 @@ export default function HabitsPage() {
               </button>
 
               {showArchived && (
-                <div className="space-y-2 mt-3">
+                <ul className="space-y-2 mt-3">
                   {archivedHabits.map((habit) => (
                     <HabitListItem
                       key={habit.id}
@@ -245,13 +248,14 @@ export default function HabitsPage() {
                       streak={streakMap.get(habit.id) ?? 0}
                     />
                   ))}
-                </div>
+                </ul>
               )}
             </div>
           )}
         </div>
       )}
     </PageContainer>
+    </ErrorBoundary>
   );
 }
 

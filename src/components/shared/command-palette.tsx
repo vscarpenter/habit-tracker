@@ -55,6 +55,7 @@ export function CommandPalette({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-10"
+            aria-label="Search habits"
             autoFocus
           />
         </div>

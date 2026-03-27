@@ -8,11 +8,19 @@ import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import type { HabitCompletion } from "@/types";
 
+interface UseWeekCompletionsReturn {
+  completions: HabitCompletion[];
+  loading: boolean;
+  isCompleted: (habitId: string, date: string) => boolean;
+  toggle: (habitId: string, date: string) => Promise<void>;
+  refresh: () => Promise<void>;
+}
+
 function completionKey(habitId: string, date: string): string {
   return `${habitId}::${date}`;
 }
 
-export function useWeekCompletions(startDate: string, endDate: string) {
+export function useWeekCompletions(startDate: string, endDate: string): UseWeekCompletionsReturn {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

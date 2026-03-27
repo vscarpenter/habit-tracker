@@ -5,13 +5,14 @@
  * The client is lazily created so the app can boot without sync configured.
  *
  * Required environment variable (add to .env.local):
- *   NEXT_PUBLIC_POCKETBASE_URL=https://api.vinny.io
+ *   NEXT_PUBLIC_POCKETBASE_URL=https://your-pocketbase-instance.example.com
  */
 
 import PocketBase from "pocketbase";
+import { POCKETBASE_URL } from "./config";
 
 function createPocketBaseClient(): PocketBase {
-  const url = process.env.NEXT_PUBLIC_POCKETBASE_URL;
+  const url = POCKETBASE_URL;
 
   if (!url) {
     throw new Error(

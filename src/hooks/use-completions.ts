@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { completionService } from "@/db/completion-service";
 import { useToast } from "@/components/shared/toast";
 import { useSyncRefresh } from "@/contexts/sync-refresh-context";
@@ -8,7 +8,15 @@ import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import type { HabitCompletion } from "@/types";
 
-export function useCompletions(date: string) {
+interface UseCompletionsReturn {
+  completions: HabitCompletion[];
+  loading: boolean;
+  toggle: (habitId: string) => Promise<void>;
+  isCompleted: (habitId: string) => boolean;
+  refresh: () => Promise<void>;
+}
+
+export function useCompletions(date: string): UseCompletionsReturn {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -62,18 +70,29 @@ export function useCompletions(date: string) {
     [completions, date, refresh, toast]
   );
 
-  const isCompleted = useCallback(
-    (habitId: string) => completions.some((c) => c.habitId === habitId),
+  const completedHabitIds = useMemo(
+    () => new Set(completions.map((c) => c.habitId)),
     [completions]
+  );
+
+  const isCompleted = useCallback(
+    (habitId: string) => completedHabitIds.has(habitId),
+    [completedHabitIds]
   );
 
   return { completions, loading, toggle, isCompleted, refresh };
 }
 
+interface UseCompletionRangeReturn {
+  completions: HabitCompletion[];
+  loading: boolean;
+  refresh: () => Promise<void>;
+}
+
 /**
  * Hook for loading completions across a date range (used by stats/detail views).
  */
-export function useCompletionRange(startDate: string, endDate: string) {
+export function useCompletionRange(startDate: string, endDate: string): UseCompletionRangeReturn {
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

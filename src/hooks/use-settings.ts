@@ -7,7 +7,14 @@ import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import type { UserSettings } from "@/types";
 
-export function useSettings() {
+interface UseSettingsReturn {
+  settings: UserSettings | null;
+  loading: boolean;
+  update: (changes: Partial<Omit<UserSettings, "id" | "createdAt" | "updatedAt">>) => Promise<UserSettings | null>;
+  refresh: () => Promise<void>;
+}
+
+export function useSettings(): UseSettingsReturn {
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
