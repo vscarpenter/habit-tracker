@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createHabitSchema } from "@/db/schemas";
 import type { CreateHabitInput } from "@/db/schemas";
-import type { Habit, HabitFrequency } from "@/types";
+import type { Habit, HabitFrequency, TimeOfDay } from "@/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { EmojiPicker } from "./emoji-picker";
 import { ColorPicker } from "./color-picker";
 import { FrequencySelector } from "./frequency-selector";
+import { TimeOfDaySelector, inferTimeOfDay } from "./time-of-day-selector";
 import { useToast } from "@/components/shared/toast";
 import { DB_ERROR_MSG, DEFAULT_HABIT_ICON, DEFAULT_X_PER_WEEK_TARGET } from "@/lib/constants";
 import { ACCENT_COLORS } from "@/lib/utils";
@@ -54,6 +55,9 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
   );
   const [targetCount, setTargetCount] = useState(initialData?.targetCount ?? DEFAULT_X_PER_WEEK_TARGET);
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime ?? "");
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(
+    initialData?.timeOfDay ?? "anytime"
+  );
   const [category, setCategory] = useState(initialData?.category ?? "");
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -68,6 +72,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       ...(frequency === "specific_days" ? { targetDays } : {}),
       ...(frequency === "x_per_week" ? { targetCount } : {}),
       ...(reminderTime ? { reminderTime } : {}),
+      timeOfDay,
       ...(category.trim() ? { category: category.trim() } : {}),
     };
 
@@ -95,7 +100,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
 
     setErrors({});
     return result.data;
-  }, [name, description, icon, color, frequency, targetDays, targetCount, reminderTime, category]);
+  }, [name, description, icon, color, frequency, targetDays, targetCount, reminderTime, timeOfDay, category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,6 +213,17 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
         </div>
       </Card>
 
+      {/* Time of Day */}
+      <Card>
+        <div className="space-y-2">
+          <p className="hf-kicker">Timing</p>
+          <fieldset className="border-0 p-0 m-0">
+            <legend className="text-sm font-medium text-text-primary mb-1">When do you do this?</legend>
+            <TimeOfDaySelector value={timeOfDay} onChange={setTimeOfDay} />
+          </fieldset>
+        </div>
+      </Card>
+
       {/* Reminder Time */}
       <Card>
         <div className="space-y-2">
@@ -217,7 +233,13 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
             id="reminderTime"
             type="time"
             value={reminderTime}
-            onChange={(e) => setReminderTime(e.target.value)}
+            onChange={(e) => {
+              setReminderTime(e.target.value);
+              // Auto-infer time-of-day from reminder if user hasn't explicitly set one
+              if (timeOfDay === "anytime" && e.target.value) {
+                setTimeOfDay(inferTimeOfDay(e.target.value));
+              }
+            }}
           />
           <p className="text-xs text-text-muted">Optional</p>
         </div>

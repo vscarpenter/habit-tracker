@@ -26,6 +26,18 @@ class HabitFlowDB extends Dexie {
             c.effort = null;
           })
       );
+
+    // Feature: Time-of-Day Grouping — add timeOfDay to habits
+    this.version(3)
+      .stores({})
+      .upgrade((tx) =>
+        tx
+          .table("habits")
+          .toCollection()
+          .modify((h: Record<string, unknown>) => {
+            h.timeOfDay = "anytime";
+          })
+      );
   }
 }
 

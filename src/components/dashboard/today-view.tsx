@@ -4,7 +4,7 @@ import { useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Flame, TrendingUp, Target, Zap } from "lucide-react";
+import { ArrowRight, Flame, TrendingUp, Target, Zap, Sunrise, Sun, Moon, Infinity } from "lucide-react";
 import { CompactProgressBar } from "./compact-progress-bar";
 import { CompletionToggle } from "@/components/habits/completion-toggle";
 import { EffortPicker } from "@/components/habits/effort-picker";
@@ -22,7 +22,7 @@ import {
 } from "@/components/shared/motion";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import { useDashboardStats } from "@/hooks/use-habit-stats";
-import type { Habit, HabitCompletion, EffortRating } from "@/types";
+import type { Habit, HabitCompletion, EffortRating, TimeOfDay } from "@/types";
 
 interface TodayViewProps {
   habits: Habit[];
@@ -110,6 +110,24 @@ export function TodayView({
     },
     [effortPickerHabitId, onEffort, getCompletionId]
   );
+
+  // Group scheduled habits by time-of-day
+  const timeGroups = useMemo(() => {
+    const groups: { key: TimeOfDay; habits: Habit[] }[] = [
+      { key: "morning", habits: [] },
+      { key: "afternoon", habits: [] },
+      { key: "evening", habits: [] },
+      { key: "anytime", habits: [] },
+    ];
+    const groupMap = new Map(groups.map((g) => [g.key, g]));
+
+    for (const habit of scheduledHabits) {
+      const group = groupMap.get(habit.timeOfDay ?? "anytime") ?? groupMap.get("anytime")!;
+      group.habits.push(habit);
+    }
+
+    return groups.filter((g) => g.habits.length > 0);
+  }, [scheduledHabits]);
 
   if (loading) {
     return (
@@ -226,25 +244,44 @@ export function TodayView({
             initial="hidden"
             animate="show"
           >
-            {scheduledHabits.map((habit, idx) => {
-              const completed = isCompleted(habit.id);
-              const streak = streakMap?.get(habit.id) ?? 0;
-              const isLast = idx === scheduledHabits.length - 1;
-
+            {timeGroups.map((group, groupIdx) => {
+              const groupCompleted = group.habits.filter((h) => isCompleted(h.id)).length;
               return (
-                <MotionListItem key={habit.id}>
-                  <ChecklistRow
-                    habit={habit}
-                    completed={completed}
-                    streak={showStreaks ? streak : 0}
-                    onToggle={() => handleToggle(habit.id)}
-                    isLast={isLast && effortPickerHabitId !== habit.id}
-                  />
-                  <EffortPicker
-                    visible={effortPickerHabitId === habit.id}
-                    onSelect={handleEffort}
-                  />
-                </MotionListItem>
+                <li key={group.key}>
+                  {/* Section header (skip if only one group and it's "anytime") */}
+                  {!(timeGroups.length === 1 && group.key === "anytime") && (
+                    <TimeGroupHeader
+                      timeOfDay={group.key}
+                      completed={groupCompleted}
+                      total={group.habits.length}
+                      isFirst={groupIdx === 0}
+                    />
+                  )}
+                  <ul>
+                    {group.habits.map((habit, idx) => {
+                      const completed = isCompleted(habit.id);
+                      const streak = streakMap?.get(habit.id) ?? 0;
+                      const isLastInGroup = idx === group.habits.length - 1;
+                      const isLastOverall = isLastInGroup && groupIdx === timeGroups.length - 1;
+
+                      return (
+                        <MotionListItem key={habit.id}>
+                          <ChecklistRow
+                            habit={habit}
+                            completed={completed}
+                            streak={showStreaks ? streak : 0}
+                            onToggle={() => handleToggle(habit.id)}
+                            isLast={isLastOverall && effortPickerHabitId !== habit.id}
+                          />
+                          <EffortPicker
+                            visible={effortPickerHabitId === habit.id}
+                            onSelect={handleEffort}
+                          />
+                        </MotionListItem>
+                      );
+                    })}
+                  </ul>
+                </li>
               );
             })}
           </motion.ul>
@@ -315,6 +352,45 @@ interface ChecklistRowProps {
   streak: number;
   onToggle: () => void;
   isLast: boolean;
+}
+
+/* ─── Time Group Header ─── */
+
+const TIME_GROUP_CONFIG: Record<TimeOfDay, { label: string; icon: typeof Sunrise }> = {
+  morning: { label: "Morning", icon: Sunrise },
+  afternoon: { label: "Afternoon", icon: Sun },
+  evening: { label: "Evening", icon: Moon },
+  anytime: { label: "Anytime", icon: Infinity },
+};
+
+interface TimeGroupHeaderProps {
+  timeOfDay: TimeOfDay;
+  completed: number;
+  total: number;
+  isFirst: boolean;
+}
+
+function TimeGroupHeader({ timeOfDay, completed, total, isFirst }: TimeGroupHeaderProps) {
+  const config = TIME_GROUP_CONFIG[timeOfDay];
+  const Icon = config.icon;
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-between px-5 py-2.5 bg-surface-muted/40",
+        !isFirst && "border-t border-border-subtle/70"
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <Icon className="h-3.5 w-3.5 text-text-muted" />
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-text-muted">
+          {config.label}
+        </span>
+      </div>
+      <span className="text-xs font-medium text-text-muted">
+        {completed}/{total}
+      </span>
+    </div>
+  );
 }
 
 const MIN_STREAK_DISPLAY = 2;

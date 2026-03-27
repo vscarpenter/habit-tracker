@@ -50,6 +50,23 @@ describe("habitSchema", () => {
     });
     expect(() => habitSchema.parse(habit)).not.toThrow();
   });
+
+  it("accepts valid timeOfDay values", () => {
+    for (const tod of ["morning", "afternoon", "evening", "anytime"] as const) {
+      const habit = createHabit({ timeOfDay: tod });
+      expect(() => habitSchema.parse(habit)).not.toThrow();
+    }
+  });
+
+  it("accepts habit without timeOfDay (optional)", () => {
+    const habit = createHabit();
+    expect(() => habitSchema.parse(habit)).not.toThrow();
+  });
+
+  it("rejects invalid timeOfDay value", () => {
+    const habit = createHabit({ timeOfDay: "midnight" as "morning" });
+    expect(() => habitSchema.parse(habit)).toThrow();
+  });
 });
 
 describe("habitCompletionSchema", () => {
