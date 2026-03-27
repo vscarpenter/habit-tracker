@@ -39,6 +39,7 @@ const habitBaseSchema = z.object({
   targetCount: z.number().int().min(1).max(7).optional(),
   reminderTime: z.string().regex(TIME_REGEX, "Invalid time format").optional(),
   category: z.string().max(50).optional(),
+  timeOfDay: z.enum(["morning", "afternoon", "evening", "anytime"]).default("anytime").optional(),
   sortOrder: z.number().int(),
   isArchived: z.boolean(),
   createdAt: z.iso.datetime(),

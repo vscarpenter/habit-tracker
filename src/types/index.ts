@@ -5,6 +5,8 @@ export type HabitFrequency =
   | "specific_days"
   | "x_per_week";
 
+export type TimeOfDay = "morning" | "afternoon" | "evening" | "anytime";
+
 export interface Habit {
   id: string;
   name: string;
@@ -16,6 +18,7 @@ export interface Habit {
   targetCount?: number;
   reminderTime?: string;
   category?: string;
+  timeOfDay?: TimeOfDay;
   sortOrder: number;
   isArchived: boolean;
   createdAt: string;
