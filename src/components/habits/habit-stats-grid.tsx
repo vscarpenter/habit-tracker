@@ -9,6 +9,7 @@ interface HabitStatsGridProps {
   stats: HabitStats;
   color: string;
   loading: boolean;
+  averageEffort?: number | null;
 }
 
 interface StatItemProps {
@@ -38,11 +39,14 @@ function StatItem({ icon: Icon, label, value, color }: StatItemProps) {
   );
 }
 
-export function HabitStatsGrid({ stats, color, loading }: HabitStatsGridProps) {
+export function HabitStatsGrid({ stats, color, loading, averageEffort }: HabitStatsGridProps) {
+  const showEffort = averageEffort != null;
+  const columns = showEffort ? 5 : 4;
+
   if (loading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div className={`grid grid-cols-2 sm:grid-cols-${columns} gap-3`}>
+        {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-28 rounded-2xl" />
         ))}
       </div>
@@ -50,7 +54,7 @@ export function HabitStatsGrid({ stats, color, loading }: HabitStatsGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className={`grid grid-cols-2 gap-3 ${showEffort ? "sm:grid-cols-5" : "sm:grid-cols-4"}`}>
       <StatItem
         icon={Flame}
         label="Current Streak"
@@ -75,6 +79,14 @@ export function HabitStatsGrid({ stats, color, loading }: HabitStatsGridProps) {
         value={`${stats.completionRate}%`}
         color={color}
       />
+      {showEffort && (
+        <StatItem
+          icon={Flame}
+          label="Avg Effort"
+          value={`${averageEffort}/5`}
+          color="var(--accent-amber)"
+        />
+      )}
     </div>
   );
 }

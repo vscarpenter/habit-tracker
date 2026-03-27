@@ -249,3 +249,56 @@ export function buildHabitHeatmapData(
 
   return { grid: columns, monthLabels: buildMonthLabels(columns) };
 }
+
+// ── Effort Trend ──────────────────────────────────────
+
+export interface EffortTrendEntry {
+  date: string;
+  habitId: string;
+  habitName: string;
+  habitColor: string;
+  effort: number;
+}
+
+const MIN_EFFORT_RATINGS_FOR_TREND = 5;
+
+/**
+ * Builds effort-over-time data for habits with enough effort ratings.
+ * Returns entries sorted by date, grouped by habit.
+ */
+export function buildEffortTrend(
+  habits: Habit[],
+  completions: HabitCompletion[],
+  startDate: string,
+  endDate: string
+): EffortTrendEntry[] {
+  const activeHabits = getActiveHabits(habits);
+  const habitMap = new Map(activeHabits.map((h) => [h.id, h]));
+
+  // Group completions with effort ratings by habit
+  const effortByHabit = new Map<string, HabitCompletion[]>();
+  for (const c of completions) {
+    if (c.effort == null || c.date < startDate || c.date > endDate) continue;
+    if (!habitMap.has(c.habitId)) continue;
+    const list = effortByHabit.get(c.habitId) ?? [];
+    list.push(c);
+    effortByHabit.set(c.habitId, list);
+  }
+
+  const entries: EffortTrendEntry[] = [];
+  for (const [habitId, effortCompletions] of effortByHabit) {
+    if (effortCompletions.length < MIN_EFFORT_RATINGS_FOR_TREND) continue;
+    const habit = habitMap.get(habitId)!;
+    for (const c of effortCompletions) {
+      entries.push({
+        date: c.date,
+        habitId,
+        habitName: habit.name,
+        habitColor: habit.color,
+        effort: c.effort!,
+      });
+    }
+  }
+
+  return entries.sort((a, b) => a.date.localeCompare(b.date));
+}

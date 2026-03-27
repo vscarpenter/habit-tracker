@@ -30,7 +30,7 @@ function getGreeting(): string {
 export default function DashboardPage() {
   const today = useToday();
   const { habits, loading: habitsLoading } = useHabits();
-  const { completions, loading: completionsLoading, toggle, isCompleted } =
+  const { completions, loading: completionsLoading, toggle, isCompleted, getCompletionId, updateEffort } =
     useCompletions(today);
   const { settings } = useSettings();
   const showStreaks = settings?.showStreaks ?? true;
@@ -90,7 +90,9 @@ export default function DashboardPage() {
             today={today}
             loading={habitsLoading || completionsLoading}
             onToggle={toggle}
+            onEffort={updateEffort}
             isCompleted={isCompleted}
+            getCompletionId={getCompletionId}
             showStreaks={showStreaks}
             streakMap={streakMap}
           />

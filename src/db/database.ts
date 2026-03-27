@@ -14,6 +14,18 @@ class HabitFlowDB extends Dexie {
       completions: "id, habitId, date, [habitId+date]",
       settings: "id",
     });
+
+    // Feature: Effort Rating — add effort field to completions
+    this.version(2)
+      .stores({})
+      .upgrade((tx) =>
+        tx
+          .table("completions")
+          .toCollection()
+          .modify((c: Record<string, unknown>) => {
+            c.effort = null;
+          })
+      );
   }
 }
 

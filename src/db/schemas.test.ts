@@ -78,6 +78,33 @@ describe("habitCompletionSchema", () => {
     const completion = createCompletion({ date: "2026-13-01" });
     expect(() => habitCompletionSchema.parse(completion)).toThrow();
   });
+
+  it("accepts valid effort values (1-5)", () => {
+    for (const effort of [1, 2, 3, 4, 5] as const) {
+      const completion = createCompletion({ effort });
+      expect(() => habitCompletionSchema.parse(completion)).not.toThrow();
+    }
+  });
+
+  it("accepts null effort", () => {
+    const completion = createCompletion({ effort: null });
+    expect(() => habitCompletionSchema.parse(completion)).not.toThrow();
+  });
+
+  it("accepts undefined effort (optional)", () => {
+    const completion = createCompletion();
+    expect(() => habitCompletionSchema.parse(completion)).not.toThrow();
+  });
+
+  it("rejects effort values outside 1-5", () => {
+    const completion = createCompletion({ effort: 0 as 1 });
+    expect(() => habitCompletionSchema.parse(completion)).toThrow();
+  });
+
+  it("rejects effort value of 6", () => {
+    const completion = createCompletion({ effort: 6 as 5 });
+    expect(() => habitCompletionSchema.parse(completion)).toThrow();
+  });
 });
 
 describe("userSettingsSchema", () => {

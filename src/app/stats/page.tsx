@@ -17,6 +17,7 @@ import {
   LazyCompletionTrendChart as CompletionTrendChart,
   LazyCategoryBreakdown as CategoryBreakdown,
   LazyWeeklyPatternChart as WeeklyPatternChart,
+  LazyEffortTrendChart as EffortTrendChart,
 } from "@/components/charts/lazy-charts";
 import { AggregateHeatmap } from "@/components/stats/aggregate-heatmap";
 import { HabitLeaderboard } from "@/components/stats/habit-leaderboard";
@@ -27,6 +28,7 @@ import {
   buildAggregateHeatmapData,
   buildCategoryBreakdown,
   buildLeaderboard,
+  buildEffortTrend,
 } from "@/lib/stats-utils";
 import { buildWeeklyPatternData } from "@/lib/date-utils";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
@@ -85,6 +87,11 @@ export default function StatsPage() {
     [rangeCompletions]
   );
 
+  const effortTrendData = useMemo(
+    () => buildEffortTrend(activeHabits, rangeCompletions, startDate, endDate),
+    [activeHabits, rangeCompletions, startDate, endDate]
+  );
+
   return (
     <ErrorBoundary>
     <PageContainer>
@@ -117,6 +124,10 @@ export default function StatsPage() {
             <CategoryBreakdown data={categoryData} />
             <WeeklyPatternChart data={weeklyPatternData} />
           </div>
+
+          {effortTrendData.length > 0 && (
+            <EffortTrendChart data={effortTrendData} />
+          )}
 
           <HabitLeaderboard entries={leaderboardData} loading={false} />
         </div>

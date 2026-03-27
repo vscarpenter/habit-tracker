@@ -20,6 +20,7 @@ import { useCompletionRange } from "@/hooks/use-completions";
 import { useToday } from "@/hooks/use-today";
 import { useSettings } from "@/hooks/use-settings";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { calculateAverageEffort } from "@/lib/stats-core";
 import { CalendarDays } from "lucide-react";
 
 export default function HabitDetailPage() {
@@ -40,6 +41,11 @@ export default function HabitDetailPage() {
   const habitCompletions = useMemo(
     () => completions.filter((c) => c.habitId === habit?.id),
     [completions, habit?.id]
+  );
+
+  const averageEffort = useMemo(
+    () => calculateAverageEffort(habitCompletions),
+    [habitCompletions]
   );
 
   if (habitLoading) {
@@ -89,6 +95,7 @@ export default function HabitDetailPage() {
           stats={stats}
           color={habit.color}
           loading={statsLoading}
+          averageEffort={averageEffort}
         />
 
         <HabitCalendarHeatmap
