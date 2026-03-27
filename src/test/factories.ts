@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import type { Habit, HabitCompletion, UserSettings, EffortRating } from "@/types";
+import type { Habit, HabitCompletion, UserSettings } from "@/types";
 
 let sortCounter = 0;
 
