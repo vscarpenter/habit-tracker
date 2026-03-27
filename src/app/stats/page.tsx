@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { format, subDays, parseISO } from "date-fns";
 import { PageContainer } from "@/components/layout/page-container";
 import { Header } from "@/components/layout/header";
@@ -32,6 +32,9 @@ import {
 } from "@/lib/stats-utils";
 import { buildWeeklyPatternData } from "@/lib/date-utils";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { ProgressCardDialog } from "@/components/shared/progress-card-dialog";
+import { Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function StatsPage() {
   const today = useToday();
@@ -92,15 +95,40 @@ export default function StatsPage() {
     [activeHabits, rangeCompletions, startDate, endDate]
   );
 
+  // Flat heatmap data for share card
+  const flatHeatmapData = useMemo(
+    () => heatmapData.grid.flatMap((week) => week.map((cell) => ({ date: cell.date, count: cell.count }))),
+    [heatmapData]
+  );
+
+  const [shareOpen, setShareOpen] = useState(false);
+
+  const renderShareCard = useCallback(
+    (canvas: HTMLCanvasElement) => {
+      import("@/lib/progress-card-renderer").then(({ renderOverallCard }) => {
+        renderOverallCard(canvas, overallStats, flatHeatmapData);
+      });
+    },
+    [overallStats, flatHeatmapData]
+  );
+
   return (
     <ErrorBoundary>
     <PageContainer>
-      <Header
-        title="Statistics"
-        subtitle="Track your progress over time"
-        eyebrow="Analytics"
-        accentColor="var(--accent-violet)"
-      />
+      <div className="flex items-start justify-between gap-4">
+        <Header
+          title="Statistics"
+          subtitle="Track your progress over time"
+          eyebrow="Analytics"
+          accentColor="var(--accent-violet)"
+        />
+        {!loading && activeHabits.length > 0 && (
+          <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="shrink-0 mt-2">
+            <Share2 className="h-3.5 w-3.5 mr-1.5" />
+            Generate Card
+          </Button>
+        )}
+      </div>
 
       {loading ? (
         <StatsSkeleton />
@@ -132,6 +160,13 @@ export default function StatsPage() {
           <HabitLeaderboard entries={leaderboardData} loading={false} />
         </div>
       )}
+      <ProgressCardDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title="Share Stats Card"
+        filename={`habitflow-stats-${today}.png`}
+        renderCard={renderShareCard}
+      />
     </PageContainer>
     </ErrorBoundary>
   );

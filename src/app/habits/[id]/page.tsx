@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { format, parseISO, subMonths } from "date-fns";
 import { PageContainer } from "@/components/layout/page-container";
@@ -20,7 +20,9 @@ import { useCompletionRange } from "@/hooks/use-completions";
 import { useToday } from "@/hooks/use-today";
 import { useSettings } from "@/hooks/use-settings";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { ProgressCardDialog } from "@/components/shared/progress-card-dialog";
 import { calculateAverageEffort } from "@/lib/stats-core";
+import { buildDailyCompletionTrend } from "@/lib/stats-charts";
 import { CalendarDays } from "lucide-react";
 
 export default function HabitDetailPage() {
@@ -46,6 +48,24 @@ export default function HabitDetailPage() {
   const averageEffort = useMemo(
     () => calculateAverageEffort(habitCompletions),
     [habitCompletions]
+  );
+
+  // Heatmap data for share card (last 30 days)
+  const shareHeatmapData = useMemo(
+    () => buildDailyCompletionTrend(habitCompletions, sixMonthsAgo, today),
+    [habitCompletions, sixMonthsAgo, today]
+  );
+
+  const [shareOpen, setShareOpen] = useState(false);
+
+  const renderShareCard = useCallback(
+    (canvas: HTMLCanvasElement) => {
+      if (!habit) return;
+      import("@/lib/progress-card-renderer").then(({ renderHabitCard }) => {
+        renderHabitCard(canvas, habit, stats, shareHeatmapData);
+      });
+    },
+    [habit, stats, shareHeatmapData]
   );
 
   if (habitLoading) {
@@ -89,7 +109,7 @@ export default function HabitDetailPage() {
     <ErrorBoundary>
     <PageContainer>
       <div className="space-y-6">
-        <HabitDetailHeader habit={habit} />
+        <HabitDetailHeader habit={habit} onShare={() => setShareOpen(true)} />
 
         <HabitStatsGrid
           stats={stats}
@@ -122,6 +142,14 @@ export default function HabitDetailPage() {
           today={today}
         />
       </div>
+
+      <ProgressCardDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title="Share Habit Card"
+        filename={`habitflow-${habit.name.toLowerCase().replace(/\s+/g, "-")}.png`}
+        renderCard={renderShareCard}
+      />
     </PageContainer>
     </ErrorBoundary>
   );
