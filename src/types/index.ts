@@ -24,6 +24,8 @@ export interface Habit {
   habitType?: HabitType;
   targetValue?: number | null;
   unit?: string | null;
+  chainId?: string | null;
+  chainOrder?: number | null;
   sortOrder: number;
   isArchived: boolean;
   createdAt: string;
@@ -53,6 +55,12 @@ export interface UserSettings {
   lastSyncedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface HabitChain {
+  id: string;
+  name: string;
+  createdAt: string;
 }
 
 export type Theme = UserSettings["theme"];

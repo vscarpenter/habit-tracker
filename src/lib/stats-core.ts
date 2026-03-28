@@ -5,7 +5,7 @@ import {
   differenceInCalendarDays,
 } from "date-fns";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
-import type { Habit, HabitCompletion } from "@/types";
+import type { Habit, HabitCompletion, HabitChain } from "@/types";
 
 // ── Types ──────────────────────────────────────────────
 
@@ -234,4 +234,87 @@ export function computeOverallStats(
     bestCurrentStreak,
     totalCompletions,
   };
+}
+
+// ── Chain Streak ────────────────────────────────────────
+
+export interface ChainStreakResult {
+  currentStreak: number;
+  bestStreak: number;
+}
+
+/**
+ * Calculates chain-level streaks. A chain day is "complete" when every
+ * habit in the chain is completed for that day.
+ */
+export function calculateChainStreak(
+  _chain: HabitChain,
+  habits: Habit[],
+  completions: HabitCompletion[],
+  today: string
+): ChainStreakResult {
+  if (habits.length === 0) return { currentStreak: 0, bestStreak: 0 };
+
+  // Find earliest creation date among chain habits
+  const earliestCreated = habits.reduce((min, h) => {
+    const d = h.createdAt.split("T")[0];
+    return d < min ? d : min;
+  }, habits[0].createdAt.split("T")[0]);
+
+  const daysSinceCreation = differenceInCalendarDays(
+    parseISO(today),
+    parseISO(earliestCreated)
+  );
+
+  // Build per-habit completion sets
+  const habitCompletionSets = new Map<string, Set<string>>();
+  for (const h of habits) {
+    habitCompletionSets.set(h.id, new Set());
+  }
+  for (const c of completions) {
+    habitCompletionSets.get(c.habitId)?.add(c.date);
+  }
+
+  function isChainCompleteOnDate(dateStr: string): boolean {
+    return habits.every((habit) => {
+      if (!isHabitScheduledForDate(habit, dateStr)) return true;
+      return habitCompletionSets.get(habit.id)?.has(dateStr) ?? false;
+    });
+  }
+
+  function anyHabitScheduled(dateStr: string): boolean {
+    return habits.some((h) => isHabitScheduledForDate(h, dateStr));
+  }
+
+  // Current streak (walks backward)
+  let currentStreak = 0;
+  for (let i = 0; i <= daysSinceCreation; i++) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!anyHabitScheduled(dateStr)) continue;
+
+    if (isChainCompleteOnDate(dateStr)) {
+      currentStreak++;
+    } else if (i === 0) {
+      continue; // Today not yet complete — don't break
+    } else {
+      break;
+    }
+  }
+
+  // Best streak (walks forward)
+  let bestStreak = 0;
+  let run = 0;
+  for (let i = daysSinceCreation; i >= 0; i--) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!anyHabitScheduled(dateStr)) continue;
+
+    if (isChainCompleteOnDate(dateStr)) {
+      run++;
+      bestStreak = Math.max(bestStreak, run);
+    } else {
+      run = 0;
+    }
+  }
+
+  return { currentStreak, bestStreak };
 }
