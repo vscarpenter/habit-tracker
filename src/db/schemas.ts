@@ -43,6 +43,8 @@ const habitBaseSchema = z.object({
   habitType: z.enum(["binary", "quantitative"]).default("binary").optional(),
   targetValue: z.number().positive().nullable().optional(),
   unit: z.string().max(20).nullable().optional(),
+  chainId: z.string().regex(UUID_REGEX).nullable().optional(),
+  chainOrder: z.number().int().nonnegative().nullable().optional(),
   sortOrder: z.number().int(),
   isArchived: z.boolean(),
   createdAt: z.iso.datetime(),
@@ -99,6 +101,12 @@ export const userSettingsSchema = z.object({
   lastSyncedAt: z.iso.datetime().nullable().optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+});
+
+export const habitChainSchema = z.object({
+  id: z.string().regex(UUID_REGEX, "Invalid UUID format"),
+  name: z.string().min(1, "Name is required").max(60, "Name is too long"),
+  createdAt: z.iso.datetime(),
 });
 
 // Derive create/update schemas from the base (no refinements)

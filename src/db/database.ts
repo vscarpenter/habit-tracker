@@ -1,10 +1,11 @@
 import Dexie, { type EntityTable } from "dexie";
-import type { Habit, HabitCompletion, UserSettings } from "@/types";
+import type { Habit, HabitCompletion, UserSettings, HabitChain } from "@/types";
 
 class HabitFlowDB extends Dexie {
   habits!: EntityTable<Habit, "id">;
   completions!: EntityTable<HabitCompletion, "id">;
   settings!: EntityTable<UserSettings, "id">;
+  habitChains!: EntityTable<HabitChain, "id">;
 
   constructor() {
     super("HabitFlowDB");
@@ -58,6 +59,22 @@ class HabitFlowDB extends Dexie {
             c.value = null;
           });
       });
+
+    // Feature: Habit Chains — add habitChains table, chainId/chainOrder to habits
+    this.version(5)
+      .stores({
+        habits: "id, sortOrder, isArchived, category, createdAt, chainId",
+        habitChains: "id",
+      })
+      .upgrade((tx) =>
+        tx
+          .table("habits")
+          .toCollection()
+          .modify((h: Record<string, unknown>) => {
+            h.chainId = null;
+            h.chainOrder = null;
+          })
+      );
   }
 }
 
