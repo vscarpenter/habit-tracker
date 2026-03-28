@@ -39,6 +39,12 @@ const habitBaseSchema = z.object({
   targetCount: z.number().int().min(1).max(7).optional(),
   reminderTime: z.string().regex(TIME_REGEX, "Invalid time format").optional(),
   category: z.string().max(50).optional(),
+  timeOfDay: z.enum(["morning", "afternoon", "evening", "anytime"]).default("anytime").optional(),
+  habitType: z.enum(["binary", "quantitative"]).default("binary").optional(),
+  targetValue: z.number().positive().nullable().optional(),
+  unit: z.string().max(20).nullable().optional(),
+  chainId: z.string().regex(UUID_REGEX).nullable().optional(),
+  chainOrder: z.number().int().nonnegative().nullable().optional(),
   sortOrder: z.number().int(),
   isArchived: z.boolean(),
   createdAt: z.iso.datetime(),
@@ -66,12 +72,22 @@ export const habitSchema = habitBaseSchema
     { message: "X per week frequency requires a target count" }
   );
 
+export const effortRatingSchema = z.union([
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+]);
+
 export const habitCompletionSchema = z.object({
   id: z.string().regex(UUID_REGEX, "Invalid UUID format"),
   habitId: z.string().regex(UUID_REGEX, "Invalid habit ID format"),
   date: dateString,
   completedAt: z.iso.datetime(),
   note: z.string().max(250, "Note is too long").optional(),
+  effort: effortRatingSchema.nullable().optional(),
+  value: z.number().nonnegative().nullable().optional(),
 });
 
 export const userSettingsSchema = z.object({
@@ -85,6 +101,12 @@ export const userSettingsSchema = z.object({
   lastSyncedAt: z.iso.datetime().nullable().optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+});
+
+export const habitChainSchema = z.object({
+  id: z.string().regex(UUID_REGEX, "Invalid UUID format"),
+  name: z.string().min(1, "Name is required").max(60, "Name is too long"),
+  createdAt: z.iso.datetime(),
 });
 
 // Derive create/update schemas from the base (no refinements)

@@ -5,6 +5,10 @@ export type HabitFrequency =
   | "specific_days"
   | "x_per_week";
 
+export type TimeOfDay = "morning" | "afternoon" | "evening" | "anytime";
+
+export type HabitType = "binary" | "quantitative";
+
 export interface Habit {
   id: string;
   name: string;
@@ -16,11 +20,19 @@ export interface Habit {
   targetCount?: number;
   reminderTime?: string;
   category?: string;
+  timeOfDay?: TimeOfDay;
+  habitType?: HabitType;
+  targetValue?: number | null;
+  unit?: string | null;
+  chainId?: string | null;
+  chainOrder?: number | null;
   sortOrder: number;
   isArchived: boolean;
   createdAt: string;
   updatedAt: string;
 }
+
+export type EffortRating = 1 | 2 | 3 | 4 | 5;
 
 export interface HabitCompletion {
   id: string;
@@ -28,6 +40,8 @@ export interface HabitCompletion {
   date: string;
   completedAt: string;
   note?: string;
+  effort?: EffortRating | null;
+  value?: number | null;
 }
 
 export interface UserSettings {
@@ -41,6 +55,12 @@ export interface UserSettings {
   lastSyncedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface HabitChain {
+  id: string;
+  name: string;
+  createdAt: string;
 }
 
 export type Theme = UserSettings["theme"];

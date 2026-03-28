@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft, Pencil } from "lucide-react";
+import { ChevronLeft, Pencil, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { frequencyLabel } from "@/lib/date-utils";
@@ -9,9 +9,10 @@ import type { Habit } from "@/types";
 
 interface HabitDetailHeaderProps {
   habit: Habit;
+  onShare?: () => void;
 }
 
-export function HabitDetailHeader({ habit }: HabitDetailHeaderProps) {
+export function HabitDetailHeader({ habit, onShare }: HabitDetailHeaderProps) {
   return (
     <div className="hf-hero rounded-3xl p-5">
       {/* Back link */}
@@ -47,12 +48,20 @@ export function HabitDetailHeader({ habit }: HabitDetailHeaderProps) {
           </div>
         </div>
 
-        <Link href={`/habits/${habit.id}/edit`}>
-          <Button variant="secondary" size="sm">
-            <Pencil className="h-3.5 w-3.5 mr-1.5" />
-            Edit
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          {onShare && (
+            <Button variant="secondary" size="sm" onClick={onShare}>
+              <Share2 className="h-3.5 w-3.5 mr-1.5" />
+              Share
+            </Button>
+          )}
+          <Link href={`/habits/${habit.id}/edit`}>
+            <Button variant="secondary" size="sm">
+              <Pencil className="h-3.5 w-3.5 mr-1.5" />
+              Edit
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

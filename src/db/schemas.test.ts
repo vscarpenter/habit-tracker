@@ -50,6 +50,49 @@ describe("habitSchema", () => {
     });
     expect(() => habitSchema.parse(habit)).not.toThrow();
   });
+
+  it("accepts valid timeOfDay values", () => {
+    for (const tod of ["morning", "afternoon", "evening", "anytime"] as const) {
+      const habit = createHabit({ timeOfDay: tod });
+      expect(() => habitSchema.parse(habit)).not.toThrow();
+    }
+  });
+
+  it("accepts habit without timeOfDay (optional)", () => {
+    const habit = createHabit();
+    expect(() => habitSchema.parse(habit)).not.toThrow();
+  });
+
+  it("rejects invalid timeOfDay value", () => {
+    const habit = createHabit({ timeOfDay: "midnight" as "morning" });
+    expect(() => habitSchema.parse(habit)).toThrow();
+  });
+
+  it("accepts valid habitType values", () => {
+    for (const type of ["binary", "quantitative"] as const) {
+      const habit = createHabit({ habitType: type });
+      expect(() => habitSchema.parse(habit)).not.toThrow();
+    }
+  });
+
+  it("accepts quantitative habit with targetValue and unit", () => {
+    const habit = createHabit({
+      habitType: "quantitative",
+      targetValue: 8,
+      unit: "glasses",
+    });
+    expect(() => habitSchema.parse(habit)).not.toThrow();
+  });
+
+  it("rejects negative targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: -1 });
+    expect(() => habitSchema.parse(habit)).toThrow();
+  });
+
+  it("rejects unit over 20 chars", () => {
+    const habit = createHabit({ habitType: "quantitative", unit: "a".repeat(21) });
+    expect(() => habitSchema.parse(habit)).toThrow();
+  });
 });
 
 describe("habitCompletionSchema", () => {
@@ -76,6 +119,33 @@ describe("habitCompletionSchema", () => {
 
   it("rejects month 13", () => {
     const completion = createCompletion({ date: "2026-13-01" });
+    expect(() => habitCompletionSchema.parse(completion)).toThrow();
+  });
+
+  it("accepts valid effort values (1-5)", () => {
+    for (const effort of [1, 2, 3, 4, 5] as const) {
+      const completion = createCompletion({ effort });
+      expect(() => habitCompletionSchema.parse(completion)).not.toThrow();
+    }
+  });
+
+  it("accepts null effort", () => {
+    const completion = createCompletion({ effort: null });
+    expect(() => habitCompletionSchema.parse(completion)).not.toThrow();
+  });
+
+  it("accepts undefined effort (optional)", () => {
+    const completion = createCompletion();
+    expect(() => habitCompletionSchema.parse(completion)).not.toThrow();
+  });
+
+  it("rejects effort values outside 1-5", () => {
+    const completion = createCompletion({ effort: 0 as 1 });
+    expect(() => habitCompletionSchema.parse(completion)).toThrow();
+  });
+
+  it("rejects effort value of 6", () => {
+    const completion = createCompletion({ effort: 6 as 5 });
     expect(() => habitCompletionSchema.parse(completion)).toThrow();
   });
 });

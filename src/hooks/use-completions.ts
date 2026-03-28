@@ -6,13 +6,17 @@ import { useToast } from "@/components/shared/toast";
 import { useSyncRefresh } from "@/contexts/sync-refresh-context";
 import { DB_ERROR_MSG } from "@/lib/constants";
 import { logger } from "@/lib/logger";
-import type { HabitCompletion } from "@/types";
+import type { HabitCompletion, EffortRating } from "@/types";
 
 interface UseCompletionsReturn {
   completions: HabitCompletion[];
   loading: boolean;
   toggle: (habitId: string) => Promise<void>;
   isCompleted: (habitId: string) => boolean;
+  getCompletionId: (habitId: string) => string | undefined;
+  getCompletionValue: (habitId: string) => number;
+  updateEffort: (completionId: string, effort: EffortRating | null) => Promise<void>;
+  updateValue: (habitId: string, value: number) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -80,7 +84,43 @@ export function useCompletions(date: string): UseCompletionsReturn {
     [completedHabitIds]
   );
 
-  return { completions, loading, toggle, isCompleted, refresh };
+  const getCompletionId = useCallback(
+    (habitId: string) => completions.find((c) => c.habitId === habitId)?.id,
+    [completions]
+  );
+
+  const updateEffort = useCallback(
+    async (completionId: string, effort: EffortRating | null) => {
+      try {
+        await completionService.updateEffort(completionId, effort);
+        await refresh();
+      } catch (error) {
+        logger.error("Failed to update effort:", error);
+        toast(DB_ERROR_MSG, "error");
+      }
+    },
+    [refresh, toast]
+  );
+
+  const getCompletionValue = useCallback(
+    (habitId: string) => completions.find((c) => c.habitId === habitId)?.value ?? 0,
+    [completions]
+  );
+
+  const updateValue = useCallback(
+    async (habitId: string, value: number) => {
+      try {
+        await completionService.updateValue(habitId, date, value);
+        await refresh();
+      } catch (error) {
+        logger.error("Failed to update value:", error);
+        toast(DB_ERROR_MSG, "error");
+      }
+    },
+    [date, refresh, toast]
+  );
+
+  return { completions, loading, toggle, isCompleted, getCompletionId, getCompletionValue, updateEffort, updateValue, refresh };
 }
 
 interface UseCompletionRangeReturn {

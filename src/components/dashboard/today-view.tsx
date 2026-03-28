@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Flame, TrendingUp, Target, Zap } from "lucide-react";
+import { ArrowRight, Flame, TrendingUp, Target, Zap, Sunrise, Sun, Moon, Infinity, Link2 } from "lucide-react";
 import { CompactProgressBar } from "./compact-progress-bar";
 import { CompletionToggle } from "@/components/habits/completion-toggle";
+import { EffortPicker } from "@/components/habits/effort-picker";
+import { ValueInput } from "@/components/habits/value-input";
 import { NoHabitsEmpty, AllCompleteMessage } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -21,15 +23,20 @@ import {
 } from "@/components/shared/motion";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
 import { useDashboardStats } from "@/hooks/use-habit-stats";
-import type { Habit, HabitCompletion } from "@/types";
+import type { Habit, HabitCompletion, HabitChain, EffortRating, TimeOfDay } from "@/types";
 
 interface TodayViewProps {
   habits: Habit[];
   completions: HabitCompletion[];
+  chains?: HabitChain[];
   today: string;
   loading: boolean;
   onToggle: (habitId: string) => void;
+  onEffort?: (completionId: string, effort: EffortRating | null) => void;
+  onValueChange?: (habitId: string, value: number) => void;
   isCompleted: (habitId: string) => boolean;
+  getCompletionId?: (habitId: string) => string | undefined;
+  getCompletionValue?: (habitId: string) => number;
   showStreaks?: boolean;
   streakMap?: Map<string, number>;
 }
@@ -37,10 +44,15 @@ interface TodayViewProps {
 export function TodayView({
   habits,
   completions,
+  chains = [],
   today,
   loading,
   onToggle,
+  onEffort,
+  onValueChange,
   isCompleted,
+  getCompletionId,
+  getCompletionValue,
   showStreaks = false,
   streakMap,
 }: TodayViewProps) {
@@ -76,6 +88,83 @@ export function TodayView({
       ).length,
     [scheduledHabits, streakMap]
   );
+
+  const [effortPickerHabitId, setEffortPickerHabitId] = useState<string | null>(null);
+
+  const handleToggle = useCallback(
+    (habitId: string) => {
+      const wasCompleted = isCompleted(habitId);
+      onToggle(habitId);
+      // Show effort picker when marking complete (not when un-completing)
+      if (!wasCompleted && onEffort) {
+        setEffortPickerHabitId(habitId);
+      } else {
+        setEffortPickerHabitId(null);
+      }
+    },
+    [onToggle, isCompleted, onEffort]
+  );
+
+  const handleEffort = useCallback(
+    (effort: EffortRating | null) => {
+      if (effortPickerHabitId && onEffort) {
+        const completionId = getCompletionId?.(effortPickerHabitId);
+        if (completionId && effort !== null) {
+          onEffort(completionId, effort);
+        }
+      }
+      setEffortPickerHabitId(null);
+    },
+    [effortPickerHabitId, onEffort, getCompletionId]
+  );
+
+  // Build chain lookup
+  const chainMap = useMemo(
+    () => new Map(chains.map((c) => [c.id, c])),
+    [chains]
+  );
+
+  // Group scheduled habits by time-of-day, with chain sub-groups
+  type HabitItem = { type: "single"; habit: Habit } | { type: "chain"; chain: HabitChain; habits: Habit[] };
+  type TimeGroup = { key: TimeOfDay; items: HabitItem[] };
+
+  const timeGroups = useMemo(() => {
+    const groups: TimeGroup[] = [
+      { key: "morning", items: [] },
+      { key: "afternoon", items: [] },
+      { key: "evening", items: [] },
+      { key: "anytime", items: [] },
+    ];
+    const groupMap = new Map(groups.map((g) => [g.key, g]));
+
+    // Track which chains have been added to avoid duplicates
+    const addedChains = new Set<string>();
+
+    for (const habit of scheduledHabits) {
+      const group = groupMap.get(habit.timeOfDay ?? "anytime") ?? groupMap.get("anytime")!;
+
+      if (habit.chainId) {
+        if (!addedChains.has(habit.chainId)) {
+          addedChains.add(habit.chainId);
+          const chain = chainMap.get(habit.chainId);
+          if (chain) {
+            // Gather all scheduled habits in this chain, sorted by chainOrder
+            const chainHabits = scheduledHabits
+              .filter((h) => h.chainId === habit.chainId)
+              .sort((a, b) => (a.chainOrder ?? 0) - (b.chainOrder ?? 0));
+            group.items.push({ type: "chain", chain, habits: chainHabits });
+          } else {
+            group.items.push({ type: "single", habit });
+          }
+        }
+        // Skip habits already gathered into their chain
+      } else {
+        group.items.push({ type: "single", habit });
+      }
+    }
+
+    return groups.filter((g) => g.items.length > 0);
+  }, [scheduledHabits, chainMap]);
 
   if (loading) {
     return (
@@ -192,21 +281,118 @@ export function TodayView({
             initial="hidden"
             animate="show"
           >
-            {scheduledHabits.map((habit, idx) => {
-              const completed = isCompleted(habit.id);
-              const streak = streakMap?.get(habit.id) ?? 0;
-              const isLast = idx === scheduledHabits.length - 1;
+            {timeGroups.map((group, groupIdx) => {
+              const allHabitsInGroup = group.items.flatMap((item) =>
+                item.type === "chain" ? item.habits : [item.habit]
+              );
+              const groupCompleted = allHabitsInGroup.filter((h) => isCompleted(h.id)).length;
+              const isLastGroup = groupIdx === timeGroups.length - 1;
 
               return (
-                <MotionListItem key={habit.id}>
-                  <ChecklistRow
-                    habit={habit}
-                    completed={completed}
-                    streak={showStreaks ? streak : 0}
-                    onToggle={() => onToggle(habit.id)}
-                    isLast={isLast}
-                  />
-                </MotionListItem>
+                <li key={group.key}>
+                  {!(timeGroups.length === 1 && group.key === "anytime") && (
+                    <TimeGroupHeader
+                      timeOfDay={group.key}
+                      completed={groupCompleted}
+                      total={allHabitsInGroup.length}
+                      isFirst={groupIdx === 0}
+                    />
+                  )}
+                  <ul>
+                    {group.items.map((item, itemIdx) => {
+                      const isLastItem = itemIdx === group.items.length - 1 && isLastGroup;
+
+                      if (item.type === "chain") {
+                        const chainCompletedCount = item.habits.filter((h) => isCompleted(h.id)).length;
+                        return (
+                          <li key={item.chain.id}>
+                            {/* Chain header */}
+                            <div className="flex items-center justify-between px-5 py-2 bg-surface-paper/30 border-b border-border-subtle/40">
+                              <div className="flex items-center gap-2">
+                                <Link2 className="h-3.5 w-3.5 text-text-muted" />
+                                <span className="text-xs font-semibold text-text-secondary">
+                                  {item.chain.name}
+                                </span>
+                              </div>
+                              <span className="text-xs font-medium text-text-muted">
+                                {chainCompletedCount}/{item.habits.length}
+                              </span>
+                            </div>
+                            {/* Chain habits with connector */}
+                            <ul className="border-l-2 ml-7" style={{ borderColor: item.habits[0]?.color ?? "var(--border-subtle)" }}>
+                              {item.habits.map((habit, hIdx) => {
+                                const isQuant = habit.habitType === "quantitative";
+                                const completed = isQuant
+                                  ? (getCompletionValue?.(habit.id) ?? 0) >= (habit.targetValue ?? 1)
+                                  : isCompleted(habit.id);
+                                const streak = streakMap?.get(habit.id) ?? 0;
+                                const isLastInChain = hIdx === item.habits.length - 1;
+
+                                return (
+                                  <MotionListItem key={habit.id}>
+                                    <ChecklistRow
+                                      habit={habit}
+                                      completed={completed}
+                                      streak={showStreaks ? streak : 0}
+                                      onToggle={isQuant ? undefined : () => handleToggle(habit.id)}
+                                      isLast={isLastInChain && isLastItem}
+                                      valueInput={isQuant && onValueChange ? (
+                                        <ValueInput
+                                          habit={habit}
+                                          currentValue={getCompletionValue?.(habit.id) ?? 0}
+                                          onValueChange={(val) => onValueChange(habit.id, val)}
+                                        />
+                                      ) : undefined}
+                                    />
+                                    {!isQuant && (
+                                      <EffortPicker
+                                        visible={effortPickerHabitId === habit.id}
+                                        onSelect={handleEffort}
+                                      />
+                                    )}
+                                  </MotionListItem>
+                                );
+                              })}
+                            </ul>
+                          </li>
+                        );
+                      }
+
+                      // Single habit (not in a chain)
+                      const habit = item.habit;
+                      const isQuant = habit.habitType === "quantitative";
+                      const completed = isQuant
+                        ? (getCompletionValue?.(habit.id) ?? 0) >= (habit.targetValue ?? 1)
+                        : isCompleted(habit.id);
+                      const streak = streakMap?.get(habit.id) ?? 0;
+
+                      return (
+                        <MotionListItem key={habit.id}>
+                          <ChecklistRow
+                            habit={habit}
+                            completed={completed}
+                            streak={showStreaks ? streak : 0}
+                            onToggle={isQuant ? undefined : () => handleToggle(habit.id)}
+                            isLast={isLastItem && effortPickerHabitId !== habit.id}
+                            valueInput={isQuant && onValueChange ? (
+                              <ValueInput
+                                habit={habit}
+                                currentValue={getCompletionValue?.(habit.id) ?? 0}
+                                onValueChange={(val) => onValueChange(habit.id, val)}
+                              />
+                            ) : undefined}
+                          />
+                          {!isQuant && (
+                            <EffortPicker
+                              visible={effortPickerHabitId === habit.id}
+                              onSelect={handleEffort}
+                            />
+                          )}
+                        </MotionListItem>
+                      );
+                    })}
+                  </ul>
+                </li>
               );
             })}
           </motion.ul>
@@ -275,13 +461,53 @@ interface ChecklistRowProps {
   habit: Habit;
   completed: boolean;
   streak: number;
-  onToggle: () => void;
+  onToggle?: () => void;
   isLast: boolean;
+  valueInput?: React.ReactNode;
+}
+
+/* ─── Time Group Header ─── */
+
+const TIME_GROUP_CONFIG: Record<TimeOfDay, { label: string; icon: typeof Sunrise }> = {
+  morning: { label: "Morning", icon: Sunrise },
+  afternoon: { label: "Afternoon", icon: Sun },
+  evening: { label: "Evening", icon: Moon },
+  anytime: { label: "Anytime", icon: Infinity },
+};
+
+interface TimeGroupHeaderProps {
+  timeOfDay: TimeOfDay;
+  completed: number;
+  total: number;
+  isFirst: boolean;
+}
+
+function TimeGroupHeader({ timeOfDay, completed, total, isFirst }: TimeGroupHeaderProps) {
+  const config = TIME_GROUP_CONFIG[timeOfDay];
+  const Icon = config.icon;
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-between px-5 py-2.5 bg-surface-muted/40",
+        !isFirst && "border-t border-border-subtle/70"
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <Icon className="h-3.5 w-3.5 text-text-muted" />
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-text-muted">
+          {config.label}
+        </span>
+      </div>
+      <span className="text-xs font-medium text-text-muted">
+        {completed}/{total}
+      </span>
+    </div>
+  );
 }
 
 const MIN_STREAK_DISPLAY = 2;
 
-function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistRowProps) {
+function ChecklistRow({ habit, completed, streak, onToggle, isLast, valueInput }: ChecklistRowProps) {
   return (
     <motion.div
       whileHover={{ backgroundColor: "var(--surface-paper)", x: 2 }}
@@ -297,34 +523,41 @@ function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistR
         className="absolute bottom-2 left-0 top-2 w-1 rounded-r-full opacity-80"
         style={{ backgroundColor: habit.color, opacity: completed ? 0.35 : 0.8 }}
       />
-      <CompletionToggle
-        completed={completed}
-        color={habit.color}
-        onToggle={onToggle}
-        size="sm"
-      />
+      {onToggle ? (
+        <CompletionToggle
+          completed={completed}
+          color={habit.color}
+          onToggle={onToggle}
+          size="sm"
+        />
+      ) : (
+        <span className="text-lg shrink-0">{habit.icon}</span>
+      )}
 
-      <Link
-        href={`/habits/${habit.id}`}
-        className="flex min-w-0 flex-1 items-center gap-2 rounded-lg pr-1"
-      >
-        <span className="text-base shrink-0">{habit.icon}</span>
-        <span
-          className={cn(
-            "text-sm font-medium truncate transition-all duration-200",
-            completed
-              ? "text-text-muted line-through"
-              : "text-text-primary"
-          )}
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <Link
+          href={`/habits/${habit.id}`}
+          className="flex items-center gap-2 rounded-lg pr-1"
         >
-          {habit.name}
-        </span>
-        {habit.category && (
-          <Badge className="hidden md:inline-flex text-[11px]">
-            {habit.category}
-          </Badge>
-        )}
-      </Link>
+          {onToggle && <span className="text-base shrink-0">{habit.icon}</span>}
+          <span
+            className={cn(
+              "text-sm font-medium truncate transition-all duration-200",
+              completed
+                ? "text-text-muted line-through"
+                : "text-text-primary"
+            )}
+          >
+            {habit.name}
+          </span>
+          {habit.category && (
+            <Badge className="hidden md:inline-flex text-[11px]">
+              {habit.category}
+            </Badge>
+          )}
+        </Link>
+        {valueInput}
+      </div>
 
       {streak >= MIN_STREAK_DISPLAY && (
         <motion.div

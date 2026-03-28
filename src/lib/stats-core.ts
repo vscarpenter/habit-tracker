@@ -5,7 +5,7 @@ import {
   differenceInCalendarDays,
 } from "date-fns";
 import { isHabitScheduledForDate } from "@/lib/date-utils";
-import type { Habit, HabitCompletion } from "@/types";
+import type { Habit, HabitCompletion, HabitChain } from "@/types";
 
 // ── Types ──────────────────────────────────────────────
 
@@ -135,6 +135,68 @@ export function computeHabitStats(
   };
 }
 
+// ── Quantitative Helpers ─────────────────────────────────
+
+/**
+ * Determines if a quantitative habit is "complete" for a given completion.
+ * Complete when value >= targetValue, or any value if no target is set.
+ */
+export function isQuantitativeComplete(
+  habit: Habit,
+  completion: HabitCompletion | undefined
+): boolean {
+  if (!completion || completion.value == null) return false;
+  if (habit.targetValue == null) return completion.value > 0;
+  return completion.value >= habit.targetValue;
+}
+
+export interface QuantitativeStats {
+  totalValue: number;
+  personalBest: number;
+  dailyAverage: number;
+  daysLogged: number;
+}
+
+/**
+ * Calculates stats for a quantitative habit from its completions.
+ */
+export function calculateQuantitativeStats(
+  completions: HabitCompletion[]
+): QuantitativeStats {
+  const withValue = completions.filter(
+    (c): c is HabitCompletion & { value: number } => c.value != null
+  );
+
+  if (withValue.length === 0) {
+    return { totalValue: 0, personalBest: 0, dailyAverage: 0, daysLogged: 0 };
+  }
+
+  const totalValue = withValue.reduce((sum, c) => sum + c.value, 0);
+  const personalBest = Math.max(...withValue.map((c) => c.value));
+  const dailyAverage = Math.round((totalValue / withValue.length) * 10) / 10;
+
+  return { totalValue, personalBest, dailyAverage, daysLogged: withValue.length };
+}
+
+// ── Effort Stats ────────────────────────────────────────
+
+/**
+ * Calculates the average effort rating from completions with non-null effort.
+ * Returns null if no effort ratings exist.
+ */
+export function calculateAverageEffort(
+  completions: HabitCompletion[]
+): number | null {
+  const withEffort = completions.filter(
+    (c): c is HabitCompletion & { effort: number } =>
+      c.effort != null
+  );
+  if (withEffort.length === 0) return null;
+
+  const sum = withEffort.reduce((acc, c) => acc + c.effort, 0);
+  return Math.round((sum / withEffort.length) * 10) / 10;
+}
+
 // ── Overall / Aggregate Stats ──────────────────────────
 
 export function computeOverallStats(
@@ -172,4 +234,87 @@ export function computeOverallStats(
     bestCurrentStreak,
     totalCompletions,
   };
+}
+
+// ── Chain Streak ────────────────────────────────────────
+
+export interface ChainStreakResult {
+  currentStreak: number;
+  bestStreak: number;
+}
+
+/**
+ * Calculates chain-level streaks. A chain day is "complete" when every
+ * habit in the chain is completed for that day.
+ */
+export function calculateChainStreak(
+  _chain: HabitChain,
+  habits: Habit[],
+  completions: HabitCompletion[],
+  today: string
+): ChainStreakResult {
+  if (habits.length === 0) return { currentStreak: 0, bestStreak: 0 };
+
+  // Find earliest creation date among chain habits
+  const earliestCreated = habits.reduce((min, h) => {
+    const d = h.createdAt.split("T")[0];
+    return d < min ? d : min;
+  }, habits[0].createdAt.split("T")[0]);
+
+  const daysSinceCreation = differenceInCalendarDays(
+    parseISO(today),
+    parseISO(earliestCreated)
+  );
+
+  // Build per-habit completion sets
+  const habitCompletionSets = new Map<string, Set<string>>();
+  for (const h of habits) {
+    habitCompletionSets.set(h.id, new Set());
+  }
+  for (const c of completions) {
+    habitCompletionSets.get(c.habitId)?.add(c.date);
+  }
+
+  function isChainCompleteOnDate(dateStr: string): boolean {
+    return habits.every((habit) => {
+      if (!isHabitScheduledForDate(habit, dateStr)) return true;
+      return habitCompletionSets.get(habit.id)?.has(dateStr) ?? false;
+    });
+  }
+
+  function anyHabitScheduled(dateStr: string): boolean {
+    return habits.some((h) => isHabitScheduledForDate(h, dateStr));
+  }
+
+  // Current streak (walks backward)
+  let currentStreak = 0;
+  for (let i = 0; i <= daysSinceCreation; i++) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!anyHabitScheduled(dateStr)) continue;
+
+    if (isChainCompleteOnDate(dateStr)) {
+      currentStreak++;
+    } else if (i === 0) {
+      continue; // Today not yet complete — don't break
+    } else {
+      break;
+    }
+  }
+
+  // Best streak (walks forward)
+  let bestStreak = 0;
+  let run = 0;
+  for (let i = daysSinceCreation; i >= 0; i--) {
+    const dateStr = format(subDays(parseISO(today), i), "yyyy-MM-dd");
+    if (!anyHabitScheduled(dateStr)) continue;
+
+    if (isChainCompleteOnDate(dateStr)) {
+      run++;
+      bestStreak = Math.max(bestStreak, run);
+    } else {
+      run = 0;
+    }
+  }
+
+  return { currentStreak, bestStreak };
 }

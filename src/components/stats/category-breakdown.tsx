@@ -57,10 +57,10 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
                     fontSize: "12px",
                     boxShadow: "var(--shadow-editorial-md)",
                   }}
-                formatter={(value: number | undefined, name: string | undefined) => [
-                  `${value ?? 0} habit${value !== 1 ? "s" : ""}`,
-                  name ?? "",
-                ]}
+                formatter={(value, name) => {
+                  const v = typeof value === "number" ? value : 0;
+                  return [`${v} habit${v !== 1 ? "s" : ""}`, String(name ?? "")];
+                }}
               />
             </PieChart>
           </ResponsiveContainer>

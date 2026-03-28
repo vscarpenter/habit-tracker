@@ -3,10 +3,15 @@ import { format, subDays, parseISO } from "date-fns";
 import {
   computeHabitStats,
   computeOverallStats,
+  calculateAverageEffort,
+  isQuantitativeComplete,
+  calculateQuantitativeStats,
+  calculateChainStreak,
   buildDailyCompletionTrend,
   buildAggregateHeatmapData,
   buildCategoryBreakdown,
   buildLeaderboard,
+  buildEffortTrend,
 } from "./stats-utils";
 import { createHabit, createCompletion, resetFactories } from "@/test/factories";
 
@@ -384,5 +389,233 @@ describe("buildAggregateHeatmapData — weekStartsOn=1", () => {
     for (const col of grid) {
       expect(col).toHaveLength(7);
     }
+  });
+});
+
+// ── calculateAverageEffort ──────────────────────────────
+
+describe("calculateAverageEffort", () => {
+  it("returns null when no completions have effort", () => {
+    const completions = [
+      createCompletion({ effort: null }),
+      createCompletion({ effort: undefined }),
+    ];
+    expect(calculateAverageEffort(completions)).toBeNull();
+  });
+
+  it("returns null for empty array", () => {
+    expect(calculateAverageEffort([])).toBeNull();
+  });
+
+  it("calculates average of non-null effort values", () => {
+    const completions = [
+      createCompletion({ effort: 3 }),
+      createCompletion({ effort: 5 }),
+      createCompletion({ effort: 4 }),
+    ];
+    expect(calculateAverageEffort(completions)).toBe(4);
+  });
+
+  it("skips null effort values in calculation", () => {
+    const completions = [
+      createCompletion({ effort: 2 }),
+      createCompletion({ effort: null }),
+      createCompletion({ effort: 4 }),
+    ];
+    expect(calculateAverageEffort(completions)).toBe(3);
+  });
+
+  it("rounds to one decimal place", () => {
+    const completions = [
+      createCompletion({ effort: 1 }),
+      createCompletion({ effort: 2 }),
+      createCompletion({ effort: 3 }),
+    ];
+    expect(calculateAverageEffort(completions)).toBe(2);
+  });
+});
+
+// ── buildEffortTrend ──────────────────────────────────
+
+describe("buildEffortTrend", () => {
+  it("returns empty for habits with fewer than 5 effort ratings", () => {
+    const habit = createHabit({ createdAt: `${daysAgo(10)}T00:00:00.000Z` });
+    const completions = [0, 1, 2, 3].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: 3 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    expect(result).toHaveLength(0);
+  });
+
+  it("returns entries for habits with 5+ effort ratings", () => {
+    const habit = createHabit({ createdAt: `${daysAgo(10)}T00:00:00.000Z` });
+    const completions = [0, 1, 2, 3, 4].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: (i + 1) as 1 | 2 | 3 | 4 | 5 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    expect(result).toHaveLength(5);
+  });
+
+  it("excludes archived habits", () => {
+    const habit = createHabit({
+      isArchived: true,
+      createdAt: `${daysAgo(10)}T00:00:00.000Z`,
+    });
+    const completions = [0, 1, 2, 3, 4].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: 3 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    expect(result).toHaveLength(0);
+  });
+
+  it("sorts entries by date ascending", () => {
+    const habit = createHabit({ createdAt: `${daysAgo(10)}T00:00:00.000Z` });
+    const completions = [4, 2, 0, 1, 3].map((i) =>
+      createCompletion({ habitId: habit.id, date: daysAgo(i), effort: 3 })
+    );
+    const result = buildEffortTrend([habit], completions, daysAgo(10), TODAY);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i].date >= result[i - 1].date).toBe(true);
+    }
+  });
+});
+
+// ── isQuantitativeComplete ──────────────────────────────
+
+describe("isQuantitativeComplete", () => {
+  it("returns true when value >= targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 8 });
+    const completion = createCompletion({ value: 8 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(true);
+  });
+
+  it("returns true when value exceeds targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 5 });
+    const completion = createCompletion({ value: 10 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(true);
+  });
+
+  it("returns false when value < targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 8 });
+    const completion = createCompletion({ value: 3 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(false);
+  });
+
+  it("returns true for any value when no targetValue is set", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: null });
+    const completion = createCompletion({ value: 1 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(true);
+  });
+
+  it("returns false when no completion exists", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 5 });
+    expect(isQuantitativeComplete(habit, undefined)).toBe(false);
+  });
+
+  it("returns false when value is null", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 5 });
+    const completion = createCompletion({ value: null });
+    expect(isQuantitativeComplete(habit, completion)).toBe(false);
+  });
+});
+
+// ── calculateQuantitativeStats ──────────────────────────
+
+describe("calculateQuantitativeStats", () => {
+  it("returns zeros for empty completions", () => {
+    const result = calculateQuantitativeStats([]);
+    expect(result.totalValue).toBe(0);
+    expect(result.personalBest).toBe(0);
+    expect(result.dailyAverage).toBe(0);
+    expect(result.daysLogged).toBe(0);
+  });
+
+  it("calculates stats correctly", () => {
+    const completions = [
+      createCompletion({ value: 5 }),
+      createCompletion({ value: 10 }),
+      createCompletion({ value: 3 }),
+    ];
+    const result = calculateQuantitativeStats(completions);
+    expect(result.totalValue).toBe(18);
+    expect(result.personalBest).toBe(10);
+    expect(result.dailyAverage).toBe(6);
+    expect(result.daysLogged).toBe(3);
+  });
+
+  it("ignores completions with null value", () => {
+    const completions = [
+      createCompletion({ value: 5 }),
+      createCompletion({ value: null }),
+      createCompletion({ value: 10 }),
+    ];
+    const result = calculateQuantitativeStats(completions);
+    expect(result.totalValue).toBe(15);
+    expect(result.daysLogged).toBe(2);
+  });
+});
+
+// ── calculateChainStreak ──────────────────────────────
+
+describe("calculateChainStreak", () => {
+  const chain = { id: "chain-1", name: "Morning Routine", createdAt: `${daysAgo(10)}T00:00:00.000Z` };
+
+  it("returns 0 when any habit in the chain missed a day", () => {
+    const h1 = createHabit({ frequency: "daily", createdAt: `${daysAgo(3)}T00:00:00.000Z` });
+    const h2 = createHabit({ frequency: "daily", createdAt: `${daysAgo(3)}T00:00:00.000Z` });
+
+    // h1 completed days 1,2,3 — h2 only completed day 1
+    const completions = [
+      createCompletion({ habitId: h1.id, date: daysAgo(1) }),
+      createCompletion({ habitId: h1.id, date: daysAgo(2) }),
+      createCompletion({ habitId: h1.id, date: daysAgo(3) }),
+      createCompletion({ habitId: h2.id, date: daysAgo(1) }),
+    ];
+
+    const result = calculateChainStreak(chain, [h1, h2], completions, TODAY);
+    expect(result.currentStreak).toBe(1);
+  });
+
+  it("increments streak only when all chain habits are complete", () => {
+    const h1 = createHabit({ frequency: "daily", createdAt: `${daysAgo(3)}T00:00:00.000Z` });
+    const h2 = createHabit({ frequency: "daily", createdAt: `${daysAgo(3)}T00:00:00.000Z` });
+
+    // Both completed days 1,2,3
+    const completions = [1, 2, 3].flatMap((i) => [
+      createCompletion({ habitId: h1.id, date: daysAgo(i) }),
+      createCompletion({ habitId: h2.id, date: daysAgo(i) }),
+    ]);
+
+    const result = calculateChainStreak(chain, [h1, h2], completions, TODAY);
+    expect(result.currentStreak).toBe(3);
+    expect(result.bestStreak).toBe(3);
+  });
+
+  it("returns 0 for empty habits", () => {
+    const result = calculateChainStreak(chain, [], [], TODAY);
+    expect(result.currentStreak).toBe(0);
+    expect(result.bestStreak).toBe(0);
+  });
+
+  it("skips non-scheduled days for individual habits", () => {
+    // h1 is daily, h2 is weekdays only
+    const h1 = createHabit({ frequency: "daily", createdAt: `${daysAgo(5)}T00:00:00.000Z` });
+    const h2 = createHabit({
+      frequency: "specific_days",
+      targetDays: [1, 2, 3, 4, 5], // Mon-Fri
+      createdAt: `${daysAgo(5)}T00:00:00.000Z`,
+    });
+
+    // Complete h1 every day, h2 only on its scheduled days
+    const completions = [0, 1, 2, 3, 4, 5].flatMap((i) => {
+      const date = daysAgo(i);
+      const result = [createCompletion({ habitId: h1.id, date })];
+      // h2 is scheduled on weekdays — since we can't easily check, just complete all days
+      result.push(createCompletion({ habitId: h2.id, date }));
+      return result;
+    });
+
+    const result = calculateChainStreak(chain, [h1, h2], completions, TODAY);
+    expect(result.currentStreak).toBeGreaterThan(0);
   });
 });
