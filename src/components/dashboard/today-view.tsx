@@ -8,6 +8,7 @@ import { ArrowRight, Flame, TrendingUp, Target, Zap, Sunrise, Sun, Moon, Infinit
 import { CompactProgressBar } from "./compact-progress-bar";
 import { CompletionToggle } from "@/components/habits/completion-toggle";
 import { EffortPicker } from "@/components/habits/effort-picker";
+import { ValueInput } from "@/components/habits/value-input";
 import { NoHabitsEmpty, AllCompleteMessage } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +32,10 @@ interface TodayViewProps {
   loading: boolean;
   onToggle: (habitId: string) => void;
   onEffort?: (completionId: string, effort: EffortRating | null) => void;
+  onValueChange?: (habitId: string, value: number) => void;
   isCompleted: (habitId: string) => boolean;
   getCompletionId?: (habitId: string) => string | undefined;
+  getCompletionValue?: (habitId: string) => number;
   showStreaks?: boolean;
   streakMap?: Map<string, number>;
 }
@@ -44,8 +47,10 @@ export function TodayView({
   loading,
   onToggle,
   onEffort,
+  onValueChange,
   isCompleted,
   getCompletionId,
+  getCompletionValue,
   showStreaks = false,
   streakMap,
 }: TodayViewProps) {
@@ -259,7 +264,10 @@ export function TodayView({
                   )}
                   <ul>
                     {group.habits.map((habit, idx) => {
-                      const completed = isCompleted(habit.id);
+                      const isQuant = habit.habitType === "quantitative";
+                      const completed = isQuant
+                        ? (getCompletionValue?.(habit.id) ?? 0) >= (habit.targetValue ?? 1)
+                        : isCompleted(habit.id);
                       const streak = streakMap?.get(habit.id) ?? 0;
                       const isLastInGroup = idx === group.habits.length - 1;
                       const isLastOverall = isLastInGroup && groupIdx === timeGroups.length - 1;
@@ -270,13 +278,22 @@ export function TodayView({
                             habit={habit}
                             completed={completed}
                             streak={showStreaks ? streak : 0}
-                            onToggle={() => handleToggle(habit.id)}
+                            onToggle={isQuant ? undefined : () => handleToggle(habit.id)}
                             isLast={isLastOverall && effortPickerHabitId !== habit.id}
+                            valueInput={isQuant && onValueChange ? (
+                              <ValueInput
+                                habit={habit}
+                                currentValue={getCompletionValue?.(habit.id) ?? 0}
+                                onValueChange={(val) => onValueChange(habit.id, val)}
+                              />
+                            ) : undefined}
                           />
-                          <EffortPicker
-                            visible={effortPickerHabitId === habit.id}
-                            onSelect={handleEffort}
-                          />
+                          {!isQuant && (
+                            <EffortPicker
+                              visible={effortPickerHabitId === habit.id}
+                              onSelect={handleEffort}
+                            />
+                          )}
                         </MotionListItem>
                       );
                     })}
@@ -350,8 +367,9 @@ interface ChecklistRowProps {
   habit: Habit;
   completed: boolean;
   streak: number;
-  onToggle: () => void;
+  onToggle?: () => void;
   isLast: boolean;
+  valueInput?: React.ReactNode;
 }
 
 /* ─── Time Group Header ─── */
@@ -395,7 +413,7 @@ function TimeGroupHeader({ timeOfDay, completed, total, isFirst }: TimeGroupHead
 
 const MIN_STREAK_DISPLAY = 2;
 
-function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistRowProps) {
+function ChecklistRow({ habit, completed, streak, onToggle, isLast, valueInput }: ChecklistRowProps) {
   return (
     <motion.div
       whileHover={{ backgroundColor: "var(--surface-paper)", x: 2 }}
@@ -411,34 +429,41 @@ function ChecklistRow({ habit, completed, streak, onToggle, isLast }: ChecklistR
         className="absolute bottom-2 left-0 top-2 w-1 rounded-r-full opacity-80"
         style={{ backgroundColor: habit.color, opacity: completed ? 0.35 : 0.8 }}
       />
-      <CompletionToggle
-        completed={completed}
-        color={habit.color}
-        onToggle={onToggle}
-        size="sm"
-      />
+      {onToggle ? (
+        <CompletionToggle
+          completed={completed}
+          color={habit.color}
+          onToggle={onToggle}
+          size="sm"
+        />
+      ) : (
+        <span className="text-lg shrink-0">{habit.icon}</span>
+      )}
 
-      <Link
-        href={`/habits/${habit.id}`}
-        className="flex min-w-0 flex-1 items-center gap-2 rounded-lg pr-1"
-      >
-        <span className="text-base shrink-0">{habit.icon}</span>
-        <span
-          className={cn(
-            "text-sm font-medium truncate transition-all duration-200",
-            completed
-              ? "text-text-muted line-through"
-              : "text-text-primary"
-          )}
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <Link
+          href={`/habits/${habit.id}`}
+          className="flex items-center gap-2 rounded-lg pr-1"
         >
-          {habit.name}
-        </span>
-        {habit.category && (
-          <Badge className="hidden md:inline-flex text-[11px]">
-            {habit.category}
-          </Badge>
-        )}
-      </Link>
+          {onToggle && <span className="text-base shrink-0">{habit.icon}</span>}
+          <span
+            className={cn(
+              "text-sm font-medium truncate transition-all duration-200",
+              completed
+                ? "text-text-muted line-through"
+                : "text-text-primary"
+            )}
+          >
+            {habit.name}
+          </span>
+          {habit.category && (
+            <Badge className="hidden md:inline-flex text-[11px]">
+              {habit.category}
+            </Badge>
+          )}
+        </Link>
+        {valueInput}
+      </div>
 
       {streak >= MIN_STREAK_DISPLAY && (
         <motion.div

@@ -4,7 +4,8 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createHabitSchema } from "@/db/schemas";
 import type { CreateHabitInput } from "@/db/schemas";
-import type { Habit, HabitFrequency, TimeOfDay } from "@/types";
+import type { Habit, HabitFrequency, HabitType, TimeOfDay } from "@/types";
+import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,11 +59,20 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(
     initialData?.timeOfDay ?? "anytime"
   );
+  const [habitType, setHabitType] = useState<HabitType>(
+    initialData?.habitType ?? "binary"
+  );
+  const [quantTargetValue, setQuantTargetValue] = useState<string>(
+    initialData?.targetValue != null ? String(initialData.targetValue) : ""
+  );
+  const [unit, setUnit] = useState(initialData?.unit ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
   const validate = useCallback((): CreateHabitInput | null => {
+    const parsedTargetValue = quantTargetValue ? Number(quantTargetValue) : null;
+
     const data: CreateHabitInput = {
       name: name.trim(),
       icon,
@@ -73,6 +83,11 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
       ...(frequency === "x_per_week" ? { targetCount } : {}),
       ...(reminderTime ? { reminderTime } : {}),
       timeOfDay,
+      habitType,
+      ...(habitType === "quantitative" ? {
+        targetValue: parsedTargetValue,
+        unit: unit.trim() || null,
+      } : {}),
       ...(category.trim() ? { category: category.trim() } : {}),
     };
 
@@ -100,7 +115,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
 
     setErrors({});
     return result.data;
-  }, [name, description, icon, color, frequency, targetDays, targetCount, reminderTime, timeOfDay, category]);
+  }, [name, description, icon, color, frequency, targetDays, targetCount, reminderTime, timeOfDay, habitType, quantTargetValue, unit, category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,6 +150,62 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
           />
           {errors.name && (
             <p className="text-xs text-error">{errors.name}</p>
+          )}
+        </div>
+      </Card>
+
+      {/* Habit Type */}
+      <Card>
+        <div className="space-y-3">
+          <p className="hf-kicker">Type</p>
+          <fieldset className="border-0 p-0 m-0">
+            <legend className="text-sm font-medium text-text-primary mb-2">Habit Type</legend>
+            <div className="grid grid-cols-2 gap-2">
+              {(["binary", "quantitative"] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setHabitType(type)}
+                  className={cn(
+                    "rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-all",
+                    "focus-visible:ring-2 focus-visible:ring-accent-blue",
+                    habitType === type
+                      ? "border-accent-blue bg-accent-blue/8 text-accent-blue"
+                      : "border-border-subtle bg-surface-paper/50 text-text-muted hover:text-text-secondary"
+                  )}
+                >
+                  {type === "binary" ? "Done / Not done" : "Track a value"}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          {habitType === "quantitative" && (
+            <div className="space-y-3 pt-1">
+              <div className="space-y-1">
+                <Label htmlFor="quantTarget">Daily target</Label>
+                <Input
+                  id="quantTarget"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  value={quantTargetValue}
+                  onChange={(e) => setQuantTargetValue(e.target.value)}
+                  placeholder="e.g., 8"
+                />
+                <p className="text-xs text-text-muted">Optional</p>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="unit">Unit</Label>
+                <Input
+                  id="unit"
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                  placeholder="e.g., glasses, miles, pages"
+                  maxLength={20}
+                />
+                <p className="text-xs text-text-muted">Optional, max 20 characters</p>
+              </div>
+            </div>
           )}
         </div>
       </Card>

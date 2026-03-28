@@ -135,6 +135,49 @@ export function computeHabitStats(
   };
 }
 
+// ── Quantitative Helpers ─────────────────────────────────
+
+/**
+ * Determines if a quantitative habit is "complete" for a given completion.
+ * Complete when value >= targetValue, or any value if no target is set.
+ */
+export function isQuantitativeComplete(
+  habit: Habit,
+  completion: HabitCompletion | undefined
+): boolean {
+  if (!completion || completion.value == null) return false;
+  if (habit.targetValue == null) return completion.value > 0;
+  return completion.value >= habit.targetValue;
+}
+
+export interface QuantitativeStats {
+  totalValue: number;
+  personalBest: number;
+  dailyAverage: number;
+  daysLogged: number;
+}
+
+/**
+ * Calculates stats for a quantitative habit from its completions.
+ */
+export function calculateQuantitativeStats(
+  completions: HabitCompletion[]
+): QuantitativeStats {
+  const withValue = completions.filter(
+    (c): c is HabitCompletion & { value: number } => c.value != null
+  );
+
+  if (withValue.length === 0) {
+    return { totalValue: 0, personalBest: 0, dailyAverage: 0, daysLogged: 0 };
+  }
+
+  const totalValue = withValue.reduce((sum, c) => sum + c.value, 0);
+  const personalBest = Math.max(...withValue.map((c) => c.value));
+  const dailyAverage = Math.round((totalValue / withValue.length) * 10) / 10;
+
+  return { totalValue, personalBest, dailyAverage, daysLogged: withValue.length };
+}
+
 // ── Effort Stats ────────────────────────────────────────
 
 /**

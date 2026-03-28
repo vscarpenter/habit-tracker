@@ -14,7 +14,9 @@ interface UseCompletionsReturn {
   toggle: (habitId: string) => Promise<void>;
   isCompleted: (habitId: string) => boolean;
   getCompletionId: (habitId: string) => string | undefined;
+  getCompletionValue: (habitId: string) => number;
   updateEffort: (completionId: string, effort: EffortRating | null) => Promise<void>;
+  updateValue: (habitId: string, value: number) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -100,7 +102,25 @@ export function useCompletions(date: string): UseCompletionsReturn {
     [refresh, toast]
   );
 
-  return { completions, loading, toggle, isCompleted, getCompletionId, updateEffort, refresh };
+  const getCompletionValue = useCallback(
+    (habitId: string) => completions.find((c) => c.habitId === habitId)?.value ?? 0,
+    [completions]
+  );
+
+  const updateValue = useCallback(
+    async (habitId: string, value: number) => {
+      try {
+        await completionService.updateValue(habitId, date, value);
+        await refresh();
+      } catch (error) {
+        logger.error("Failed to update value:", error);
+        toast(DB_ERROR_MSG, "error");
+      }
+    },
+    [date, refresh, toast]
+  );
+
+  return { completions, loading, toggle, isCompleted, getCompletionId, getCompletionValue, updateEffort, updateValue, refresh };
 }
 
 interface UseCompletionRangeReturn {

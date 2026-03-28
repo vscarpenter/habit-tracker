@@ -67,6 +67,32 @@ describe("habitSchema", () => {
     const habit = createHabit({ timeOfDay: "midnight" as "morning" });
     expect(() => habitSchema.parse(habit)).toThrow();
   });
+
+  it("accepts valid habitType values", () => {
+    for (const type of ["binary", "quantitative"] as const) {
+      const habit = createHabit({ habitType: type });
+      expect(() => habitSchema.parse(habit)).not.toThrow();
+    }
+  });
+
+  it("accepts quantitative habit with targetValue and unit", () => {
+    const habit = createHabit({
+      habitType: "quantitative",
+      targetValue: 8,
+      unit: "glasses",
+    });
+    expect(() => habitSchema.parse(habit)).not.toThrow();
+  });
+
+  it("rejects negative targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: -1 });
+    expect(() => habitSchema.parse(habit)).toThrow();
+  });
+
+  it("rejects unit over 20 chars", () => {
+    const habit = createHabit({ habitType: "quantitative", unit: "a".repeat(21) });
+    expect(() => habitSchema.parse(habit)).toThrow();
+  });
 });
 
 describe("habitCompletionSchema", () => {
