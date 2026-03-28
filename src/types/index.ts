@@ -7,6 +7,8 @@ export type HabitFrequency =
 
 export type TimeOfDay = "morning" | "afternoon" | "evening" | "anytime";
 
+export type HabitType = "binary" | "quantitative";
+
 export interface Habit {
   id: string;
   name: string;
@@ -19,6 +21,9 @@ export interface Habit {
   reminderTime?: string;
   category?: string;
   timeOfDay?: TimeOfDay;
+  habitType?: HabitType;
+  targetValue?: number | null;
+  unit?: string | null;
   sortOrder: number;
   isArchived: boolean;
   createdAt: string;
@@ -34,6 +39,7 @@ export interface HabitCompletion {
   completedAt: string;
   note?: string;
   effort?: EffortRating | null;
+  value?: number | null;
 }
 
 export interface UserSettings {

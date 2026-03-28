@@ -38,6 +38,26 @@ class HabitFlowDB extends Dexie {
             h.timeOfDay = "anytime";
           })
       );
+
+    // Feature: Quantitative Habits — add habitType/targetValue/unit to habits, value to completions
+    this.version(4)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table("habits")
+          .toCollection()
+          .modify((h: Record<string, unknown>) => {
+            h.habitType = "binary";
+            h.targetValue = null;
+            h.unit = null;
+          });
+        await tx
+          .table("completions")
+          .toCollection()
+          .modify((c: Record<string, unknown>) => {
+            c.value = null;
+          });
+      });
   }
 }
 

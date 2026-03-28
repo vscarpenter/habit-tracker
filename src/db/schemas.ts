@@ -40,6 +40,9 @@ const habitBaseSchema = z.object({
   reminderTime: z.string().regex(TIME_REGEX, "Invalid time format").optional(),
   category: z.string().max(50).optional(),
   timeOfDay: z.enum(["morning", "afternoon", "evening", "anytime"]).default("anytime").optional(),
+  habitType: z.enum(["binary", "quantitative"]).default("binary").optional(),
+  targetValue: z.number().positive().nullable().optional(),
+  unit: z.string().max(20).nullable().optional(),
   sortOrder: z.number().int(),
   isArchived: z.boolean(),
   createdAt: z.iso.datetime(),
@@ -82,6 +85,7 @@ export const habitCompletionSchema = z.object({
   completedAt: z.iso.datetime(),
   note: z.string().max(250, "Note is too long").optional(),
   effort: effortRatingSchema.nullable().optional(),
+  value: z.number().nonnegative().nullable().optional(),
 });
 
 export const userSettingsSchema = z.object({

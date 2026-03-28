@@ -4,6 +4,8 @@ import {
   computeHabitStats,
   computeOverallStats,
   calculateAverageEffort,
+  isQuantitativeComplete,
+  calculateQuantitativeStats,
   buildDailyCompletionTrend,
   buildAggregateHeatmapData,
   buildCategoryBreakdown,
@@ -474,5 +476,80 @@ describe("buildEffortTrend", () => {
     for (let i = 1; i < result.length; i++) {
       expect(result[i].date >= result[i - 1].date).toBe(true);
     }
+  });
+});
+
+// ── isQuantitativeComplete ──────────────────────────────
+
+describe("isQuantitativeComplete", () => {
+  it("returns true when value >= targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 8 });
+    const completion = createCompletion({ value: 8 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(true);
+  });
+
+  it("returns true when value exceeds targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 5 });
+    const completion = createCompletion({ value: 10 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(true);
+  });
+
+  it("returns false when value < targetValue", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 8 });
+    const completion = createCompletion({ value: 3 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(false);
+  });
+
+  it("returns true for any value when no targetValue is set", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: null });
+    const completion = createCompletion({ value: 1 });
+    expect(isQuantitativeComplete(habit, completion)).toBe(true);
+  });
+
+  it("returns false when no completion exists", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 5 });
+    expect(isQuantitativeComplete(habit, undefined)).toBe(false);
+  });
+
+  it("returns false when value is null", () => {
+    const habit = createHabit({ habitType: "quantitative", targetValue: 5 });
+    const completion = createCompletion({ value: null });
+    expect(isQuantitativeComplete(habit, completion)).toBe(false);
+  });
+});
+
+// ── calculateQuantitativeStats ──────────────────────────
+
+describe("calculateQuantitativeStats", () => {
+  it("returns zeros for empty completions", () => {
+    const result = calculateQuantitativeStats([]);
+    expect(result.totalValue).toBe(0);
+    expect(result.personalBest).toBe(0);
+    expect(result.dailyAverage).toBe(0);
+    expect(result.daysLogged).toBe(0);
+  });
+
+  it("calculates stats correctly", () => {
+    const completions = [
+      createCompletion({ value: 5 }),
+      createCompletion({ value: 10 }),
+      createCompletion({ value: 3 }),
+    ];
+    const result = calculateQuantitativeStats(completions);
+    expect(result.totalValue).toBe(18);
+    expect(result.personalBest).toBe(10);
+    expect(result.dailyAverage).toBe(6);
+    expect(result.daysLogged).toBe(3);
+  });
+
+  it("ignores completions with null value", () => {
+    const completions = [
+      createCompletion({ value: 5 }),
+      createCompletion({ value: null }),
+      createCompletion({ value: 10 }),
+    ];
+    const result = calculateQuantitativeStats(completions);
+    expect(result.totalValue).toBe(15);
+    expect(result.daysLogged).toBe(2);
   });
 });
