@@ -12,13 +12,30 @@
  */
 
 import type { ExportData } from "@/lib/export-import";
-import type { Habit, HabitCompletion, UserSettings } from "@/types";
+import type { Habit, HabitChain, HabitCompletion, UserSettings } from "@/types";
 import type { MergeResult } from "./types";
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
 
 function newerHabit(localHabit: Habit, remoteHabit: Habit): Habit {
   return new Date(localHabit.updatedAt) >= new Date(remoteHabit.updatedAt) ? localHabit : remoteHabit;
+}
+
+function mergeChains(
+  local: HabitChain[],
+  remote: HabitChain[]
+): { habitChains: HabitChain[]; added: number } {
+  const map = new Map(local.map((chain) => [chain.id, chain]));
+  let added = 0;
+
+  for (const chain of remote) {
+    if (!map.has(chain.id)) {
+      map.set(chain.id, chain);
+      added++;
+    }
+  }
+
+  return { habitChains: Array.from(map.values()), added };
 }
 
 function mergeHabits(local: Habit[], remote: Habit[]): { habits: Habit[]; updated: number } {
@@ -95,6 +112,11 @@ export interface MergeOutput {
  * @returns      An object containing the merged ExportData and a MergeResult.
  */
 export function mergeSnapshots(local: ExportData, remote: ExportData): MergeOutput {
+  const { habitChains, added: chainsAdded } = mergeChains(
+    local.data.habitChains,
+    remote.data.habitChains
+  );
+
   const { habits, updated: habitsUpdated } = mergeHabits(
     local.data.habits,
     remote.data.habits
@@ -112,16 +134,17 @@ export function mergeSnapshots(local: ExportData, remote: ExportData): MergeOutp
     version: local.version,
     exportedAt: new Date().toISOString(),
     app: "HabitFlow",
-    data: { habits, completions, settings },
+    data: { habitChains, habits, completions, settings },
   };
 
-  const hasChanges = habitsUpdated > 0 || completionsAdded > 0 || settingsUpdated;
+  const hasChanges =
+    chainsAdded > 0 || habitsUpdated > 0 || completionsAdded > 0 || settingsUpdated;
 
   return {
     merged,
     result: {
       hasChanges,
-      stats: { habitsUpdated, completionsAdded, settingsUpdated },
+      stats: { chainsAdded, habitsUpdated, completionsAdded, settingsUpdated },
     },
   };
 }

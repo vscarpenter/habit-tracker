@@ -10,11 +10,16 @@ import type { LeaderboardEntry } from "@/lib/stats-utils";
 interface HabitLeaderboardProps {
   entries: LeaderboardEntry[];
   loading: boolean;
+  showCompletionRate?: boolean;
 }
 
 const DEFAULT_VISIBLE = 10;
 
-export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
+export function HabitLeaderboard({
+  entries,
+  loading,
+  showCompletionRate = true,
+}: HabitLeaderboardProps) {
   const [showAll, setShowAll] = useState(false);
 
   if (loading) {
@@ -69,7 +74,7 @@ export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
                 {/* Progress bar */}
                 <div className="h-2 w-20 shrink-0 rounded-full bg-border-subtle sm:w-28">
                   <div
-                    className="h-full rounded-full transition-all"
+                    className="h-full rounded-full transition-[width] duration-300"
                     style={{
                       width: `${entry.completionRate}%`,
                       backgroundColor: entry.habit.color,
@@ -77,10 +82,11 @@ export function HabitLeaderboard({ entries, loading }: HabitLeaderboardProps) {
                   />
                 </div>
 
-                {/* Rate */}
-                <span className="text-sm font-medium text-text-primary w-10 text-right shrink-0">
-                  {entry.completionRate}%
-                </span>
+                {showCompletionRate && (
+                  <span className="text-sm font-medium text-text-primary w-10 text-right shrink-0">
+                    {entry.completionRate}%
+                  </span>
+                )}
 
                 {/* Streak */}
                 <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-border-subtle/70 bg-surface-paper/50 px-2 py-0.5">

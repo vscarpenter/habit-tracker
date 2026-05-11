@@ -22,11 +22,10 @@ export const staggerContainer: Variants = {
 
 /* ─── Fade-up item (for stagger children) ─── */
 export const fadeUpItem: Variants = {
-  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
+  hidden: { opacity: 0, y: 12 },
   show: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: springGentle,
   },
 };
@@ -65,13 +64,7 @@ export function MotionCard({ className, interactive = true, children }: MotionCa
     <motion.div
       variants={fadeUpItem}
       {...(interactive ? cardInteraction : {})}
-      className={cn(
-        "rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl",
-        "shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
-        "dark:border-slate-700/40 dark:bg-slate-900/70",
-        "transition-shadow duration-300 hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]",
-        className
-      )}
+      className={cn("card", interactive && "is-link", className)}
     >
       {children}
     </motion.div>

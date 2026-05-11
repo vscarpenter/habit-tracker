@@ -1,539 +1,422 @@
+/* =====================================================================
+   HabitFlow — global stylesheet (Inkwell Design System)
+
+   Inkwell (Indigo & Cloud) is the single source of styling truth.
+   Vendored files live in ../styles/inkwell/ and are imported in the
+   order Inkwell expects: Tailwind v4 first, then the Inkwell theme
+   bundle (which @imports inkwell-tokens.css unlayered and
+   inkwell-components.css under @layer components).
+
+   This file ONLY contains:
+     • Inkwell imports
+     • A token-alias bridge that re-points legacy `--color-*` names
+       (used throughout components as `bg-surface-paper`, `text-text-primary`,
+       `accent-blue`, etc.) at Inkwell tokens. No new colors are introduced.
+     • App-specific feature animations that don't conflict with Inkwell
+   ===================================================================== */
+
 @import "tailwindcss";
+@import "../styles/inkwell/inkwell-tokens.css";
+@import "../styles/inkwell/inkwell-components.css" layer(components);
 
-/* ─── Light Mode (default) ───────────────────────────────── */
-:root {
-  --background: #f7f3ec;
-  --background-alt: #eee6da;
-  --surface: rgba(255, 255, 255, 0.64);
-  --surface-elevated: rgba(255, 255, 255, 0.84);
-  --surface-strong: #fffefb;
-  --surface-muted: #f4ede2;
-  --surface-paper: #fffdf8;
-  --surface-panel: rgba(255, 252, 246, 0.78);
-  --surface-overlay: rgba(255, 255, 255, 0.52);
-  --surface-tint: rgba(245, 236, 223, 0.72);
-  --text-primary: #1f1b16;
-  --text-secondary: #554e43;
-  --text-muted: #8f8578;
-  --border: rgba(64, 50, 31, 0.14);
-  --border-subtle: #d9cfbf;
-  --border-strong: rgba(78, 61, 38, 0.2);
-  --ring: #2563eb;
-  --bg-glow-1: rgba(14, 165, 233, 0.15);
-  --bg-glow-2: rgba(245, 158, 11, 0.14);
-  --bg-grid: rgba(102, 83, 58, 0.06);
-  --shadow-editorial-sm: 0 8px 20px -16px rgba(37, 29, 18, 0.34);
-  --shadow-editorial-md: 0 18px 34px -22px rgba(37, 29, 18, 0.38);
-  --shadow-editorial-lg: 0 28px 56px -32px rgba(37, 29, 18, 0.46);
+/* =====================================================================
+   Inkwell → Tailwind v4 bridge.
+   This block reproduces the @theme aliases, @utility, and
+   @custom-variant declarations from Inkwell's inkwell-theme.css.
+   We inline them here (instead of @import-ing inkwell-theme.css) so
+   the nested Inkwell @imports stay at the top of the cascade — Tailwind
+   v4's PostCSS otherwise hoists them after preflight, triggering CSS
+   "imports must precede rules" warnings.
+   ===================================================================== */
+@theme {
+  --color-ivory: var(--ivory);
+  --color-paper: var(--paper);
+  --color-slate: var(--slate);
+  --color-oat:   var(--oat);
 
-  /* Accent Colors */
-  --accent-blue: #2563eb;
-  --accent-emerald: #059669;
-  --accent-violet: #7c3aed;
-  --accent-amber: #d97706;
-  --accent-rose: #f43f5e;
-  --accent-cyan: #06b6d4;
-  --accent-orange: #ea580c;
-  --accent-pink: #db2777;
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-300: var(--gray-300);
+  --color-gray-500: var(--gray-500);
+  --color-gray-700: var(--gray-700);
 
-  /* Semantic Colors */
-  --success: #16a34a;
-  --warning: #ca8a04;
-  --error: #dc2626;
-  --info: #2563eb;
+  --color-accent:               var(--accent);
+  --color-accent-d:             var(--accent-d);
+  --color-accent-tint:          var(--accent-tint);
+  --color-accent-focus:         var(--accent-focus-ring);
+  --color-accent-strong-border: var(--accent-strong-border);
 
-  /* Data Viz */
-  --chart-1: #0f766e;
-  --chart-2: #2563eb;
-  --chart-3: #9333ea;
-  --chart-4: #ea580c;
-  --chart-5: #0ea5e9;
-  --heatmap-0: #e6dfd4;
-  --heatmap-1: #bfdbfe;
-  --heatmap-2: #7dd3fc;
-  --heatmap-3: #60a5fa;
-  --heatmap-4: #1d4ed8;
+  --color-olive:            var(--olive);
+  --color-olive-tint:       var(--olive-tint);
+  --color-rust:             var(--rust);
+  --color-rust-d:           var(--rust-d);
+  --color-rust-tint:        var(--rust-tint);
+  --color-rust-tint-border: var(--rust-tint-border);
+  --color-warning:          var(--warning);
+  --color-warning-dark:     var(--warning-dark);
+  --color-warning-tint:     var(--warning-tint);
+  --color-info:             var(--info);
+  --color-sky:              var(--sky);
+
+  --font-serif: var(--serif);
+  --font-sans:  var(--sans);
+  --font-mono:  var(--mono);
+
+  --text-display: var(--t-display);
+  --text-h1:      var(--t-h1);
+  --text-h2:      var(--t-h2);
+  --text-h3:      var(--t-h3);
+  --text-body:    var(--t-body);
+  --text-small:   var(--t-small);
+  --text-caption: var(--t-caption);
+  --text-eyebrow: var(--t-eyebrow);
+
+  --radius-xs:   var(--r-xs);
+  --radius-sm:   var(--r-sm);
+  --radius-md:   var(--r-md);
+  --radius-lg:   var(--r-lg);
+  --radius-xl:   var(--r-xl);
+  --radius-full: var(--r-pill);
+
+  --container-narrow:  820px;
+  --container-default: 920px;
+  --container-wide:   1120px;
 }
 
-/* ─── Dark Mode ──────────────────────────────────────────── */
-.dark {
-  --background: #13100d;
-  --background-alt: #1b1611;
-  --surface: rgba(41, 31, 23, 0.58);
-  --surface-elevated: rgba(46, 35, 26, 0.78);
-  --surface-strong: #31261c;
-  --surface-muted: #2a2017;
-  --surface-paper: #2b2219;
-  --surface-panel: rgba(47, 36, 26, 0.82);
-  --surface-overlay: rgba(57, 43, 31, 0.6);
-  --surface-tint: rgba(68, 51, 36, 0.76);
-  --text-primary: #f8f2e8;
-  --text-secondary: #ddd0bf;
-  --text-muted: #b4a692;
-  --border: rgba(255, 235, 209, 0.14);
-  --border-subtle: #594535;
-  --border-strong: rgba(255, 235, 209, 0.26);
-  --ring: #60a5fa;
-  --bg-glow-1: rgba(37, 99, 235, 0.26);
-  --bg-glow-2: rgba(217, 119, 6, 0.2);
-  --bg-grid: rgba(208, 176, 142, 0.05);
-  --shadow-editorial-sm: 0 10px 22px -16px rgba(0, 0, 0, 0.5);
-  --shadow-editorial-md: 0 22px 40px -24px rgba(0, 0, 0, 0.56);
-  --shadow-editorial-lg: 0 30px 58px -30px rgba(0, 0, 0, 0.62);
-  --chart-1: #2dd4bf;
-  --chart-2: #60a5fa;
-  --chart-3: #c084fc;
-  --chart-4: #fb923c;
-  --chart-5: #22d3ee;
-  --heatmap-0: #2f261d;
-  --heatmap-1: #164e63;
-  --heatmap-2: #0369a1;
-  --heatmap-3: #2563eb;
-  --heatmap-4: #60a5fa;
+@utility border-hair {
+  border-width: 1.5px;
 }
 
-/* ─── Tailwind v4 Theme Tokens ───────────────────────────── */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* =====================================================================
+   Token alias bridge.
+
+   Inkwell's @theme already exposes its own tokens (bg-paper, text-slate,
+   border-accent, font-serif, ...). The bridge below adds aliases for
+   the *legacy* token names this codebase uses so existing utility
+   classes resolve to Inkwell's palette without rewriting every file.
+
+   The 8-color habit accent palette is collapsed into Inkwell's
+   semantic set per the "one accent only" rule. Some colors look
+   identical (blue/violet → accent family; amber/orange → warning
+   family; rose/pink → rust family); the schema field stays the same
+   but visually we comply with Inkwell.
+   ===================================================================== */
 @theme inline {
-  --color-background: var(--background);
-  --color-background-alt: var(--background-alt);
-  --color-surface: var(--surface);
-  --color-surface-elevated: var(--surface-elevated);
-  --color-surface-strong: var(--surface-strong);
-  --color-surface-muted: var(--surface-muted);
-  --color-surface-paper: var(--surface-paper);
-  --color-surface-panel: var(--surface-panel);
-  --color-surface-overlay: var(--surface-overlay);
-  --color-surface-tint: var(--surface-tint);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-  --color-border: var(--border);
-  --color-border-subtle: var(--border-subtle);
-  --color-border-strong: var(--border-strong);
-  --color-ring: var(--ring);
+  /* Surfaces */
+  --color-background:        var(--ivory);
+  --color-background-alt:    var(--ivory);
+  --color-surface:           var(--paper);
+  --color-surface-elevated:  var(--paper);
+  --color-surface-strong:    var(--paper);
+  --color-surface-muted:     var(--gray-100);
+  --color-surface-paper:     var(--paper);
+  --color-surface-panel:     var(--paper);
+  --color-surface-overlay:   var(--paper);
+  --color-surface-tint:      var(--gray-100);
 
-  --color-accent-blue: var(--accent-blue);
-  --color-accent-emerald: var(--accent-emerald);
-  --color-accent-violet: var(--accent-violet);
-  --color-accent-amber: var(--accent-amber);
-  --color-accent-rose: var(--accent-rose);
-  --color-accent-cyan: var(--accent-cyan);
-  --color-accent-orange: var(--accent-orange);
-  --color-accent-pink: var(--accent-pink);
+  /* Text */
+  --color-text-primary:   var(--slate);
+  --color-text-secondary: var(--gray-700);
+  --color-text-muted:     var(--gray-500);
 
-  --color-success: var(--success);
+  /* Borders & focus ring */
+  --color-border:        var(--gray-300);
+  --color-border-subtle: var(--gray-200);
+  --color-border-strong: var(--slate);
+  --color-ring:          var(--accent);
+
+  /* 8-color habit accent palette → Inkwell semantic set
+     (collapses per "one accent only": blue/violet share accent family,
+     amber/orange share warning family, rose/pink share rust family). */
+  --color-accent-blue:    var(--accent);
+  --color-accent-violet:  var(--accent-d);
+  --color-accent-emerald: var(--olive);
+  --color-accent-cyan:    var(--sky);
+  --color-accent-amber:   var(--warning);
+  --color-accent-orange:  var(--warning-dark);
+  --color-accent-rose:    var(--rust);
+  --color-accent-pink:    var(--rust-d);
+
+  /* Semantic */
+  --color-success: var(--olive);
   --color-warning: var(--warning);
-  --color-error: var(--error);
-  --color-info: var(--info);
+  --color-error:   var(--rust);
+  --color-info:    var(--info);
 
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-heatmap-0: var(--heatmap-0);
-  --color-heatmap-1: var(--heatmap-1);
-  --color-heatmap-2: var(--heatmap-2);
-  --color-heatmap-3: var(--heatmap-3);
-  --color-heatmap-4: var(--heatmap-4);
+  /* Charts — five distinguishable Inkwell hues for Recharts */
+  --color-chart-1: var(--accent);
+  --color-chart-2: var(--olive);
+  --color-chart-3: var(--sky);
+  --color-chart-4: var(--warning);
+  --color-chart-5: var(--rust);
 
-  --font-sans: var(--font-instrument-sans), system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-space-grotesk), var(--font-instrument-sans), system-ui, sans-serif;
+  /* Heatmap — single-hue ramp built from accent + ivory */
+  --color-heatmap-0: var(--gray-100);
+  --color-heatmap-1: color-mix(in srgb, var(--accent) 18%, var(--paper));
+  --color-heatmap-2: color-mix(in srgb, var(--accent) 38%, var(--paper));
+  --color-heatmap-3: color-mix(in srgb, var(--accent) 62%, var(--paper));
+  --color-heatmap-4: var(--accent);
+
+  /* Type families — Inkwell mandates platform fonts only */
+  --font-sans:    var(--sans);
+  --font-display: var(--serif);
+  --font-mono:    var(--mono);
 
   /* Animation timings */
-  --animate-fast: 150ms ease;
-  --animate-base: 200ms ease;
-  --animate-slow: 300ms ease;
+  --animate-fast: var(--t-fast) ease;
+  --animate-base: var(--t-base) ease;
+  --animate-slow: var(--t-slow) ease;
 }
 
-/* ─── Base Styles ────────────────────────────────────────── */
+/* =====================================================================
+   Bare custom-property aliases — components inline `var(--chart-3)`,
+   `var(--text-muted)`, etc. directly in style objects (Recharts fills,
+   heatmap intensity colors, header accent stripes). These can't go
+   through Tailwind's @theme namespace, so we declare them at :root
+   pointing to Inkwell tokens. Both light + dark mode adapt because
+   the right-hand-side is itself a token that shifts via Inkwell's
+   Pattern B cascade.
+   ===================================================================== */
+:root {
+  /* Habit accent palette (collapsed per "one accent only") */
+  --accent-blue:    var(--accent);
+  --accent-violet:  var(--accent-d);
+  --accent-emerald: var(--olive);
+  --accent-cyan:    var(--sky);
+  --accent-amber:   var(--warning);
+  --accent-orange:  var(--warning-dark);
+  --accent-rose:    var(--rust);
+  --accent-pink:    var(--rust-d);
+
+  /* Recharts series colors */
+  --chart-1: var(--accent);
+  --chart-2: var(--olive);
+  --chart-3: var(--sky);
+  --chart-4: var(--warning);
+  --chart-5: var(--rust);
+
+  /* Heatmap intensity ramp (single-hue accent ramp on paper) */
+  --heatmap-0: var(--gray-100);
+  --heatmap-1: color-mix(in srgb, var(--accent) 18%, var(--paper));
+  --heatmap-2: color-mix(in srgb, var(--accent) 38%, var(--paper));
+  --heatmap-3: color-mix(in srgb, var(--accent) 62%, var(--paper));
+  --heatmap-4: var(--accent);
+
+  /* Legacy surface / text aliases used by inline styles */
+  --surface-paper:    var(--paper);
+  --surface-elevated: var(--paper);
+  --surface-tint:     var(--gray-100);
+  --border-subtle:    var(--gray-200);
+  --text-muted:       var(--gray-500);
+
+  /* Legacy editorial shadows → Inkwell shadows */
+  --shadow-editorial-sm: var(--shadow-sm);
+  --shadow-editorial-md: var(--shadow-md);
+}
+
+/* =====================================================================
+   Body / base — replaces glassmorphism shell with Inkwell flat ivory.
+   Inkwell's components.css already sets these on body, but Tailwind's
+   preflight plus our Tailwind utilities can override; declare again to
+   make the intent explicit.
+   ===================================================================== */
 body {
-  background-color: var(--background);
-  background-image:
-    radial-gradient(1200px 760px at 50% 120%, rgba(255, 255, 255, 0.35) 0%, transparent 68%),
-    repeating-linear-gradient(
-      45deg,
-      transparent 0 20px,
-      var(--bg-grid) 20px 21px
-    ),
-    radial-gradient(1200px 700px at -5% -15%, var(--bg-glow-1) 0%, transparent 60%),
-    radial-gradient(900px 540px at 105% -10%, var(--bg-glow-2) 0%, transparent 55%),
-    linear-gradient(180deg, var(--background) 0%, var(--background-alt) 100%);
-  background-attachment: fixed;
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  line-height: 1.5;
+  background: var(--ivory);
+  color: var(--slate);
+  font-family: var(--sans);
+  font-size: var(--t-body);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent-blue) 22%, transparent);
-  color: var(--text-primary);
+  background: var(--accent-tint);
+  color: var(--slate);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
+/* Headings always use serif per Inkwell typography rules. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--slate);
 }
 
-/* ─── Focus Ring (Accessibility) ─────────────────────────── */
-*:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
+/* =====================================================================
+   Scrollbar — neutral, no warm browns
+   ===================================================================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
 
-/* ─── Reduced Motion ─────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
+/* =====================================================================
+   Safe-area helper (used by mobile bottom nav)
+   ===================================================================== */
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
-/* ─── Scrollbar ──────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* =====================================================================
+   Legacy hf-* helpers — kept as token-only aliases for backward
+   compatibility with feature components that still reference them.
+   No glassmorphism, no gradients, no backdrop-filter. Pure Inkwell
+   surfaces.
+   ===================================================================== */
+.hf-panel,
+.hf-panel-strong,
+.hf-panel-muted,
+.hf-row {
+  background: var(--paper);
+  border: var(--border);
+  border-radius: var(--r-md);
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-}
-
-/* ─── Safe Area Helpers ──────────────────────────────────── */
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* ─── Completion Bounce Animation ────────────────────────── */
-@keyframes completion-bounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.animate-completion-bounce {
-  animation: completion-bounce 200ms ease-in-out;
-}
-
-/* ─── Fade In ────────────────────────────────────────────── */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fade-in 200ms ease-out;
-}
-
-/* ─── Nav Pop ────────────────────────────────────────────── */
-@keyframes nav-pop {
-  0% { transform: scale(0.94); }
-  65% { transform: scale(1.04); }
-  100% { transform: scale(1); }
-}
-
-.animate-nav-pop {
-  animation: nav-pop 220ms ease-out;
-}
-
-/* ─── Overlay Fade ───────────────────────────────────────── */
-@keyframes overlay-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.animate-overlay-fade {
-  animation: overlay-fade 200ms ease-out;
-}
-
-/* ─── Editorial Surface Helpers ──────────────────────────── */
-.hf-panel {
-  background: var(--surface-panel);
-  border: 1px solid color-mix(in srgb, var(--border-subtle) 88%, white 12%);
-  box-shadow: var(--shadow-editorial-sm);
-  backdrop-filter: blur(20px);
-}
-
-.hf-panel-strong {
-  background: var(--surface-paper);
-  border: 1px solid color-mix(in srgb, var(--border-subtle) 88%, white 12%);
-  box-shadow: var(--shadow-editorial-md);
-}
-
-.hf-panel-muted {
-  background: color-mix(in srgb, var(--surface-tint) 75%, transparent);
-  border: 1px solid color-mix(in srgb, var(--border-subtle) 85%, transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(18px);
-}
+.hf-panel        { box-shadow: var(--shadow-sm); }
+.hf-panel-strong { box-shadow: var(--shadow-md); }
+.hf-panel-muted  { background: var(--gray-100); }
+.hf-row:hover    { border-color: var(--slate); }
 
 .hf-hero {
-  position: relative;
-  background:
-    radial-gradient(600px 240px at 105% -10%, color-mix(in srgb, var(--accent-amber) 15%, transparent), transparent 65%),
-    radial-gradient(680px 260px at -5% -25%, color-mix(in srgb, var(--accent-cyan) 14%, transparent), transparent 70%),
-    var(--surface-paper);
-  border: 1px solid color-mix(in srgb, var(--border-subtle) 85%, white 15%);
-  box-shadow: var(--shadow-editorial-md);
-}
-
-.hf-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.32), transparent 40%),
-    repeating-linear-gradient(
-      135deg,
-      transparent 0 13px,
-      color-mix(in srgb, var(--bg-grid) 70%, transparent) 13px 14px
-    );
-  opacity: 0.65;
-}
-
-.hf-row {
-  background: color-mix(in srgb, var(--surface-overlay) 78%, transparent);
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
-  backdrop-filter: blur(18px);
-}
-
-.hf-row:hover {
-  background: color-mix(in srgb, var(--surface-paper) 72%, transparent);
-  border-color: color-mix(in srgb, var(--border-strong) 86%, transparent);
+  background: var(--paper);
+  border: var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .hf-kicker {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-family: var(--mono);
+  font-size: var(--t-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--gray-500);
 }
 
-@media (max-width: 640px) {
-  .hf-hero::before {
-    opacity: 0.48;
-  }
-}
-
-/* ─── Cell Fill (Month Grid) ────────────────────────────── */
-@keyframes cell-fill {
-  0% { transform: scale(0); }
-  60% { transform: scale(1.1); }
+/* =====================================================================
+   Feature animations — preserved from previous design.
+   These do not introduce new colors or surfaces; they only animate
+   existing properties (transform, opacity, stroke).
+   ===================================================================== */
+@keyframes completion-bounce {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
+.animate-completion-bounce { animation: completion-bounce 200ms ease-in-out; }
 
-.animate-cell-fill {
-  animation: cell-fill 200ms ease-out;
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+.animate-fade-in { animation: fade-in 200ms ease-out; }
 
-/* ─── Staggered List Fade-In ────────────────────────────── */
+@keyframes nav-pop {
+  0%   { transform: scale(0.94); }
+  65%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.animate-nav-pop { animation: nav-pop 220ms ease-out; }
+
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-overlay-fade { animation: overlay-fade 200ms ease-out; }
+
+@keyframes cell-fill {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.animate-cell-fill { animation: cell-fill 200ms ease-out; }
+
 @keyframes stagger-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .animate-stagger-in {
   opacity: 0;
   animation: stagger-in 300ms ease-out forwards;
 }
 
-/* ─── Shimmer Skeleton ──────────────────────────────────── */
+/* Skeleton shimmer — falls back to Inkwell's neutral putty ramp.
+   Components calling .animate-shimmer get a token-only gradient. */
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
-
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    var(--border-subtle) 25%,
-    color-mix(in srgb, var(--border-subtle) 60%, white 40%) 50%,
-    var(--border-subtle) 75%
+    var(--gray-100) 0%,
+    var(--gray-200) 50%,
+    var(--gray-100) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;
 }
 
-.dark .animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--border-subtle) 25%,
-    color-mix(in srgb, var(--border-subtle) 70%, var(--surface-elevated) 30%) 50%,
-    var(--border-subtle) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.8s ease-in-out infinite;
-}
-
-/* ─── Completion Ripple ─────────────────────────────────── */
 @keyframes completion-ripple {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--ripple-color, rgba(37, 99, 235, 0.4));
-  }
-  50% {
-    transform: scale(1.15);
-    box-shadow: 0 0 0 8px var(--ripple-color, rgba(37, 99, 235, 0));
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 10px transparent;
-  }
+  0%   { transform: scale(1);     box-shadow: 0 0 0 0  var(--ripple-color, var(--accent-focus-ring)); }
+  50%  { transform: scale(1.15);  box-shadow: 0 0 0 8  transparent; }
+  100% { transform: scale(1);     box-shadow: 0 0 0 10 transparent; }
 }
+.animate-completion-ripple { animation: completion-ripple 400ms ease-out; }
 
-.animate-completion-ripple {
-  animation: completion-ripple 400ms ease-out;
-}
-
-/* ─── Progress Ring Entry ───────────────────────────────── */
 @keyframes ring-draw {
-  from {
-    stroke-dashoffset: var(--ring-circumference);
-  }
-  to {
-    stroke-dashoffset: var(--ring-target-offset);
-  }
+  from { stroke-dashoffset: var(--ring-circumference); }
+  to   { stroke-dashoffset: var(--ring-target-offset); }
 }
-
 .animate-ring-draw {
   animation: ring-draw 800ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ─── Confetti Particle ─────────────────────────────────── */
 @keyframes confetti-fall {
-  0% {
-    transform: translateY(0) rotate(0deg) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(120px) rotate(var(--confetti-rotation, 360deg)) scale(0);
-    opacity: 0;
-  }
+  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(120px) rotate(var(--confetti-rotation, 360deg)) scale(0); opacity: 0; }
 }
-
 @keyframes confetti-burst {
-  0% {
-    transform: translate(0, 0) scale(0);
-    opacity: 1;
-  }
-  20% {
-    transform: translate(var(--confetti-x), var(--confetti-y)) scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--confetti-x), calc(var(--confetti-y) + 60px)) scale(0);
-    opacity: 0;
-  }
+  0%   { transform: translate(0, 0) scale(0); opacity: 1; }
+  20%  { transform: translate(var(--confetti-x), var(--confetti-y)) scale(1.2); opacity: 1; }
+  100% { transform: translate(var(--confetti-x), calc(var(--confetti-y) + 60px)) scale(0); opacity: 0; }
 }
 
-/* ─── Animated Mesh Gradient Background ─────────────────── */
-@keyframes mesh-drift {
-  0%, 100% {
-    background-position: 0% 50%, 100% 50%, 50% 0%;
-  }
-  33% {
-    background-position: 100% 25%, 0% 75%, 75% 100%;
-  }
-  66% {
-    background-position: 50% 100%, 50% 0%, 0% 50%;
-  }
-}
-
-body {
-  --progress-warmth: 0;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: calc(0.06 + var(--progress-warmth, 0) * 0.08);
-  background:
-    radial-gradient(ellipse 600px 400px at 20% 30%, var(--bg-glow-1), transparent),
-    radial-gradient(ellipse 500px 350px at 80% 70%, var(--bg-glow-2), transparent),
-    radial-gradient(ellipse 450px 300px at 50% 50%, color-mix(in srgb, var(--accent-emerald) 12%, transparent), transparent);
-  animation: mesh-drift 30s ease-in-out infinite;
-  transition: opacity 2s ease;
-}
-
-/* ─── Streak Flame Flicker ──────────────────────────────── */
 @keyframes flame-flicker {
-  0%, 100% {
-    transform: scaleY(1) scaleX(1);
-    filter: brightness(1);
-  }
-  25% {
-    transform: scaleY(1.08) scaleX(0.95);
-    filter: brightness(1.1);
-  }
-  50% {
-    transform: scaleY(0.94) scaleX(1.04);
-    filter: brightness(0.95);
-  }
-  75% {
-    transform: scaleY(1.05) scaleX(0.97);
-    filter: brightness(1.05);
-  }
+  0%, 100% { transform: scaleY(1)    scaleX(1);    filter: brightness(1); }
+  25%      { transform: scaleY(1.08) scaleX(0.95); filter: brightness(1.1); }
+  50%      { transform: scaleY(0.94) scaleX(1.04); filter: brightness(0.95); }
+  75%      { transform: scaleY(1.05) scaleX(0.97); filter: brightness(1.05); }
 }
-
 .animate-flame-flicker {
   animation: flame-flicker 1.2s ease-in-out infinite;
   transform-origin: bottom center;
 }
 
-/* ─── Celebration Glow Pulse ────────────────────────────── */
 @keyframes glow-pulse {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.02);
-  }
+  0%   { opacity: 0; transform: scale(0.95); }
+  50%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.02); }
 }
+.animate-glow-pulse { animation: glow-pulse 1.2s ease-out; }
 
-.animate-glow-pulse {
-  animation: glow-pulse 1.2s ease-out;
+/* =====================================================================
+   Reduced motion (Inkwell already covers this in components.css; this
+   block adds the feature-animation-specific keyframes so reduced motion
+   stops them too.)
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .animate-completion-bounce,
+  .animate-fade-in,
+  .animate-nav-pop,
+  .animate-overlay-fade,
+  .animate-cell-fill,
+  .animate-stagger-in,
+  .animate-shimmer,
+  .animate-completion-ripple,
+  .animate-ring-draw,
+  .animate-flame-flicker,
+  .animate-glow-pulse {
+    animation: none !important;
+  }
 }

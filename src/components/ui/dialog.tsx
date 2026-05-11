@@ -37,7 +37,8 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] animate-overlay-fade"
+        className="fixed inset-0 animate-overlay-fade"
+        style={{ background: "rgba(15, 16, 24, 0.55)" }}
         onClick={() => onOpenChange(false)}
         aria-hidden="true"
       />
@@ -58,17 +59,13 @@ const DialogContent = forwardRef<
 >(({ className, children, onClose, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "mx-4 w-full max-w-lg rounded-3xl p-6",
-      "bg-surface-paper/96 backdrop-blur-xl border border-border-subtle shadow-[var(--shadow-editorial-lg)]",
-      className
-    )}
+    className={cn("dialog mx-4 w-full max-w-lg p-6 relative", className)}
     {...props}
   >
     {onClose && (
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 rounded-xl border border-border-subtle/70 bg-surface-overlay/80 p-1.5 text-text-muted transition-colors hover:text-text-primary"
+        className="dialog-close absolute right-3 top-3"
         aria-label="Close"
       >
         <X className="h-4 w-4" />
@@ -84,7 +81,11 @@ const DialogHeader = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mb-4 border-b border-border-subtle/70 pb-3", className)} {...props} />
+  <div
+    ref={ref}
+    className={cn("mb-4 pb-3 border-b border-gray-100", className)}
+    {...props}
+  />
 ));
 
 DialogHeader.displayName = "DialogHeader";
@@ -95,7 +96,7 @@ const DialogTitle = forwardRef<
 >(({ className, ...props }, ref) => (
   <h2
     ref={ref}
-    className={cn("text-lg font-semibold text-text-primary", className)}
+    className={cn("font-serif text-h3 font-medium text-slate", className)}
     {...props}
   />
 ));
@@ -108,7 +109,7 @@ const DialogDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-text-secondary mt-1", className)}
+    className={cn("text-small text-gray-500 mt-1", className)}
     {...props}
   />
 ));
@@ -121,7 +122,10 @@ const DialogFooter = forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("mt-6 flex justify-end gap-3 border-t border-border-subtle/70 pt-4", className)}
+    className={cn(
+      "mt-6 flex justify-end gap-2 border-t border-gray-100 pt-4",
+      className
+    )}
     {...props}
   />
 ));

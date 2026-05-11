@@ -14,7 +14,7 @@ export function AppFooter() {
   const formatted = formatBuildDate(BUILD_DATE);
 
   return (
-    <footer className="px-6 py-4 text-center text-xs text-text-muted">
+    <footer className="px-6 py-4 text-center font-mono text-eyebrow uppercase tracking-[0.12em] text-gray-500">
       v{APP_VERSION}
       {formatted && <> · Built {formatted}</>}
     </footer>

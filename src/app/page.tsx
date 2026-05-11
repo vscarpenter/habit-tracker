@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { PageContainer } from "@/components/layout/page-container";
 import { Header } from "@/components/layout/header";
 import { TodayView } from "@/components/dashboard/today-view";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUpItem, staggerContainer } from "@/components/shared/motion";
 import { useHabits } from "@/hooks/use-habits";
 import { useCompletions } from "@/hooks/use-completions";
@@ -29,12 +31,14 @@ function getGreeting(): string {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const today = useToday();
   const { habits, loading: habitsLoading } = useHabits();
   const { completions, loading: completionsLoading, toggle, isCompleted, getCompletionId, getCompletionValue, updateEffort, updateValue } =
     useCompletions(today);
-  const { settings } = useSettings();
+  const { settings, loading: settingsLoading } = useSettings();
   const showStreaks = settings?.showStreaks ?? true;
+  const showCompletionRate = settings?.showCompletionRate ?? true;
   const { streakMap } = useStreaks(habits, today);
   const { chains } = useChains();
 
@@ -70,6 +74,22 @@ export default function DashboardPage() {
     return () => { document.body.style.removeProperty("--progress-warmth"); };
   }, [progressWarmth]);
 
+  useEffect(() => {
+    if (!settings || settings.defaultView === "today") return;
+    router.replace(`/${settings.defaultView}`);
+  }, [router, settings]);
+
+  if (settingsLoading || (settings?.defaultView != null && settings.defaultView !== "today")) {
+    return (
+      <PageContainer>
+        <div className="space-y-4">
+          <Skeleton className="h-24 rounded-3xl" />
+          <Skeleton className="h-64 rounded-3xl" />
+        </div>
+      </PageContainer>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <PageContainer>
@@ -99,6 +119,7 @@ export default function DashboardPage() {
             getCompletionId={getCompletionId}
             getCompletionValue={getCompletionValue}
             showStreaks={showStreaks}
+            showCompletionRate={showCompletionRate}
             streakMap={streakMap}
           />
         </motion.div>

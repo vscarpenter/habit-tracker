@@ -45,9 +45,10 @@ function makeSnapshot(): ExportData {
     exportedAt: "2026-02-28T00:00:00.000Z",
     app: "HabitFlow",
     data: {
+      habitChains: [],
       habits: [],
       completions: [],
-      settings: createSettings({ syncEnabled: false, lastSyncedAt: null }),
+      settings: createSettings(),
     },
   };
 }
@@ -89,7 +90,7 @@ describe("syncService", () => {
     const merged = makeSnapshot();
     const mergeResult = {
       hasChanges: true,
-      stats: { habitsUpdated: 1, completionsAdded: 0, settingsUpdated: false },
+      stats: { chainsAdded: 0, habitsUpdated: 1, completionsAdded: 0, settingsUpdated: false },
     };
 
     vi.mocked(authService.getUser).mockResolvedValue({

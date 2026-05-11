@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createHabit,
+  createHabitChain,
   createCompletion,
   createSettings,
   resetFactories,
@@ -27,6 +28,7 @@ function buildValidPayload(
     exportedAt: new Date().toISOString(),
     app: "HabitFlow",
     data: {
+      habitChains: [createHabitChain()],
       habits: [createHabit()],
       completions: [createCompletion()],
       settings: createSettings(),
@@ -63,6 +65,7 @@ describe("validateImportData", () => {
     const badHabit = createHabit({ name: "" }); // name min(1) violated
     const payload = buildValidPayload({
       data: {
+        habitChains: [],
         habits: [badHabit],
         completions: [],
         settings: createSettings(),
@@ -96,6 +99,7 @@ describe("validateImportData", () => {
 
     expect(result.valid).toBe(true);
     if (!result.valid) throw new Error("Expected valid result");
+    expect(result.data.data.habitChains).toHaveLength(1);
     expect(result.data.data.habits).toHaveLength(1);
     expect(result.data.data.completions).toHaveLength(1);
   });
@@ -144,6 +148,12 @@ describe("CSV export helpers", () => {
         name: "Morning Run",
         description: "Run 5k",
         category: "fitness",
+        timeOfDay: "morning",
+        habitType: "quantitative",
+        targetValue: 5,
+        unit: "miles",
+        chainId: "11111111-1111-4111-8111-111111111111",
+        chainOrder: 1,
       });
       const row = buildHabitCSVRow(habit);
       const fields = row.split(",");
@@ -151,6 +161,9 @@ describe("CSV export helpers", () => {
       expect(fields[0]).toBe(habit.id);
       expect(fields[1]).toBe("Morning Run");
       expect(fields[2]).toBe("Run 5k");
+      expect(fields[10]).toBe("morning");
+      expect(fields[11]).toBe("quantitative");
+      expect(fields[14]).toBe("11111111-1111-4111-8111-111111111111");
     });
 
     it("handles missing optional fields", () => {
@@ -194,12 +207,15 @@ describe("CSV export helpers", () => {
       const completion = createCompletion({
         habitId: habit.id,
         note: 'Felt "great", ran fast',
+        effort: 4,
+        value: 12,
       });
       const nameMap = new Map([[habit.id, habit.name]]);
 
       const row = buildCompletionCSVRow(completion, nameMap);
 
       expect(row).toContain('"Felt ""great"", ran fast"');
+      expect(row).toContain(",4,12");
     });
   });
 });

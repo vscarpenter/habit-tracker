@@ -134,10 +134,10 @@ function MonthHabitRow({
       <Link
         href={`/habits/${habit.id}`}
         className={cn(
-          "flex items-center gap-2 min-h-[40px] px-2 sticky left-0 rounded-md border-l-2",
-          "z-10 backdrop-blur-xl",
-          rowIndex % 2 === 0 ? "bg-surface-paper/72" : "bg-surface-overlay/72",
-          !isLast && "border-b border-border-subtle/45"
+          "flex items-center gap-2 min-h-[40px] px-2 sticky left-0 rounded-sm border-l-2",
+          "z-10",
+          rowIndex % 2 === 0 ? "bg-paper" : "bg-gray-100",
+          !isLast && "border-b border-gray-100"
         )}
         style={{ borderLeftColor: habit.color }}
       >

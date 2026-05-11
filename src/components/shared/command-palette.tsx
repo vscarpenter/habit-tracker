@@ -8,6 +8,7 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useIsDesktop } from "@/hooks/use-media-query";
 import type { Habit } from "@/types";
 
 const MAX_RESULTS = 10;
@@ -24,6 +25,7 @@ export function CommandPalette({
   habits,
 }: CommandPaletteProps) {
   const router = useRouter();
+  const isDesktop = useIsDesktop();
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -51,12 +53,12 @@ export function CommandPalette({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
           <Input
-            placeholder="Search habits..."
+            placeholder="Search habits…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-10"
             aria-label="Search habits"
-            autoFocus
+            autoFocus={isDesktop}
           />
         </div>
 

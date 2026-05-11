@@ -2,6 +2,7 @@ import { z } from "zod/v4";
 import { db } from "@/db/database";
 import {
   habitSchema,
+  habitChainSchema,
   habitCompletionSchema,
   userSettingsSchema,
 } from "@/db/schemas";
@@ -16,6 +17,7 @@ const exportDataSchema = z.object({
   exportedAt: z.iso.datetime(),
   app: z.literal("HabitFlow"),
   data: z.object({
+    habitChains: z.array(habitChainSchema),
     habits: z.array(habitSchema),
     completions: z.array(habitCompletionSchema),
     settings: userSettingsSchema,
@@ -31,7 +33,8 @@ export type ImportValidationResult =
 // ── Export ────────────────────────────────────────────────────────────
 
 export async function buildExportPayload(): Promise<ExportData> {
-  const [habits, completions, settingsRows] = await Promise.all([
+  const [habitChains, habits, completions, settingsRows] = await Promise.all([
+    db.habitChains.toArray(),
     db.habits.toArray(),
     db.completions.toArray(),
     db.settings.toArray(),
@@ -46,7 +49,7 @@ export async function buildExportPayload(): Promise<ExportData> {
     version: EXPORT_VERSION,
     exportedAt: new Date().toISOString(),
     app: "HabitFlow",
-    data: { habits, completions, settings },
+    data: { habitChains, habits, completions, settings },
   };
 }
 
@@ -78,12 +81,13 @@ export function toCSVRow(fields: string[]): string {
 
 const HABIT_CSV_COLUMNS = [
   "id", "name", "description", "icon", "color", "frequency",
-  "targetDays", "targetCount", "reminderTime", "category",
+  "targetDays", "targetCount", "reminderTime", "category", "timeOfDay",
+  "habitType", "targetValue", "unit", "chainId", "chainOrder",
   "isArchived", "createdAt", "updatedAt",
 ] as const;
 
 const COMPLETION_CSV_COLUMNS = [
-  "id", "habitId", "habitName", "date", "completedAt", "note",
+  "id", "habitId", "habitName", "date", "completedAt", "note", "effort", "value",
 ] as const;
 
 export function buildHabitCSVRow(habit: Habit): string {
@@ -98,6 +102,12 @@ export function buildHabitCSVRow(habit: Habit): string {
     habit.targetCount?.toString() ?? "",
     habit.reminderTime ?? "",
     habit.category ?? "",
+    habit.timeOfDay ?? "",
+    habit.habitType ?? "binary",
+    habit.targetValue?.toString() ?? "",
+    habit.unit ?? "",
+    habit.chainId ?? "",
+    habit.chainOrder?.toString() ?? "",
     String(habit.isArchived),
     habit.createdAt,
     habit.updatedAt,
@@ -115,6 +125,8 @@ export function buildCompletionCSVRow(
     completion.date,
     completion.completedAt,
     completion.note ?? "",
+    completion.effort?.toString() ?? "",
+    completion.value?.toString() ?? "",
   ]);
 }
 
@@ -185,12 +197,14 @@ export function validateImportData(raw: unknown): ImportValidationResult {
 export async function applyImport(data: ExportData): Promise<void> {
   await db.transaction(
     "rw",
-    [db.habits, db.completions, db.settings],
+    [db.habitChains, db.habits, db.completions, db.settings],
     async () => {
+      await db.habitChains.clear();
       await db.habits.clear();
       await db.completions.clear();
       await db.settings.clear();
 
+      await db.habitChains.bulkPut(data.data.habitChains);
       await db.habits.bulkPut(data.data.habits);
       await db.completions.bulkPut(data.data.completions);
       await db.settings.put(data.data.settings);
@@ -203,8 +217,9 @@ export async function applyImport(data: ExportData): Promise<void> {
 export async function clearAllData(): Promise<void> {
   await db.transaction(
     "rw",
-    [db.habits, db.completions, db.settings],
+    [db.habitChains, db.habits, db.completions, db.settings],
     async () => {
+      await db.habitChains.clear();
       await db.habits.clear();
       await db.completions.clear();
       await db.settings.clear();

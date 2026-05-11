@@ -37,7 +37,7 @@ export function CompletionToggle({
       onClick={handleClick}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full",
-        "transition-all duration-200 border-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
+        "border-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition-[background-color,border-color,box-shadow,transform] duration-200",
         sizeClass,
         animating && "animate-completion-ripple"
       )}

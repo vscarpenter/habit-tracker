@@ -34,11 +34,11 @@ export function ThemeToggle({ theme, onChange, className }: ThemeToggleProps) {
             aria-checked={active}
             onClick={() => onChange(value)}
             className={cn(
-              "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium",
-              "transition-colors duration-150",
+              "flex items-center gap-2 rounded-sm px-4 py-2 text-small font-medium",
+              "border transition-colors duration-150",
               active
-                ? "border border-accent-blue/20 bg-accent-blue/10 text-accent-blue shadow-[var(--shadow-editorial-sm)]"
-                : "border border-transparent text-text-secondary hover:bg-surface-tint/70 hover:text-text-primary"
+                ? "border-accent bg-accent-tint text-accent"
+                : "border-transparent text-gray-700 hover:bg-gray-100 hover:text-slate"
             )}
           >
             <Icon className="h-4 w-4" />

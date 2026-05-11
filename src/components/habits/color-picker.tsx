@@ -19,7 +19,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
           onClick={() => onChange(color.value)}
           className={cn(
             "h-10 w-10 rounded-full flex items-center justify-center",
-            "transition-all duration-150 hover:scale-110",
+            "transition-[transform,box-shadow] duration-150 hover:scale-110",
             value === color.value && "ring-2 ring-offset-2 ring-offset-background"
           )}
           style={{

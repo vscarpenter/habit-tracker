@@ -97,8 +97,6 @@ export const userSettingsSchema = z.object({
   showStreaks: z.boolean(),
   showCompletionRate: z.boolean(),
   defaultView: z.enum(["today", "week", "month"]),
-  syncEnabled: z.boolean().optional(),
-  lastSyncedAt: z.iso.datetime().nullable().optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });

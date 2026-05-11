@@ -146,7 +146,6 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g., Morning Run"
             maxLength={100}
-            autoFocus
           />
           {errors.name && (
             <p className="text-xs text-error">{errors.name}</p>
@@ -167,7 +166,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
                   type="button"
                   onClick={() => setHabitType(type)}
                   className={cn(
-                    "rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-all",
+                    "rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-[background-color,border-color,color,box-shadow]",
                     "focus-visible:ring-2 focus-visible:ring-accent-blue",
                     habitType === type
                       ? "border-accent-blue bg-accent-blue/8 text-accent-blue"
@@ -218,7 +217,7 @@ export function HabitForm({ initialData, onSubmit, submitLabel }: HabitFormProps
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Optional description..."
+            placeholder="Optional description…"
             maxLength={500}
           />
         </div>

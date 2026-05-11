@@ -51,8 +51,6 @@ export interface UserSettings {
   showStreaks: boolean;
   showCompletionRate: boolean;
   defaultView: "today" | "week" | "month";
-  syncEnabled?: boolean;
-  lastSyncedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

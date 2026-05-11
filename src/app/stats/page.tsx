@@ -52,6 +52,7 @@ export default function StatsPage() {
 
   const loading = habitsLoading || completionsLoading;
   const weekStartsOn = settings?.weekStartsOn ?? 0;
+  const showCompletionRate = settings?.showCompletionRate ?? true;
 
   // Filter completions to selected date range (for trend/stats, not heatmap)
   const rangeCompletions = useMemo(
@@ -142,14 +143,21 @@ export default function StatsPage() {
             onSelect={setPreset}
           />
 
-          <OverallStatsRow stats={overallStats} loading={false} />
+          <OverallStatsRow
+            stats={overallStats}
+            loading={false}
+            showCompletionRate={showCompletionRate}
+          />
 
           <CompletionTrendChart data={trendData} />
 
           <AggregateHeatmap data={heatmapData} today={today} />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <CategoryBreakdown data={categoryData} />
+            <CategoryBreakdown
+              data={categoryData}
+              showCompletionRate={showCompletionRate}
+            />
             <WeeklyPatternChart data={weeklyPatternData} />
           </div>
 
@@ -157,7 +165,11 @@ export default function StatsPage() {
             <EffortTrendChart data={effortTrendData} />
           )}
 
-          <HabitLeaderboard entries={leaderboardData} loading={false} />
+          <HabitLeaderboard
+            entries={leaderboardData}
+            loading={false}
+            showCompletionRate={showCompletionRate}
+          />
         </div>
       )}
       <ProgressCardDialog

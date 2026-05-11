@@ -41,9 +41,9 @@ const ICONS: Record<ToastVariant, React.ComponentType<{ className?: string }>> =
 };
 
 const VARIANT_STYLES: Record<ToastVariant, string> = {
-  success: "border-success/20 text-success",
-  error: "border-error/20 text-error",
-  info: "border-info/20 text-info",
+  success: "alert is-success",
+  error: "alert is-danger",
+  info: "alert is-info",
 };
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -72,20 +72,18 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <div
               key={t.id}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-4 py-3 shadow-xl",
-                "bg-surface-elevated backdrop-blur-xl border",
                 "animate-fade-in min-w-[280px] max-w-[400px]",
                 VARIANT_STYLES[t.variant]
               )}
               role={t.variant === "error" ? "alert" : "status"}
             >
               <Icon className="h-5 w-5 shrink-0" />
-              <span className="text-sm font-medium text-text-primary flex-1">
+              <span className="text-small font-medium flex-1">
                 {t.message}
               </span>
               <button
                 onClick={() => removeToast(t.id)}
-                className="text-text-muted hover:text-text-primary shrink-0"
+                className="text-gray-500 hover:text-slate shrink-0"
                 aria-label="Dismiss"
               >
                 <X className="h-4 w-4" />

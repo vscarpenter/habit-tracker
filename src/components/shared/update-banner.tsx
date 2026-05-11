@@ -15,6 +15,8 @@ export function UpdateBanner({ visible, onRefresh, className }: UpdateBannerProp
 
   return (
     <div
+      aria-live="polite"
+      role="status"
       className={cn(
         "fixed top-4 left-1/2 -translate-x-1/2 z-50",
         "flex items-center gap-3 rounded-xl px-4 py-3",

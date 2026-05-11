@@ -241,7 +241,7 @@ export function DataManagement() {
                       <Icon className="h-3.5 w-3.5" />
                     </span>
                     <span className="min-w-0 text-left">
-                      <span className="block text-sm">{loading ? "Loading..." : sample.label}</span>
+                      <span className="block text-sm">{loading ? "Loading…" : sample.label}</span>
                       <span className="block text-xs font-normal text-text-muted">
                         {sample.description}
                       </span>

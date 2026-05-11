@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import type { Habit, HabitCompletion, UserSettings } from "@/types";
+import type { Habit, HabitCompletion, HabitChain, UserSettings } from "@/types";
 
 let sortCounter = 0;
 
@@ -46,6 +46,17 @@ export function createSettings(
     defaultView: "today",
     createdAt: now,
     updatedAt: now,
+    ...overrides,
+  };
+}
+
+export function createHabitChain(
+  overrides: Partial<HabitChain> = {}
+): HabitChain {
+  return {
+    id: uuidv4(),
+    name: "Morning Routine",
+    createdAt: new Date().toISOString(),
     ...overrides,
   };
 }

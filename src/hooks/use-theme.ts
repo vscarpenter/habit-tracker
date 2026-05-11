@@ -14,20 +14,13 @@ function getSystemTheme(): "light" | "dark" {
 
 function applyTheme(theme: Theme): void {
   const resolved = theme === "system" ? getSystemTheme() : theme;
-  const root = document.documentElement;
+  document.documentElement.setAttribute("data-theme", resolved);
 
-  if (resolved === "dark") {
-    root.classList.add("dark");
-  } else {
-    root.classList.remove("dark");
-  }
-
-  // Update theme-color meta tag for mobile browsers
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
     meta.setAttribute(
       "content",
-      resolved === "dark" ? "#020617" : "#f8fafc"
+      resolved === "dark" ? "#0F1018" : "#F4F4F0"
     );
   }
 }
