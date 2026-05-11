@@ -157,11 +157,11 @@ function HabitRow({
       <Link
         href={`/habits/${habit.id}`}
         className={cn(
-          "flex items-center gap-2.5 min-h-[52px] px-2.5 sticky left-0 rounded-lg border-l-2",
-          "z-10 backdrop-blur-xl transition-colors duration-150",
-          rowIndex % 2 === 0 ? "bg-surface-paper/70" : "bg-surface-overlay/70",
-          "hover:bg-surface-paper",
-          !isLast && "border-b border-border-subtle/50"
+          "flex items-center gap-2.5 min-h-[52px] px-2.5 sticky left-0 rounded-sm border-l-2",
+          "z-10 transition-colors duration-150",
+          rowIndex % 2 === 0 ? "bg-paper" : "bg-gray-100",
+          "hover:bg-gray-100",
+          !isLast && "border-b border-gray-100"
         )}
         style={{ borderLeftColor: habit.color }}
       >

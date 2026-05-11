@@ -177,7 +177,7 @@ export default function HabitsPage() {
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search habits..."
+                  placeholder="Search habits…"
                   className="pl-9"
                   aria-label="Search habits"
                 />

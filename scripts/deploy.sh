@@ -303,6 +303,16 @@ update_distribution_config() {
 }
 
 echo "Building..."
+BUILD_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+export NEXT_PUBLIC_BUILD_DATE="${NEXT_PUBLIC_BUILD_DATE:-$BUILD_TIMESTAMP}"
+
+if [[ "$DRY_RUN" == "1" ]]; then
+  echo "[dry-run] bun scripts/bump-deploy-version.mjs"
+else
+  NEXT_VERSION=$(bun scripts/bump-deploy-version.mjs)
+  echo "Bumped app version to ${NEXT_VERSION}"
+fi
+
 run bun run build
 
 if [[ ! -d "$OUT_DIR" ]]; then

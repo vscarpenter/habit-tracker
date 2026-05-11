@@ -35,7 +35,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
                 onClick={() => onChange(emoji)}
                 className={cn(
                   "h-9 w-9 rounded-lg text-lg flex items-center justify-center",
-                  "transition-all duration-150 hover:bg-surface-elevated",
+                  "transition-[background-color,transform,box-shadow] duration-150 hover:bg-surface-elevated",
                   value === emoji &&
                     "bg-accent-blue/10 ring-2 ring-accent-blue scale-110"
                 )}

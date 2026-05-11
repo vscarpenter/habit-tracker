@@ -48,7 +48,7 @@ export function HabitListItem({
       <li
         className={cn(
           "hf-row group relative list-none rounded-2xl px-4 py-3",
-          "transition-all duration-200 hover:-translate-y-0.5",
+          "transition-[transform,border-color,background-color,box-shadow] duration-200 hover:-translate-y-0.5",
           menuOpen && "z-10"
         )}
       >

@@ -4,12 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Flame, Trophy, Hash, TrendingUp } from "lucide-react";
 import type { HabitStats } from "@/hooks/use-habit-stats";
+import { cn } from "@/lib/utils";
 
 interface HabitStatsGridProps {
   stats: HabitStats;
   color: string;
   loading: boolean;
   averageEffort?: number | null;
+  showCompletionRate?: boolean;
 }
 
 interface StatItemProps {
@@ -39,13 +41,26 @@ function StatItem({ icon: Icon, label, value, color }: StatItemProps) {
   );
 }
 
-export function HabitStatsGrid({ stats, color, loading, averageEffort }: HabitStatsGridProps) {
+export function HabitStatsGrid({
+  stats,
+  color,
+  loading,
+  averageEffort,
+  showCompletionRate = true,
+}: HabitStatsGridProps) {
   const showEffort = averageEffort != null;
-  const columns = showEffort ? 5 : 4;
+  const columns = 3 + Number(showCompletionRate) + Number(showEffort);
 
   if (loading) {
     return (
-      <div className={`grid grid-cols-2 sm:grid-cols-${columns} gap-3`}>
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-3",
+          columns === 5 && "sm:grid-cols-5",
+          columns === 4 && "sm:grid-cols-4",
+          columns === 3 && "sm:grid-cols-3"
+        )}
+      >
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-28 rounded-2xl" />
         ))}
@@ -54,7 +69,14 @@ export function HabitStatsGrid({ stats, color, loading, averageEffort }: HabitSt
   }
 
   return (
-    <div className={`grid grid-cols-2 gap-3 ${showEffort ? "sm:grid-cols-5" : "sm:grid-cols-4"}`}>
+    <div
+      className={cn(
+        "grid grid-cols-2 gap-3",
+        columns === 5 && "sm:grid-cols-5",
+        columns === 4 && "sm:grid-cols-4",
+        columns === 3 && "sm:grid-cols-3"
+      )}
+    >
       <StatItem
         icon={Flame}
         label="Current Streak"
@@ -73,12 +95,14 @@ export function HabitStatsGrid({ stats, color, loading, averageEffort }: HabitSt
         value={stats.totalCompletions}
         color={color}
       />
-      <StatItem
-        icon={TrendingUp}
-        label="Completion Rate"
-        value={`${stats.completionRate}%`}
-        color={color}
-      />
+      {showCompletionRate && (
+        <StatItem
+          icon={TrendingUp}
+          label="Completion Rate"
+          value={`${stats.completionRate}%`}
+          color={color}
+        />
+      )}
       {showEffort && (
         <StatItem
           icon={Flame}

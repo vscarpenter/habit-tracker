@@ -60,7 +60,7 @@ export function MonthCell({
       onClick={handleClick}
       className={cn(
         "h-8 w-8 rounded-md flex items-center justify-center border",
-        "transition-all duration-150",
+        "transition-[background-color,border-color,box-shadow,transform] duration-150",
         completed ? "shadow-[var(--shadow-editorial-sm)]" : "border-border-subtle/60 bg-surface-paper/40 hover:border-border-subtle",
         isToday && "ring-1 ring-accent-blue/45 ring-offset-1 ring-offset-background",
         animating && "animate-cell-fill"

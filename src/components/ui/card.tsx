@@ -9,13 +9,10 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: CardVariant;
 }
 
-const variantStyles: Record<CardVariant, string> = {
-  default:
-    "bg-surface-panel backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-sm)]",
-  elevated:
-    "bg-surface-paper backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-md)]",
-  interactive:
-    "bg-surface-panel backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-sm)] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[var(--shadow-editorial-md)] transition-all duration-200 cursor-pointer",
+const variantClass: Record<CardVariant, string> = {
+  default:     "card",
+  elevated:    "card shadow-md",
+  interactive: "card is-link",
 };
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
@@ -23,7 +20,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={cn("rounded-2xl p-4 sm:p-6", variantStyles[variant], className)}
+        className={cn(variantClass[variant], className)}
         {...props}
       />
     );
@@ -36,7 +33,11 @@ const CardHeader = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mb-4 border-b border-border-subtle/70 pb-3", className)} {...props} />
+  <div
+    ref={ref}
+    className={cn("mb-4 pb-3 border-b border-gray-200", className)}
+    {...props}
+  />
 ));
 
 CardHeader.displayName = "CardHeader";
@@ -47,7 +48,7 @@ const CardTitle = forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-lg font-semibold text-text-primary", className)}
+    className={cn("font-serif text-h3 font-medium text-slate", className)}
     {...props}
   />
 ));
@@ -60,7 +61,7 @@ const CardDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("mt-1 text-sm text-text-secondary", className)}
+    className={cn("mt-1 text-small text-gray-500", className)}
     {...props}
   />
 ));

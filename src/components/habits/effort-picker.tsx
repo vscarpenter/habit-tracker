@@ -61,7 +61,7 @@ export function EffortPicker({ onSelect, visible }: EffortPickerProps) {
                   type="button"
                   onClick={() => handleSelect(rating)}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
+                    "flex h-8 w-8 items-center justify-center rounded-lg transition-[background-color,color,box-shadow,transform] duration-150",
                     "hover:bg-accent-amber/10 focus-visible:ring-2 focus-visible:ring-accent-amber",
                     selected !== null && rating <= selected
                       ? "text-accent-amber"

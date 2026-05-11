@@ -39,7 +39,9 @@ Deploy: `aws s3 sync out/ s3://BUCKET --delete` then invalidate CloudFront.
 ## Architecture
 
 ### Data Layer (`src/db/`)
-Three IndexedDB tables via Dexie: `Habit`, `HabitCompletion`, `UserSettings`. Every write must pass through Zod validation in `schemas.ts`. Service modules (`habit-service.ts`, `completion-service.ts`, `settings-service.ts`) are the only code that touches the database.
+Four IndexedDB tables via Dexie: `Habit`, `HabitCompletion`, `UserSettings`, `HabitChain`. Every write must pass through Zod validation in `schemas.ts`. Service modules (`habit-service.ts`, `completion-service.ts`, `settings-service.ts`, `chain-service.ts`) are the only code that touches the database.
+
+Export/import uses the `ExportData` shape from `src/lib/export-import.ts` and now includes `habitChains` alongside `habits`, `completions`, and `settings`. If the export/import contract changes, sync merge logic in `src/lib/sync/merge.ts` must be updated in lockstep.
 
 ### Hooks (`src/hooks/`)
 Domain logic lives in hooks, not components. `use-habit-stats.ts` owns all computed stats (streaks, rates, trends). Components render; hooks compute.
@@ -49,10 +51,12 @@ Domain logic lives in hooks, not components. `use-habit-stats.ts` owns all compu
 
 Dynamic routes under `[id]` use a layout-level `generateStaticParams` with a placeholder ID for static export. CloudFront's 404→index.html fallback enables client-side routing to actual habit IDs.
 
+`settings.defaultView` is active. The root route `/` redirects client-side to `/week` or `/month` when the user selects a non-`today` default view.
+
 ### Sync Layer (`src/lib/sync/`)
 Optional PocketBase cloud sync using snapshot merge (full `ExportData` JSON per user). Auth via Google OAuth. Key files:
 - `types.ts` — `SyncStatus`, `SyncState`, `SyncUser`, `MergeResult` (provider-agnostic)
-- `merge.ts` — `mergeSnapshots()` (habits: LWW, completions: union, settings: LWW)
+- `merge.ts` — `mergeSnapshots()` (chains: additive union, habits: LWW, completions: union, settings: LWW)
 - `pocketbase-client.ts` — lazy client singleton (requires `NEXT_PUBLIC_POCKETBASE_URL`)
 - `auth-service.ts` — Google OAuth sign-in/out via PocketBase SDK
 - `sync-service.ts` — pull/push/sync operations via `habitflow_sync_snapshots` collection
@@ -68,6 +72,8 @@ Design docs: `docs/sync-design.md` (option analysis), `docs/sync-pocketbase-plan
 - `habits/`, `dashboard/`, `stats/`, `settings/` — feature components
 - `sync/` — SyncAuthModal, SyncSection (settings page sync UI)
 - `shared/` — EmptyState, ErrorBoundary, Toast, ConfirmDialog
+
+The dashboard was split into smaller units: `today-view.tsx` orchestrates, while `today-overview.tsx`, `today-checklist.tsx`, and `today-time-group-header.tsx` own the major rendering sections.
 
 ### Test files are co-located: `component.test.tsx` beside `component.tsx`. Factories in `src/test/factories.ts`, DB mocks in `src/test/mocks/db.ts`.
 
@@ -86,12 +92,18 @@ Glassmorphism: `bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-white/2
 - `completions / scheduled_days * 100` for the period
 - Exclude future days and days before habit creation
 - Respect frequency settings (daily, weekdays, weekends, specific_days, x_per_week)
+- The `showCompletionRate` setting is live and should hide completion-rate UI where that metric is displayed.
 
 ### Date Handling
 - Dates stored as `YYYY-MM-DD` strings (local date, never UTC)
 - Timestamps stored as ISO 8601
 - "Today" = user's local date; day boundary = local midnight
 - Week boundaries respect `weekStartsOn` setting (0=Sun, 1=Mon)
+
+### Habit Chains
+- Chain records are first-class persisted data in IndexedDB and the export/sync payload.
+- A chain groups habits for display on the today dashboard using `chainId` and `chainOrder`.
+- If a habit references a missing chain record, the UI falls back to rendering that habit as a normal single item.
 
 ### Archive vs Delete
 - Archive: hidden from views, data preserved, restorable
@@ -110,6 +122,9 @@ Glassmorphism: `bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-white/2
 - DRY after 3+ repetitions, not before
 - All function signatures need type annotations; no `any` without justification comment
 - Error handling: toast for DB errors ("Something went wrong. Your data is safe."), inline errors for forms, Error Boundaries at page level
+- Do not add dead settings fields to `UserSettings`; sync status such as `lastSyncedAt` belongs to `SyncState`, not persisted settings.
+- Avoid broad `suppressHydrationWarning`; scope hydration exceptions narrowly to the node that actually needs them.
+- Prefer explicit transition properties over `transition-all`, and use `aria-live="polite"` for async status banners/toasts that appear after user actions or background events.
 
 ## Responsive Breakpoints
 

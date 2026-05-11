@@ -116,6 +116,7 @@ export default function HabitDetailPage() {
           color={habit.color}
           loading={statsLoading}
           averageEffort={averageEffort}
+          showCompletionRate={settings?.showCompletionRate ?? true}
         />
 
         <HabitCalendarHeatmap

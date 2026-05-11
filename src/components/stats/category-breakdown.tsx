@@ -6,9 +6,13 @@ import type { CategoryBreakdownEntry } from "@/lib/stats-utils";
 
 interface CategoryBreakdownProps {
   data: CategoryBreakdownEntry[];
+  showCompletionRate?: boolean;
 }
 
-export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
+export function CategoryBreakdown({
+  data,
+  showCompletionRate = true,
+}: CategoryBreakdownProps) {
   if (data.length === 0) {
     return (
       <Card>
@@ -81,7 +85,8 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
                 {entry.category}
               </span>
               <span className="text-xs text-text-muted ml-auto whitespace-nowrap">
-                {entry.habitCount} · {entry.completionRate}%
+                {entry.habitCount}
+                {showCompletionRate ? ` · ${entry.completionRate}%` : ""}
               </span>
             </div>
           ))}

@@ -12,8 +12,6 @@ const DEFAULT_SETTINGS: UserSettings = {
   showStreaks: true,
   showCompletionRate: true,
   defaultView: "today",
-  syncEnabled: false,
-  lastSyncedAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };

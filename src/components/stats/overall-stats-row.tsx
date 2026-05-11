@@ -4,11 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, TrendingUp, Flame, Hash } from "lucide-react";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
+import { cn } from "@/lib/utils";
 import type { OverallStatsResult } from "@/lib/stats-utils";
 
 interface OverallStatsRowProps {
   stats: OverallStatsResult;
   loading: boolean;
+  showCompletionRate?: boolean;
 }
 
 interface StatCardProps {
@@ -51,11 +53,22 @@ function StatCard({ icon: Icon, label, value, suffix, accent, index }: StatCardP
   );
 }
 
-export function OverallStatsRow({ stats, loading }: OverallStatsRowProps) {
+export function OverallStatsRow({
+  stats,
+  loading,
+  showCompletionRate = true,
+}: OverallStatsRowProps) {
+  const columns = showCompletionRate ? 4 : 3;
+
   if (loading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-3",
+          showCompletionRate ? "sm:grid-cols-4" : "sm:grid-cols-3"
+        )}
+      >
+        {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-28 rounded-2xl" />
         ))}
       </div>
@@ -63,7 +76,7 @@ export function OverallStatsRow({ stats, loading }: OverallStatsRowProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className={`grid grid-cols-2 gap-3 ${showCompletionRate ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
       <StatCard
         icon={Activity}
         label="Active Habits"
@@ -71,27 +84,29 @@ export function OverallStatsRow({ stats, loading }: OverallStatsRowProps) {
         accent="var(--chart-1)"
         index={0}
       />
-      <StatCard
-        icon={TrendingUp}
-        label="Completion Rate"
-        value={stats.overallCompletionRate}
-        suffix="%"
-        accent="var(--chart-2)"
-        index={1}
-      />
+      {showCompletionRate && (
+        <StatCard
+          icon={TrendingUp}
+          label="Completion Rate"
+          value={stats.overallCompletionRate}
+          suffix="%"
+          accent="var(--chart-2)"
+          index={1}
+        />
+      )}
       <StatCard
         icon={Flame}
         label="Best Streak"
         value={stats.bestCurrentStreak}
         accent="var(--chart-4)"
-        index={2}
+        index={showCompletionRate ? 2 : 1}
       />
       <StatCard
         icon={Hash}
         label="Total Completions"
         value={stats.totalCompletions}
         accent="var(--chart-3)"
-        index={3}
+        index={showCompletionRate ? 3 : 2}
       />
     </div>
   );

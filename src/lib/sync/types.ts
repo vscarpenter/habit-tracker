@@ -47,6 +47,7 @@ export interface MergeResult {
   hasChanges: boolean;
   /** Stats about what changed — useful for logging / user feedback. */
   stats: {
+    chainsAdded: number;
     habitsUpdated: number;
     completionsAdded: number;
     settingsUpdated: boolean;

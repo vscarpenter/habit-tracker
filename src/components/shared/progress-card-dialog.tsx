@@ -81,7 +81,7 @@ export function ProgressCardDialog({
             />
           ) : (
             <div className="flex h-48 items-center justify-center text-sm text-text-muted">
-              Generating...
+              Generating…
             </div>
           )}
         </div>

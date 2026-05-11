@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { mergeSnapshots } from "./merge";
 import {
   createHabit,
+  createHabitChain,
   createCompletion,
   createSettings,
   resetFactories,
@@ -17,6 +18,7 @@ function makeSnapshot(
     exportedAt: new Date().toISOString(),
     app: "HabitFlow",
     data: {
+      habitChains: [],
       habits: [],
       completions: [],
       settings: createSettings(),
@@ -27,6 +29,21 @@ function makeSnapshot(
 
 describe("mergeSnapshots", () => {
   beforeEach(() => resetFactories());
+
+  describe("habit chains", () => {
+    it("adds remote-only chains to the merged snapshot", () => {
+      const localChain = createHabitChain({ id: "11111111-1111-4111-8111-111111111111" });
+      const remoteOnlyChain = createHabitChain({ id: "22222222-2222-4222-8222-222222222222" });
+
+      const { merged, result } = mergeSnapshots(
+        makeSnapshot({ habitChains: [localChain] }),
+        makeSnapshot({ habitChains: [localChain, remoteOnlyChain] })
+      );
+
+      expect(merged.data.habitChains).toHaveLength(2);
+      expect(result.stats.chainsAdded).toBe(1);
+    });
+  });
 
   // ── Habits ──────────────────────────────────────────────────────────────
 

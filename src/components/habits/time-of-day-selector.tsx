@@ -30,7 +30,7 @@ export function TimeOfDaySelector({ value, onChange }: TimeOfDaySelectorProps) {
             aria-checked={selected}
             onClick={() => onChange(option.value)}
             className={cn(
-              "flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-all",
+              "flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-[background-color,border-color,color,box-shadow,transform]",
               "focus-visible:ring-2 focus-visible:ring-accent-blue focus-visible:ring-offset-2",
               selected
                 ? "border-accent-blue bg-accent-blue/8 text-accent-blue"

@@ -167,8 +167,8 @@ const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuContentProps>
         }}
         role="menu"
         className={cn(
-          "absolute z-50 min-w-[160px] overflow-hidden rounded-xl",
-          "bg-surface-paper/96 backdrop-blur-2xl border border-border-subtle shadow-[var(--shadow-editorial-lg)]",
+          "absolute z-50 min-w-[160px] overflow-hidden rounded-md",
+          "bg-paper border border-gray-300 shadow-lg",
           "p-1 animate-fade-in",
           flipUp ? "bottom-full mb-1" : "top-full mt-1",
           align === "start" && "left-0",
@@ -203,11 +203,11 @@ const DropdownMenuItem = forwardRef<HTMLButtonElement, DropdownMenuItemProps>(
           setOpen(false);
         }}
         className={cn(
-          "flex w-full items-center rounded-lg px-2 py-1.5 text-sm",
-          "transition-colors duration-150 outline-none",
+          "flex w-full items-center rounded-sm px-2 py-1.5 text-small",
+          "transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
           destructive
-            ? "text-error hover:bg-error/8"
-            : "text-text-primary hover:bg-surface-tint/75",
+            ? "text-rust hover:bg-rust-tint"
+            : "text-slate hover:bg-gray-100",
           className
         )}
         {...props}
@@ -225,7 +225,7 @@ const DropdownMenuSeparator = forwardRef<
   <div
     ref={ref}
     role="separator"
-    className={cn("-mx-1 my-1 h-px bg-border-subtle", className)}
+    className={cn("-mx-1 my-1 h-px bg-gray-200", className)}
     {...props}
   />
 ));

@@ -32,7 +32,7 @@ export function CompactProgressBar({ completed, total }: CompactProgressBarProps
         </div>
         <div className="h-2.5 overflow-hidden rounded-full border border-border-subtle/70 bg-surface-muted">
           <div
-            className="h-full rounded-full bg-accent-blue transition-all duration-500 ease-out"
+            className="h-full rounded-full bg-accent-blue transition-[width] duration-500 ease-out"
             style={{ width: `${percentage}%` }}
           />
         </div>
